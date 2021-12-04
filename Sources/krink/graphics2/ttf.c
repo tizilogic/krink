@@ -5,7 +5,7 @@
 #include "stb_truetype.h"
 #include <assert.h>
 #include <kinc/io/filereader.h>
-#include <krink/system/memory.h>
+#include <krink/util/memory.h>
 
 static int krink_glyph_blocks[KRINK_GLYPH_BLOCKS_LEN] = KRINK_GLYPH_BLOCKS;
 
@@ -22,7 +22,7 @@ void krink_ttf_internal_load_font_blob(krink_ttf_font_t* font, const char* fontp
 	assert(kinc_file_reader_open(&fh, fontpath, KINC_FILE_TYPE_ASSET));
 	size_t sz = kinc_file_reader_size(&fh);
 	font->blob = krink_malloc(sz);
-	assert(font->blob != NULL);	
+	assert(font->blob != NULL);
 	assert(kinc_file_reader_read(&fh, font->blob, sz) == sz);
 	kinc_file_reader_close(&fh);
 }
@@ -33,7 +33,7 @@ krink_ttf_image_t* krink_ttf_internal_get_image(krink_ttf_font_t* font, int size
 			return &(font->images[i]);
 		}
 	}
-	return NULL;	
+	return NULL;
 }
 
 void krink_ttf_font_init(krink_ttf_font_t* font) {
@@ -49,7 +49,7 @@ void krink_ttf_load(krink_ttf_font_t* font, const char* fontpath, int size) {
 		krink_ttf_internal_load_font_blob(font, fontpath);
 	}
 	if (krink_ttf_internal_get_image(font, size) != NULL) return;
-	
+
 	// resize images array if necessary
 	if (font->m_capacity <= font->m_images_len) {
 		size_t new_capacity = 2;
@@ -63,7 +63,7 @@ void krink_ttf_load(krink_ttf_font_t* font, const char* fontpath, int size) {
 		assert(font->images != NULL);
 		font->m_capacity = new_capacity;
 	}
-	
+
 	// create image
 }
 
