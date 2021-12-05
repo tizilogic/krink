@@ -14,7 +14,7 @@ typedef struct krink_ttf_font {
 	krink_ttf_image_t* images;
 	size_t m_capacity;
 	size_t m_images_len;
-	int font_index;
+	int offset;
 } krink_ttf_font_t;
 
 
@@ -27,12 +27,18 @@ typedef struct krink_ttf_font {
 void krink_ttf_init(int* glyphs, int num_glyphs);
 
 /// <summary>
-/// Initializes a font object. Call this only the first time a new font is created.
+/// Initializes a font object. You need one font object per font and font index.
 /// </summary>
 /// <param name="font">Pointer to your font object</param>
-void krink_ttf_font_init(krink_ttf_font_t* font, int font_index);
+/// <param name="fontpath">Path to the TTF file</param>
+/// <param name="font_index">Font index to determine offset. Silently falls back to 0 if unable to load the specified index</param>
+void krink_ttf_font_init(krink_ttf_font_t* font, const char* fontpath, int font_index);
 
-void krink_ttf_load(krink_ttf_font_t* font, const char* fontpath, int size);
+/// <summary>
+/// Load a font with a given size.
+/// </summary>
+/// <param name="font">Pointer to your font object</param>
+void krink_ttf_load(krink_ttf_font_t* font, int size);
 
 float krink_ttf_height(krink_ttf_font_t* font, int size);
 

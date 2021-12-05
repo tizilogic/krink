@@ -93,19 +93,20 @@ void krink_ttf_init(int* glyphs, int num_glyphs) {
 	}
 }
 
-void krink_ttf_font_init(krink_ttf_font_t* font, int font_index) {
+void krink_ttf_font_init(krink_ttf_font_t* font, const char* fontpath, int font_index) {
 	font->blob = NULL;
 	font->images = NULL;
 	font->m_images_len = 0;
 	font->m_capacity = 0;
-	font->font_index = font_index;
+	font_index = font_index;
+	krink_ttf_internal_load_font_blob(font, fontpath);
+	font->offset = stbtt_GetFontOffsetForIndex(font->blob, font_index);
+	if (font->offset == -1) {
+		font->offset = stbtt_GetFontOffsetForIndex(font->blob, 0);
+	}
 }
 
-void krink_ttf_load(krink_ttf_font_t* font, const char* fontpath, int size) {
-	// only load blob on first load call
-	if (font->m_images_len == 0) {
-		krink_ttf_internal_load_font_blob(font, fontpath);
-	}
+void krink_ttf_load(krink_ttf_font_t* font, int size) {
 	if (krink_ttf_internal_get_image(font, size) != NULL) return; // nothing to do
 
 	// resize images array if necessary
@@ -129,24 +130,21 @@ void krink_ttf_load(krink_ttf_font_t* font, const char* fontpath, int size) {
 	int height = 32;
 	stbtt_bakedchar* baked = (stbtt_bakedchar*) krink_malloc(krink_ttf_num_glyphs * sizeof(stbtt_bakedchar));
 	unsigned char* pixels = NULL;
-	int offset = stbtt_GetFontOffsetForIndex(font->blob, font->font_index);
-	if (offset == -1) {
-		offset = stbtt_GetFontOffsetForIndex(font->blob, 0);
-	}
+
 	int status = -1;
 	while (status <= 0) {
 		if (height < width) height *= 2;
 		else width *= 2;
 		if (pixels == NULL) pixels = (unsigned char*) krink_malloc(width * height);
 		else pixels = (unsigned char*) krink_realloc(pixels, width * height);
-		status = stbtt_BakeFontBitmapArr(font->blob, offset, (float) size, pixels, width, height, krink_ttf_glyphs, krink_ttf_num_glyphs, baked);
+		status = stbtt_BakeFontBitmapArr(font->blob, font->offset, (float) size, pixels, width, height, krink_ttf_glyphs, krink_ttf_num_glyphs, baked);
 	}
 
 	// TODO: Scale pixels down if they exceed the supported texture size
 
 	stbtt_fontinfo info;
 	int ascent, descent, line_gap;
-	stbtt_InitFont(&info, font->blob, offset);
+	stbtt_InitFont(&info, font->blob, font->offset);
 	stbtt_GetFontVMetrics(&info, &ascent, &descent, &line_gap);
 	float scale = stbtt_ScaleForPixelHeight(&info, (float) size);
 	img->m_size = (float) size;
