@@ -150,9 +150,9 @@ void krink_ttf_load(krink_ttf_font_t* font, const char* fontpath, int size) {
 	stbtt_GetFontVMetrics(&info, &ascent, &descent, &line_gap);
 	float scale = stbtt_ScaleForPixelHeight(&info, (float) size);
 	img->m_size = (float) size;
-	img->baseline = (float) ascent * scale;
-	img->descent = (float) descent * scale;
-	img->line_gap = (float) line_gap * scale;
+	img->baseline = round((float) ascent * scale);
+	img->descent = round((float) descent * scale);
+	img->line_gap = round((float) line_gap * scale);
 	img->width = (float) width;
 	img->height = (float) height;
 	img->chars = baked;
