@@ -10,7 +10,7 @@ typedef struct krink_ttf_aligned_quad {
 } krink_ttf_aligned_quad_t;
 
 typedef struct krink_ttf_font {
-	void* blob;
+	unsigned char* blob;
 	krink_ttf_image_t* images;
 	size_t m_capacity;
 	size_t m_images_len;
@@ -30,7 +30,7 @@ void krink_ttf_init(int* glyphs, int num_glyphs);
 /// Initializes a font object. Call this only the first time a new font is created.
 /// </summary>
 /// <param name="font">Pointer to your font object</param>
-void krink_ttf_font_init(krink_ttf_font_t* font);
+void krink_ttf_font_init(krink_ttf_font_t* font, int font_index);
 
 void krink_ttf_load(krink_ttf_font_t* font, const char* fontpath, int size);
 

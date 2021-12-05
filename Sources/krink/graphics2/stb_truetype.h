@@ -540,6 +540,16 @@ STBTT_DEF int stbtt_BakeFontBitmap(const unsigned char *data, int offset,  // fo
 // if return is 0, no characters fit and no rows were used
 // This uses a very crappy packing.
 
+STBTT_DEF int stbtt_BakeFontBitmapArr(const unsigned char *data, int offset,  // font location (use offset=0 for plain .ttf)
+                                float pixel_height,                     // height of font in pixels
+                                unsigned char *pixels, int pw, int ph,  // bitmap to be filled in
+                                int* glyphs, int num_glyphs,            // characters to bake
+                                stbtt_bakedchar *chardata);             // you allocate this, it's num_chars long
+// if return is positive, the first unused row of the bitmap
+// if return is negative, returns the negative of the number of characters that fit
+// if return is 0, no characters fit and no rows were used
+// This uses a very crappy packing.
+
 typedef struct
 {
    float x0,y0,s0,t0; // top-left
@@ -3856,6 +3866,58 @@ static int stbtt_BakeFontBitmap_internal(unsigned char *data, int offset,  // fo
    return bottom_y;
 }
 
+//////////////////////////////////////////////////////////////////////////////
+//
+// bitmap baking with custom array of glyphs
+//
+// This is SUPER-CRAPPY packing to keep source code small
+
+static int stbtt_BakeFontBitmapArr_internal(unsigned char *data, int offset,  // font location (use offset=0 for plain .ttf)
+                                float pixel_height,                     // height of font in pixels
+                                unsigned char *pixels, int pw, int ph,  // bitmap to be filled in
+                                int* chars, int num_chars,              // characters to bake
+                                stbtt_bakedchar *chardata)
+{
+   float scale;
+   int x,y,bottom_y, i;
+   stbtt_fontinfo f;
+   f.userdata = NULL;
+   if (!stbtt_InitFont(&f, data, offset))
+      return -1;
+   STBTT_memset(pixels, 0, pw*ph); // background of 0 around pixels
+   x=y=1;
+   bottom_y = 1;
+
+   scale = stbtt_ScaleForPixelHeight(&f, pixel_height);
+
+   for (i=0; i < num_chars; ++i) {
+      int advance, lsb, x0,y0,x1,y1,gw,gh;
+      int g = stbtt_FindGlyphIndex(&f, chars[i]);
+      stbtt_GetGlyphHMetrics(&f, g, &advance, &lsb);
+      stbtt_GetGlyphBitmapBox(&f, g, scale,scale, &x0,&y0,&x1,&y1);
+      gw = x1-x0;
+      gh = y1-y0;
+      if (x + gw + 1 >= pw)
+         y = bottom_y, x = 1; // advance to next row
+      if (y + gh + 1 >= ph) // check if it fits vertically AFTER potentially moving to next row
+         return -i;
+      STBTT_assert(x+gw < pw);
+      STBTT_assert(y+gh < ph);
+      stbtt_MakeGlyphBitmap(&f, pixels+x+y*pw, gw,gh,pw, scale,scale, g);
+      chardata[i].x0 = (stbtt_int16) x;
+      chardata[i].y0 = (stbtt_int16) y;
+      chardata[i].x1 = (stbtt_int16) (x + gw);
+      chardata[i].y1 = (stbtt_int16) (y + gh);
+      chardata[i].xadvance = scale * advance;
+      chardata[i].xoff     = (float) x0;
+      chardata[i].yoff     = (float) y0;
+      x = x + gw + 1;
+      if (y+gh+1 > bottom_y)
+         bottom_y = y+gh+1;
+   }
+   return bottom_y;
+}
+
 STBTT_DEF void stbtt_GetBakedQuad(const stbtt_bakedchar *chardata, int pw, int ph, int char_index, float *xpos, float *ypos, stbtt_aligned_quad *q, int opengl_fillrule)
 {
    float d3d_bias = opengl_fillrule ? 0 : -0.5f;
@@ -4937,6 +4999,13 @@ STBTT_DEF int stbtt_BakeFontBitmap(const unsigned char *data, int offset,
                                 int first_char, int num_chars, stbtt_bakedchar *chardata)
 {
    return stbtt_BakeFontBitmap_internal((unsigned char *) data, offset, pixel_height, pixels, pw, ph, first_char, num_chars, chardata);
+}
+
+STBTT_DEF int stbtt_BakeFontBitmapArr(const unsigned char *data, int offset,
+                                float pixel_height, unsigned char *pixels, int pw, int ph,
+                                int* chars, int num_chars, stbtt_bakedchar *chardata)
+{
+   return stbtt_BakeFontBitmapArr_internal((unsigned char *) data, offset, pixel_height, pixels, pw, ph, chars, num_chars, chardata);
 }
 
 STBTT_DEF int stbtt_GetFontOffsetForIndex(const unsigned char *data, int index)
