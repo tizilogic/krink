@@ -1,14 +1,6 @@
 #pragma once
 #include <kinc/graphics4/texture.h>
 
-#ifndef KRINK_GLYPH_BLOCKS_LEN
-#define KRINK_GLYPH_BLOCKS_LEN 2
-#endif
-
-#ifndef KRINK_GLYPH_BLOCKS
-#define KRINK_GLYPH_BLOCKS {32, 255}
-#endif
-
 typedef struct krink_ttf_image krink_ttf_image_t;
 
 typedef struct krink_ttf_aligned_quad {
@@ -26,15 +18,36 @@ typedef struct krink_ttf_font {
 } krink_ttf_font_t;
 
 
+/// <summary>
+/// Initialize krink_ttf with optional glyphs array. The array passed in, if any, is copied and no
+/// longer used by krink_ttf after calling this function.
+/// </summary>
+/// <param name="glyphs">Either an array of glyphs or `NULL` to use the default glyph array</param>
+/// <param name="num_glyphs">The length of `glyphs` if not `NULL` otherwise this is ignored</param>
+void krink_ttf_init(int* glyphs, int num_glyphs);
+
+/// <summary>
+/// Initializes a font object. Call this only the first time a new font is created.
+/// </summary>
+/// <param name="font">Pointer to your font object</param>
 void krink_ttf_font_init(krink_ttf_font_t* font);
+
 void krink_ttf_load(krink_ttf_font_t* font, const char* fontpath, int size);
+
 float krink_ttf_height(krink_ttf_font_t* font, int size);
+
 float krink_ttf_width(krink_ttf_font_t* font, int size, const char* str);
+
 float krink_ttf_width_of_characters(krink_ttf_font_t* font, int size, int* characters, int start, int length);
+
 float krink_ttf_baseline(krink_ttf_font_t* font, int size);
+
 void krink_ttf_get_baked_quad(krink_ttf_font_t* font, int size, krink_ttf_aligned_quad_t* quad, int char_index, float xpos, float ypos);
+
 void krink_ttf_get_texture(krink_ttf_font_t* font, int size, kinc_g4_texture_t* tex);
+
 void krink_ttf_font_destroy(krink_ttf_font_t* font);
+
 
 /*
 class KravurImage {
