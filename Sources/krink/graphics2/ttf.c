@@ -78,7 +78,9 @@ float krink_ttf_get_string_width_internal(krink_ttf_image_t* img, const char* st
 void krink_ttf_init(int* glyphs, int num_glyphs) {
 	if (glyphs == NULL) {
 		krink_ttf_glyph_blocks = (int*) krink_malloc(2 * sizeof(int));
+		assert(krink_ttf_glyph_blocks != NULL);
 		krink_ttf_glyphs = (int*) krink_malloc(224 * sizeof(int));
+		assert(krink_ttf_glyphs != NULL);
 		krink_ttf_num_glyph_blocks = 2;
 		krink_ttf_num_glyphs = 224;
 		krink_ttf_glyph_blocks[0] = 32;
@@ -87,6 +89,7 @@ void krink_ttf_init(int* glyphs, int num_glyphs) {
 	}
 	else {
 		krink_ttf_glyphs = (int*) krink_malloc(num_glyphs * sizeof(int));
+		assert(krink_ttf_glyphs != NULL);
 		krink_ttf_num_glyphs = num_glyphs;
 		int blocks = 1;
 		krink_ttf_glyphs[0] = glyphs[0];
@@ -105,6 +108,7 @@ void krink_ttf_init(int* glyphs, int num_glyphs) {
 		}
 
 		krink_ttf_glyph_blocks = (int*) krink_malloc(blocks * 2 * sizeof(int));
+		assert(krink_ttf_glyph_blocks != NULL);
 		krink_ttf_num_glyph_blocks = 2 * blocks;
 		krink_ttf_glyph_blocks[0] = glyphs[0];
 		next_char = glyphs[0] + 1;
@@ -160,6 +164,7 @@ void krink_ttf_load(krink_ttf_font_t* font, int size) {
 	int width = 64;
 	int height = 32;
 	stbtt_bakedchar* baked = (stbtt_bakedchar*) krink_malloc(krink_ttf_num_glyphs * sizeof(stbtt_bakedchar));
+	assert(baked != NULL);
 	unsigned char* pixels = NULL;
 
 	int status = -1;
@@ -168,6 +173,7 @@ void krink_ttf_load(krink_ttf_font_t* font, int size) {
 		else width *= 2;
 		if (pixels == NULL) pixels = (unsigned char*) krink_malloc(width * height);
 		else pixels = (unsigned char*) krink_realloc(pixels, width * height);
+		assert(pixels != NULL);
 		status = stbtt_BakeFontBitmapArr(font->blob, font->offset, (float) size, pixels, width, height, krink_ttf_glyphs, krink_ttf_num_glyphs, baked);
 	}
 
