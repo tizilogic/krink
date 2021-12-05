@@ -25,7 +25,7 @@ typedef struct krink_ttf_image {
 	float baseline, descent, line_gap;
 } krink_ttf_image_t;
 
-void krink_ttf_internal_load_font_blob(krink_ttf_font_t* font, const char* fontpath) {
+void krink_ttf_load_font_blob_internal(krink_ttf_font_t* font, const char* fontpath) {
 	kinc_file_reader_t fh;
 	assert(kinc_file_reader_open(&fh, fontpath, KINC_FILE_TYPE_ASSET));
 	size_t sz = kinc_file_reader_size(&fh);
@@ -35,13 +35,44 @@ void krink_ttf_internal_load_font_blob(krink_ttf_font_t* font, const char* fontp
 	kinc_file_reader_close(&fh);
 }
 
-krink_ttf_image_t* krink_ttf_internal_get_image(krink_ttf_font_t* font, int size) {
+krink_ttf_image_t* krink_ttf_get_image_internal(krink_ttf_font_t* font, int size) {
 	for (int i=0; i < font->m_images_len; ++i) {
 		if ((int) font->images[i].m_size == size) {
 			return &(font->images[i]);
 		}
 	}
 	return NULL;
+}
+
+int krink_ttf_get_char_index_internal(krink_ttf_image_t* img, int char_index) {
+	if (krink_ttf_num_glyphs <= 0) {
+		return 0;
+	}
+	int offset = krink_ttf_glyph_blocks[0];
+	if (char_index < offset) return 0;
+
+	for (int i = 1; i < krink_ttf_num_glyph_blocks / 2; ++i) {
+		int prev_end = krink_ttf_glyph_blocks[i * 2 - 1];
+		int start = krink_ttf_glyph_blocks[i * 2];
+		if (char_index > start - 1)
+			offset += start - 1 - prev_end;
+	}
+
+	if (char_index - offset >= krink_ttf_num_glyphs)
+		return 0;
+	return char_index - offset;
+}
+
+float krink_ttf_get_char_width_internal(krink_ttf_image_t* img, int char_index) {
+	return img->chars[krink_ttf_get_char_index_internal(img, char_index)].xadvance;
+}
+
+float krink_ttf_get_string_width_internal(krink_ttf_image_t* img, const char* str) {
+	float width = 0.0f;
+	for (int i = 0; str[i] != 0; ++i) {
+		width += krink_ttf_get_char_width_internal(img, str[i]);
+	}
+	return width;
 }
 
 void krink_ttf_init(int* glyphs, int num_glyphs) {
@@ -99,7 +130,7 @@ void krink_ttf_font_init(krink_ttf_font_t* font, const char* fontpath, int font_
 	font->m_images_len = 0;
 	font->m_capacity = 0;
 	font_index = font_index;
-	krink_ttf_internal_load_font_blob(font, fontpath);
+	krink_ttf_load_font_blob_internal(font, fontpath);
 	font->offset = stbtt_GetFontOffsetForIndex(font->blob, font_index);
 	if (font->offset == -1) {
 		font->offset = stbtt_GetFontOffsetForIndex(font->blob, 0);
@@ -107,7 +138,7 @@ void krink_ttf_font_init(krink_ttf_font_t* font, const char* fontpath, int font_
 }
 
 void krink_ttf_load(krink_ttf_font_t* font, int size) {
-	if (krink_ttf_internal_get_image(font, size) != NULL) return; // nothing to do
+	if (krink_ttf_get_image_internal(font, size) != NULL) return; // nothing to do
 
 	// resize images array if necessary
 	if (font->m_capacity <= font->m_images_len) {
@@ -162,29 +193,76 @@ void krink_ttf_load(krink_ttf_font_t* font, int size) {
 }
 
 float krink_ttf_height(krink_ttf_font_t* font, int size) {
-	krink_ttf_image_t* img = krink_ttf_internal_get_image(font, size);
+	krink_ttf_image_t* img = krink_ttf_get_image_internal(font, size);
 	assert(img != NULL);
 	return img->m_size;
 }
 
 float krink_ttf_width(krink_ttf_font_t* font, int size, const char* str) {
-
+	krink_ttf_image_t* img = krink_ttf_get_image_internal(font, size);
+	assert(img != NULL);
+	return krink_ttf_get_string_width_internal(img, str);
 }
 
 float krink_ttf_width_of_characters(krink_ttf_font_t* font, int size, int* characters, int start, int length) {
-
+	krink_ttf_image_t* img = krink_ttf_get_image_internal(font, size);
+	assert(img != NULL);
+	float width = 0.0f;
+	for (int i = start; i < start + length; ++i) {
+		width += krink_ttf_get_char_width_internal(img, characters[i]);
+	}
+	return width;
 }
 
 float krink_ttf_baseline(krink_ttf_font_t* font, int size) {
-
+	krink_ttf_image_t* img = krink_ttf_get_image_internal(font, size);
+	assert(img != NULL);
+	return img->baseline;
 }
 
-void krink_ttf_get_baked_quad(krink_ttf_font_t* font, int size, krink_ttf_aligned_quad_t* quad, int char_index, float xpos, float ypos) {
-
+float krink_ttf_descent(krink_ttf_font_t* font, int size) {
+	krink_ttf_image_t* img = krink_ttf_get_image_internal(font, size);
+	assert(img != NULL);
+	return img->descent;
 }
 
-void krink_ttf_get_texture(krink_ttf_font_t* font, int size, kinc_g4_texture_t* tex) {
+float krink_ttf_line_gap(krink_ttf_font_t* font, int size) {
+	krink_ttf_image_t* img = krink_ttf_get_image_internal(font, size);
+	assert(img != NULL);
+	return img->line_gap;
+}
 
+bool krink_ttf_get_baked_quad(krink_ttf_font_t* font, int size, krink_ttf_aligned_quad_t* q, int char_code, float xpos, float ypos) {
+	krink_ttf_image_t* img = krink_ttf_get_image_internal(font, size);
+	assert(img != NULL);
+	int char_index = krink_ttf_get_char_index_internal(img, char_code);
+	if (char_index >= krink_ttf_num_glyphs) return false;
+	float ipw = 1.0f / (float) img->width;
+	float iph = 1.0f / (float) img->height;
+	stbtt_bakedchar b = img->chars[char_index];
+	// if (b == NULL) return null;
+	int round_x = (int) (xpos + b.xoff + 0.5);
+	int round_y = (int) (ypos + b.yoff + 0.5);
+
+	q->x0 = round_x;
+	q->y0 = round_y;
+	q->x1 = round_x + b.x1 - b.x0;
+	q->y1 = round_y + b.y1 - b.y0;
+
+	q->s0 = b.x0 * ipw;
+	q->t0 = b.y0 * iph;
+	q->s1 = b.x1 * ipw;
+	q->t1 = b.y1 * iph;
+
+	q->xadvance = b.xadvance;
+
+	return true;
+}
+
+kinc_g4_texture_t krink_ttf_get_texture(krink_ttf_font_t* font, int size) {
+	krink_ttf_image_t* img = krink_ttf_get_image_internal(font, size);
+	assert(img != NULL);
+	return img->tex;
 }
 
 void krink_ttf_font_destroy(krink_ttf_font_t* font) {
