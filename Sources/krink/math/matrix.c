@@ -3,6 +3,96 @@
 
 // krink_matrix3x3 impl
 
+krink_matrix3x3_t krink_matrix3x3_translation(float x, float y) {
+	return (krink_matrix3x3_t){1.0f, 0.0f, x, 0.0f, 1.0f, y, 0.0f, 0.0f, 1.0f};
+}
+
+krink_matrix3x3_t krink_matrix3x3_empty(void) {
+	return (krink_matrix3x3_t){0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f};
+}
+
+krink_matrix3x3_t krink_matrix3x3_identity(void) {
+	return (krink_matrix3x3_t){1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f};
+}
+
+krink_matrix3x3_t krink_matrix3x3_scale(float x, float y) {
+	return (krink_matrix3x3_t){x, 0.0f, 0.0f, 0.0f, y, 0.0f, 0.0f, 0.0f, 1.0f};
+}
+
+krink_matrix3x3_t krink_matrix3x3_rotation(float alpha) {
+	return (krink_matrix3x3_t){cosf(alpha), -sinf(alpha), 0.0f, sinf(alpha), cosf(alpha), 0.0f, 0.0f, 0.0f, 1.0f};
+}
+
+krink_matrix3x3_t krink_matrix3x3_add(krink_matrix3x3_t mlh, krink_matrix3x3_t mrh) {
+	return (krink_matrix3x3_t){mlh.m00 + mrh.m00, mlh.m10 + mrh.m10, mlh.m20 + mrh.m20, mlh.m01 + mrh.m01, mlh.m11 + mrh.m11,
+	                           mlh.m21 + mrh.m21, mlh.m02 + mrh.m02, mlh.m12 + mrh.m12, mlh.m22 + mrh.m22};
+}
+
+krink_matrix3x3_t krink_matrix3x3_sub(krink_matrix3x3_t mlh, krink_matrix3x3_t mrh) {
+	return (krink_matrix3x3_t){mlh.m00 - mrh.m00, mlh.m10 - mrh.m10, mlh.m20 - mrh.m20, mlh.m01 - mrh.m01, mlh.m11 - mrh.m11,
+	                           mlh.m21 - mrh.m21, mlh.m02 - mrh.m02, mlh.m12 - mrh.m12, mlh.m22 - mrh.m22};
+}
+
+krink_matrix3x3_t krink_matrix3x3_mult(krink_matrix3x3_t m, float value) {
+	return (krink_matrix3x3_t){m.m00 * value, m.m10 * value, m.m20 * value, m.m01 * value, m.m11 * value,
+	                           m.m21 * value, m.m02 * value, m.m12 * value, m.m22 * value};
+}
+
+krink_matrix3x3_t krink_matrix3x3_transpose(krink_matrix3x3_t m) {
+	return (krink_matrix3x3_t){m.m00, m.m01, m.m02, m.m10, m.m11, m.m12, m.m20, m.m21, m.m22};
+}
+
+float krink_matrix3x3_trace(krink_matrix3x3_t m) {
+	return m.m00 + m.m11 + m.m22;
+}
+
+krink_matrix3x3_t krink_matrix3x3_multmat(krink_matrix3x3_t mlh, krink_matrix3x3_t mrh) {
+	return (krink_matrix3x3_t){mlh.m00 * mrh.m00 + mlh.m10 * mrh.m01 + mlh.m20 * mrh.m02, mlh.m00 * mrh.m10 + mlh.m10 * mrh.m11 + mlh.m20 * mrh.m12,
+	                           mlh.m00 * mrh.m20 + mlh.m10 * mrh.m21 + mlh.m20 * mrh.m22, mlh.m01 * mrh.m00 + mlh.m11 * mrh.m01 + mlh.m21 * mrh.m02,
+	                           mlh.m01 * mrh.m10 + mlh.m11 * mrh.m11 + mlh.m21 * mrh.m12, mlh.m01 * mrh.m20 + mlh.m11 * mrh.m21 + mlh.m21 * mrh.m22,
+	                           mlh.m02 * mrh.m00 + mlh.m12 * mrh.m01 + mlh.m22 * mrh.m02, mlh.m02 * mrh.m10 + mlh.m12 * mrh.m11 + mlh.m22 * mrh.m12,
+	                           mlh.m02 * mrh.m20 + mlh.m12 * mrh.m21 + mlh.m22 * mrh.m22};
+}
+
+krink_vec2_t krink_matrix3x3_multvec(krink_matrix3x3_t m, krink_vec2_t v) {
+	float w = m.m02 * v.x + m.m12 * v.y + m.m22 * 1.0f;
+	float x = (m.m00 * v.x + m.m10 * v.y + m.m20 * 1.0f) / w;
+	float y = (m.m01 * v.x + m.m11 * v.y + m.m21 * 1.0f) / w;
+	return (krink_vec2_t){x, y};
+}
+
+float krink_matrix3x3_cofactor(float m0, float m1, float m2, float m3) {
+	return m0 * m3 - m1 * m2;
+}
+
+float krink_matrix3x3_determinant(krink_matrix3x3_t m) {
+	float c00 = krink_matrix3x3_cofactor(m.m11, m.m21, m.m12, m.m22);
+	float c01 = krink_matrix3x3_cofactor(m.m10, m.m20, m.m12, m.m22);
+	float c02 = krink_matrix3x3_cofactor(m.m10, m.m20, m.m11, m.m21);
+	return m.m00 * c00 - m.m01 * c01 + m.m02 * c02;
+}
+
+krink_matrix3x3_t krink_matrix3x3_inverse(krink_matrix3x3_t m) {
+	float c00 = krink_matrix3x3_cofactor(m.m11, m.m21, m.m12, m.m22);
+	float c01 = krink_matrix3x3_cofactor(m.m10, m.m20, m.m12, m.m22);
+	float c02 = krink_matrix3x3_cofactor(m.m10, m.m20, m.m11, m.m21);
+
+	float det = m.m00 * c00 - m.m01 * c01 + m.m02 * c02;
+	if (absf(det) < 0.000001f) return krink_matrix3x3_empty();
+
+	float c10 = krink_matrix3x3_cofactor(m.m01, m.m21, m.m02, m.m22);
+	float c11 = krink_matrix3x3_cofactor(m.m00, m.m20, m.m02, m.m22);
+	float c12 = krink_matrix3x3_cofactor(m.m00, m.m20, m.m01, m.m21);
+
+	float c20 = krink_matrix3x3_cofactor(m.m01, m.m11, m.m02, m.m12);
+	float c21 = krink_matrix3x3_cofactor(m.m00, m.m10, m.m02, m.m12);
+	float c22 = krink_matrix3x3_cofactor(m.m00, m.m10, m.m01, m.m11);
+
+	float invdet = 1.0f / det;
+	return (krink_matrix3x3_t){c00 * invdet,  -c01 * invdet, c02 * invdet,  -c10 * invdet, c11 * invdet,
+	                           -c12 * invdet, c20 * invdet,  -c21 * invdet, c22 * invdet};
+}
+
 // krink_matrix4x4 impl
 
 krink_matrix4x4_t krink_matrix4x4_translation(float x, float y, float z) {
