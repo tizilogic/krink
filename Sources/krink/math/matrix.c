@@ -80,15 +80,12 @@ krink_matrix4x4_t krink_matrix4x4_perspective_projection(float fov_y, float aspe
 }
 
 krink_matrix4x4_t krink_matrix4x4_look_at(krink_vec3_t eye, krink_vec3_t at, krink_vec3_t up) {
-	// TODO: implement
-	/*		var zaxis = at.sub(eye).normalized();
-	        var xaxis = zaxis.cross(up).normalized();
-	        var yaxis = xaxis.cross(zaxis);
+	krink_vec3_t zaxis = krink_vec3_normalized(krink_vec3_subv(at, eye));
+	krink_vec3_t xaxis = krink_vec3_normalized(krink_vec3_cross(zaxis, up));
+	krink_vec3_t yaxis = krink_vec3_cross(xaxis, zaxis);
 
-	        return new FastMatrix4(xaxis.x, xaxis.y, xaxis.z, -xaxis.dot(eye), yaxis.x, yaxis.y, yaxis.z, -yaxis.dot(eye), -zaxis.x, -zaxis.y, -zaxis.z,
-	            zaxis.dot(eye), 0, 0, 0, 1);
-	*/
-	return krink_matrix4x4_identity();
+	return (krink_matrix4x4_t){xaxis.x,  xaxis.y,  xaxis.z,  -krink_vec3_dot(xaxis, eye), yaxis.x, yaxis.y, yaxis.z, -krink_vec3_dot(yaxis, eye),
+	                           -zaxis.x, -zaxis.y, -zaxis.z, krink_vec3_dot(zaxis, eye),  0.0f,    0.0f,    0.0f,    1.0f};
 }
 
 krink_matrix4x4_t krink_matrix4x4_add(krink_matrix4x4_t mlh, krink_matrix4x4_t mrh) {
