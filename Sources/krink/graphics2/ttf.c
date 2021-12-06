@@ -266,10 +266,10 @@ bool krink_ttf_get_baked_quad(krink_ttf_font_t *font, int size, krink_ttf_aligne
 	return true;
 }
 
-kinc_g4_texture_t krink_ttf_get_texture(krink_ttf_font_t *font, int size) {
+kinc_g4_texture_t *krink_ttf_get_texture(krink_ttf_font_t *font, int size) {
 	krink_ttf_image_t *img = krink_ttf_get_image_internal(font, size);
 	assert(img != NULL);
-	return img->tex;
+	return &(img->tex);
 }
 
 void krink_ttf_font_destroy(krink_ttf_font_t *font) {

@@ -103,7 +103,7 @@ bool krink_ttf_get_baked_quad(krink_ttf_font_t *font, int size, krink_ttf_aligne
 /// </summary>
 /// <param name="font">Pointer to your font object</param>
 /// <param name="size">Font height in pixel</param>
-kinc_g4_texture_t krink_ttf_get_texture(krink_ttf_font_t *font, int size);
+kinc_g4_texture_t *krink_ttf_get_texture(krink_ttf_font_t *font, int size);
 
 /// <summary>
 /// Destroys a font with all loaded font sizes.
