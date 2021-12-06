@@ -3,16 +3,11 @@
 #include "vector.h"
 
 typedef struct krink_matrix3x3 {
-    float m00, m10, m20,
-          m01, m11, m21,
-          m02, m12, m22;
+	float m00, m10, m20, m01, m11, m21, m02, m12, m22;
 } krink_matrix3x3_t;
 
 typedef struct krink_matrix4x4 {
-    float m00, m10, m20, m30,
-          m01, m11, m21, m31,
-          m02, m12, m22, m32,
-          m03, m13, m23, m33;
+	float m00, m10, m20, m30, m01, m11, m21, m31, m02, m12, m22, m32, m03, m13, m23, m33;
 } krink_matrix4x4_t;
 
 krink_matrix4x4_t krink_matrix4x4_translation(float x, float y, float z);

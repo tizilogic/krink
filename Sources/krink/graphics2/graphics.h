@@ -1,8 +1,8 @@
 #pragma once
 #include <kinc/global.h>
-#include <kinc/math/vector.h>
-#include <kinc/math/matrix.h>
 #include <kinc/graphics4/texture.h>
+#include <kinc/math/matrix.h>
+#include <kinc/math/vector.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -77,11 +77,11 @@ void krink_g2_fill_triangle(float x1, float y1, float x2, float y2, float x3, fl
 /// <param name="text"></param>
 /// <param name="x"></param>
 /// <param name="y"></param>
-void krink_g2_draw_string(const char* text, float x, float y);
+void krink_g2_draw_string(const char *text, float x, float y);
 
 void krink_g2_draw_line(float x1, float y1, float x2, float y2, float strength);
 
-void krink_g2_draw_scaled_sub_image(kinc_g4_texture_t* img, float sx, float sy, float sw, float sh, float dx, float dy, float dw, float dh);
+void krink_g2_draw_scaled_sub_image(kinc_g4_texture_t *img, float sx, float sy, float sw, float sh, float dx, float dy, float dw, float dh);
 /*
 void krink_g2_reset_transform();
 void krink_g2_pushTransformation(kinc_matrix3x3_t* trans);
@@ -89,9 +89,9 @@ kinc_matrix3x3_t* krink_g2_popTransformation();
 void krink_g2_translate(kinc_vector2_t pos);
 void krink_g2_set_rotation(float angle, float centerx, float centery);
 */
-const char* krink_g2_get_font();
+const char *krink_g2_get_font();
 int krink_g2_get_font_size();
-void krink_g2_set_font(const char* font, size_t size);
+void krink_g2_set_font(const char *font, size_t size);
 void krink_g2_scissor(int x, int y, int w, int h);
 void krink_g2_disable_scissor(void);
 

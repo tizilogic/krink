@@ -10,4 +10,4 @@
 /// <param name="size">The size of `memblk`</param>
 /// <param name="glyphs">For font rendering: Either an array of glyphs or `NULL` to use the default glyph array</param>
 /// <param name="num_glyphs">The length of `glyphs` if not `NULL` otherwise this is ignored</param>
-void krink_init(void* memblk, size_t size, int* glyphs, int num_glyphs);
+void krink_init(void *memblk, size_t size, int *glyphs, int num_glyphs);
