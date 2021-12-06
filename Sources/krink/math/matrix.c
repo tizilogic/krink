@@ -277,3 +277,24 @@ krink_matrix4x4_t krink_matrix4x4_inverse(krink_matrix4x4_t m) {
 	return (krink_matrix4x4_t){c00 * invdet, -c01 * invdet, c02 * invdet, -c03 * invdet, -c10 * invdet, c11 * invdet, -c12 * invdet, c13 * invdet,
 	                           c20 * invdet, -c21 * invdet, c22 * invdet, -c23 * invdet, -c30 * invdet, c31 * invdet, -c32 * invdet, c33 * invdet};
 }
+
+kinc_matrix4x4_t krink_matrix4x4_to_kinc(krink_matrix4x4_t m) {
+	kinc_matrix4x4_t value;
+	kinc_matrix4x4_set(&value, 0, 0, m.m00);
+	kinc_matrix4x4_set(&value, 1, 0, m.m10);
+	kinc_matrix4x4_set(&value, 2, 0, m.m20);
+	kinc_matrix4x4_set(&value, 3, 0, m.m30);
+	kinc_matrix4x4_set(&value, 0, 1, m.m01);
+	kinc_matrix4x4_set(&value, 1, 1, m.m11);
+	kinc_matrix4x4_set(&value, 2, 1, m.m21);
+	kinc_matrix4x4_set(&value, 3, 1, m.m31);
+	kinc_matrix4x4_set(&value, 0, 2, m.m02);
+	kinc_matrix4x4_set(&value, 1, 2, m.m12);
+	kinc_matrix4x4_set(&value, 2, 2, m.m22);
+	kinc_matrix4x4_set(&value, 3, 2, m.m32);
+	kinc_matrix4x4_set(&value, 0, 3, m.m03);
+	kinc_matrix4x4_set(&value, 1, 3, m.m13);
+	kinc_matrix4x4_set(&value, 2, 3, m.m23);
+	kinc_matrix4x4_set(&value, 3, 3, m.m33);
+	return value;
+}

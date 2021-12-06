@@ -1,6 +1,7 @@
 #pragma once
 
 #include "vector.h"
+#include <kinc/math/matrix.h>
 
 typedef struct krink_matrix3x3 {
 	float m00, m10, m20, m01, m11, m21, m02, m12, m22;
@@ -48,3 +49,4 @@ krink_vec4_t krink_matrix4x4_multvec(krink_matrix4x4_t m, krink_vec4_t v);
 float krink_matrix4x4_cofactor(float m0, float m1, float m2, float m3, float m4, float m5, float m6, float m7, float m8);
 float krink_matrix4x4_determinant(krink_matrix4x4_t m);
 krink_matrix4x4_t krink_matrix4x4_inverse(krink_matrix4x4_t m);
+kinc_matrix4x4_t krink_matrix4x4_to_kinc(krink_matrix4x4_t m);
