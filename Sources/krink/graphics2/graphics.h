@@ -8,6 +8,10 @@
 extern "C" {
 #endif
 
+typedef struct krink_sdf_corner_radius {
+	float top_left, bottom_left, bottom_right, top_right;
+} krink_sdf_corner_radius_t;
+
 /// <summary>
 /// Initialize krink_g2.
 /// </summary>
@@ -82,16 +86,17 @@ void krink_g2_draw_string(const char *text, float x, float y);
 void krink_g2_draw_line(float x1, float y1, float x2, float y2, float strength);
 
 void krink_g2_draw_scaled_sub_image(kinc_g4_texture_t *img, float sx, float sy, float sw, float sh, float dx, float dy, float dw, float dh);
-/*
-void krink_g2_reset_transform();
-void krink_g2_pushTransformation(kinc_matrix3x3_t* trans);
-kinc_matrix3x3_t* krink_g2_popTransformation();
-void krink_g2_translate(kinc_vector2_t pos);
-void krink_g2_set_rotation(float angle, float centerx, float centery);
-*/
+
+void krink_g2_set_transform(kinc_matrix3x3_t m);
+kinc_matrix3x3_t krink_g2_get_transform(void);
+
 const char *krink_g2_get_font();
 int krink_g2_get_font_size();
-void krink_g2_set_font(const char *font, size_t size);
+void krink_g2_set_font(const char *font, int size);
+void krink_g2_draw_sdf_rect(float x, float y, float width, float height, krink_sdf_corner_radius_t corner, float border, unsigned int border_color,
+                            float smooth);
+void krink_g2_draw_sdf_circle(float x, float y, float r, float border, unsigned int border_color, float smooth);
+void krink_g2_draw_sdf_line(float x1, float y1, float x2, float y2, float strength, float smooth);
 void krink_g2_scissor(int x, int y, int w, int h);
 void krink_g2_disable_scissor(void);
 
