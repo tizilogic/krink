@@ -1,8 +1,8 @@
 #pragma once
 #include <kinc/global.h>
-#include <kinc/graphics4/texture.h>
 #include <kinc/math/matrix.h>
 #include <kinc/math/vector.h>
+#include <krink/image.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -85,7 +85,7 @@ void krink_g2_draw_string(const char *text, float x, float y);
 
 void krink_g2_draw_line(float x1, float y1, float x2, float y2, float strength);
 
-void krink_g2_draw_scaled_sub_image(kinc_g4_texture_t *img, float sx, float sy, float sw, float sh, float dx, float dy, float dw, float dh);
+void krink_g2_draw_scaled_sub_image(krink_image_t *img, float sx, float sy, float sw, float sh, float dx, float dy, float dw, float dh);
 
 void krink_g2_set_transform(kinc_matrix3x3_t m);
 kinc_matrix3x3_t krink_g2_get_transform(void);
