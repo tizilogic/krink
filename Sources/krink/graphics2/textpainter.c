@@ -9,6 +9,7 @@
 #include <kinc/graphics4/vertexbuffer.h>
 #include <kinc/graphics4/vertexstructure.h>
 #include <kinc/io/filereader.h>
+#include <krink/color.h>
 #include <krink/memory.h>
 
 static kinc_g4_vertex_buffer_t vertex_buffer;
@@ -69,12 +70,12 @@ void krink_g2_tsp_init(void) {
 	texunit = kinc_g4_pipeline_get_texture_unit(&pipeline, "tex");
 	proj_mat_loc = kinc_g4_pipeline_get_constant_location(&pipeline, "projectionMatrix");
 
-	kinc_g4_vertex_buffer_init(&vertex_buffer, KRINK_G2_BUFFER_SIZE * 4, &structure, KINC_G4_USAGE_DYNAMIC, 0);
+	kinc_g4_vertex_buffer_init(&vertex_buffer, KRINK_G2_TSP_BUFFER_SIZE * 4, &structure, KINC_G4_USAGE_DYNAMIC, 0);
 	rect_verts = kinc_g4_vertex_buffer_lock_all(&vertex_buffer);
 
-	kinc_g4_index_buffer_init(&index_buffer, KRINK_G2_BUFFER_SIZE * 3 * 2, KINC_G4_USAGE_STATIC);
+	kinc_g4_index_buffer_init(&index_buffer, KRINK_G2_TSP_BUFFER_SIZE * 3 * 2, KINC_G4_USAGE_STATIC);
 	int *indices = kinc_g4_index_buffer_lock(&index_buffer);
-	for (int i = 0; i < KRINK_G2_BUFFER_SIZE; ++i) {
+	for (int i = 0; i < KRINK_G2_TSP_BUFFER_SIZE; ++i) {
 		indices[i * 3 * 2 + 0] = i * 4 + 0;
 		indices[i * 3 * 2 + 1] = i * 4 + 1;
 		indices[i * 3 * 2 + 2] = i * 4 + 2;
@@ -119,26 +120,12 @@ void krink_g2_tsp_set_rect_tex_coords(float left, float top, float right, float 
 	rect_verts[base_idx + 31] = bottom;
 }
 
-static unsigned int krink_get_color_channel_internal(unsigned int color, const char ch) {
-	switch (ch) {
-	case 'A':
-		return color >> 24;
-	case 'R':
-		return (color & 0x00ff0000) >> 16;
-	case 'G':
-		return (color & 0x0000ff00) >> 8;
-	case 'B':
-		return color & 0x000000ff;
-	}
-	return 0;
-}
-
 void krink_g2_tsp_set_rect_colors(float opacity, unsigned int color) {
 	int base_idx = buffer_index * 9 * 4;
-	float a = opacity * ((float)krink_get_color_channel_internal(color, 'A') / 255.0f);
-	float r = ((float)krink_get_color_channel_internal(color, 'R') / 255.0f);
-	float g = ((float)krink_get_color_channel_internal(color, 'G') / 255.0f);
-	float b = ((float)krink_get_color_channel_internal(color, 'B') / 255.0f);
+	float a = opacity * ((float)krink_color_get_channel(color, 'A') / 255.0f);
+	float r = ((float)krink_color_get_channel(color, 'R') / 255.0f);
+	float g = ((float)krink_color_get_channel(color, 'G') / 255.0f);
+	float b = ((float)krink_color_get_channel(color, 'B') / 255.0f);
 
 	rect_verts[base_idx + 5] = r;
 	rect_verts[base_idx + 6] = g;
@@ -209,7 +196,7 @@ void krink_g2_tsp_draw_string(const char *text, float opacity, unsigned int colo
 	for (int i = 0; text[i] != 0; ++i) {
 		int char_code = (unsigned int)text[i];
 		if (krink_ttf_get_baked_quad(active_font, font_size, &q, char_code, xpos, ypos)) {
-			if (buffer_index + 1 >= KRINK_G2_BUFFER_SIZE) krink_g2_tsp_draw_buffer();
+			if (buffer_index + 1 >= KRINK_G2_TSP_BUFFER_SIZE) krink_g2_tsp_draw_buffer();
 			krink_g2_tsp_set_rect_colors(opacity, color);
 			krink_g2_tsp_set_rect_tex_coords(q.s0, q.t0, q.s1, q.t1);
 			kinc_vector3_t p0 = kinc_matrix3x3_multiply_vector(&transformation, (kinc_vector3_t){q.x0, q.y1, 0.0f}); // bottom-left
@@ -234,7 +221,7 @@ void krink_g2_tsp_draw_characters(int *text, int start, int length, float opacit
 	krink_ttf_aligned_quad_t q;
 	for (int i = start; i < start + length; ++i) {
 		if (krink_ttf_get_baked_quad(active_font, font_size, &q, text[i], xpos, ypos)) {
-			if (buffer_index + 1 >= KRINK_G2_BUFFER_SIZE) krink_g2_tsp_draw_buffer();
+			if (buffer_index + 1 >= KRINK_G2_TSP_BUFFER_SIZE) krink_g2_tsp_draw_buffer();
 			krink_g2_tsp_set_rect_colors(opacity, color);
 			krink_g2_tsp_set_rect_tex_coords(q.s0, q.t0, q.s1, q.t1);
 			kinc_vector3_t p0 = kinc_matrix3x3_multiply_vector(&transformation, (kinc_vector3_t){q.x0, q.y1, 0.0f}); // bottom-left

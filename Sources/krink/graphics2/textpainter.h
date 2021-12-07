@@ -5,8 +5,8 @@
 #include <kinc/math/matrix.h>
 #include <stdbool.h>
 
-#ifndef KRINK_G2_BUFFER_SIZE
-#define KRINK_G2_BUFFER_SIZE 1000
+#ifndef KRINK_G2_TSP_BUFFER_SIZE
+#define KRINK_G2_TSP_BUFFER_SIZE 1000
 #endif
 
 void krink_g2_tsp_init(void);
