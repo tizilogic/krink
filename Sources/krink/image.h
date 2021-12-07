@@ -8,7 +8,7 @@
 typedef struct krink_image {
 	kinc_g4_texture_t tex;
 	kinc_image_t *image;
-	int real_width, real_height;
+	float real_width, real_height;
 	char *path;
 	bool in_memory, loaded;
 } krink_image_t;

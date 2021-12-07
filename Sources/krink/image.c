@@ -4,8 +4,8 @@
 #include <assert.h>
 
 void krink_image_init(krink_image_t *img) {
-	img->real_width = 0;
-	img->real_height = 0;
+	img->real_width = 0.0f;
+	img->real_height = 0.0f;
 	img->path = NULL;
 	img->image = NULL;
 	img->in_memory = false;
@@ -24,8 +24,8 @@ void krink_image_load(krink_image_t *img, const char *path, bool keep_in_memory)
 	kinc_g4_texture_init_from_image(&(img->tex), img->image);
 	img->loaded = true;
 	img->in_memory = keep_in_memory;
-	img->real_width = img->image->width;
-	img->real_height = img->image->height;
+	img->real_width = (float)img->image->width;
+	img->real_height = (float)img->image->height;
 
 	if (!keep_in_memory) {
 		kinc_image_destroy(img->image);
