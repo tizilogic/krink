@@ -23,6 +23,7 @@ static kinc_g4_constant_location_t proj_mat_loc;
 static kinc_matrix4x4_t projection_matrix;
 static float *rect_verts = NULL;
 static int buffer_index = 0;
+static int buffer_start = 0;
 
 static bool bilinear_filter = false;
 static unsigned int color = 0xffffffff;
@@ -147,9 +148,9 @@ void krink_g2_isp_set_rect_colors(float opacity, unsigned int color) {
 	rect_verts[base_idx + 35] = a;
 }
 
-void krink_g2_isp_draw_buffer(void) {
-	if (buffer_index == 0) return;
-	kinc_g4_vertex_buffer_unlock(&vertex_buffer, buffer_index * 4);
+void krink_g2_isp_draw_buffer(bool end) {
+	if (buffer_index - buffer_start == 0) return;
+	kinc_g4_vertex_buffer_unlock(&vertex_buffer, (buffer_index - buffer_start) * 4);
 	kinc_g4_set_pipeline(&pipeline);
 	kinc_g4_set_matrix4(proj_mat_loc, &projection_matrix);
 	kinc_g4_set_vertex_buffer(&vertex_buffer);
@@ -159,11 +160,19 @@ void krink_g2_isp_draw_buffer(void) {
 	kinc_g4_set_texture_mipmap_filter(texunit, KINC_G4_MIPMAP_FILTER_NONE);
 	kinc_g4_set_texture_minification_filter(texunit, bilinear_filter ? KINC_G4_TEXTURE_FILTER_LINEAR : KINC_G4_TEXTURE_FILTER_POINT);
 	kinc_g4_set_texture_magnification_filter(texunit, bilinear_filter ? KINC_G4_TEXTURE_FILTER_LINEAR : KINC_G4_TEXTURE_FILTER_POINT);
-	kinc_g4_draw_indexed_vertices_from_to(0, buffer_index * 4);
+	kinc_g4_draw_indexed_vertices_from_to(buffer_start, buffer_index * 4);
 
 	kinc_g4_set_texture(texunit, NULL);
-	buffer_index = 0;
-	rect_verts = kinc_g4_vertex_buffer_lock_all(&vertex_buffer);
+
+	if (end || buffer_start + buffer_index + 1 >= KRINK_G2_ISP_BUFFER_SIZE) {
+		buffer_start = 0;
+		buffer_index = 0;
+		rect_verts = kinc_g4_vertex_buffer_lock(&vertex_buffer, 0, KRINK_G2_ISP_BUFFER_SIZE * 4);
+	}
+	else {
+		buffer_start = buffer_index;
+		rect_verts = kinc_g4_vertex_buffer_lock(&vertex_buffer, buffer_start, (KRINK_G2_ISP_BUFFER_SIZE - buffer_start) * 4);
+	}
 }
 
 void krink_g2_isp_set_bilinear_filter(bool bilinear) {
@@ -178,7 +187,7 @@ void krink_g2_isp_set_projection_matrix(kinc_matrix4x4_t mat) {
 void krink_g2_isp_draw_scaled_sub_image(krink_image_t *img, float sx, float sy, float sw, float sh, float dx, float dy, float dw, float dh, float opacity,
                                         unsigned int color) {
 	kinc_g4_texture_t *tex = &(img->tex);
-	if (buffer_index + 1 >= KRINK_G2_ISP_BUFFER_SIZE || (last_texture != NULL && tex != last_texture)) krink_g2_isp_draw_buffer();
+	if (buffer_index + 1 >= KRINK_G2_ISP_BUFFER_SIZE || (last_texture != NULL && tex != last_texture)) krink_g2_isp_draw_buffer(false);
 
 	krink_g2_isp_set_rect_tex_coords(sx / img->real_width, sy / img->real_height, (sx + sw) / img->real_width, (sy + sh) / img->real_height);
 	krink_g2_isp_set_rect_colors(opacity, color);
@@ -189,6 +198,6 @@ void krink_g2_isp_draw_scaled_sub_image(krink_image_t *img, float sx, float sy, 
 }
 
 void krink_g2_isp_end(void) {
-	if (buffer_index > 0) krink_g2_isp_draw_buffer();
+	if (buffer_index > 0) krink_g2_isp_draw_buffer(true);
 	last_texture = NULL;
 }

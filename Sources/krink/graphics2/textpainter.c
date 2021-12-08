@@ -23,6 +23,7 @@ static kinc_g4_constant_location_t proj_mat_loc;
 static kinc_matrix4x4_t projection_matrix;
 static float *rect_verts = NULL;
 static int buffer_index = 0;
+static int buffer_start = 0;
 
 static krink_ttf_font_t *active_font = NULL;
 static bool bilinear_filter = false;
@@ -148,8 +149,8 @@ void krink_g2_tsp_set_rect_colors(float opacity, unsigned int color) {
 	rect_verts[base_idx + 35] = a;
 }
 
-void krink_g2_tsp_draw_buffer(void) {
-	if (buffer_index == 0) return;
+void krink_g2_tsp_draw_buffer(bool end) {
+	if (buffer_index - buffer_start == 0) return;
 	kinc_g4_vertex_buffer_unlock(&vertex_buffer, buffer_index * 4);
 	kinc_g4_set_pipeline(&pipeline);
 	kinc_g4_set_matrix4(proj_mat_loc, &projection_matrix);
@@ -160,11 +161,18 @@ void krink_g2_tsp_draw_buffer(void) {
 	kinc_g4_set_texture_mipmap_filter(texunit, KINC_G4_MIPMAP_FILTER_NONE);
 	kinc_g4_set_texture_minification_filter(texunit, bilinear_filter ? KINC_G4_TEXTURE_FILTER_LINEAR : KINC_G4_TEXTURE_FILTER_POINT);
 	kinc_g4_set_texture_magnification_filter(texunit, bilinear_filter ? KINC_G4_TEXTURE_FILTER_LINEAR : KINC_G4_TEXTURE_FILTER_POINT);
-	kinc_g4_draw_indexed_vertices_from_to(0, buffer_index * 4);
+	kinc_g4_draw_indexed_vertices_from_to(buffer_start, buffer_index * 4);
 
 	kinc_g4_set_texture(texunit, NULL);
-	buffer_index = 0;
-	rect_verts = kinc_g4_vertex_buffer_lock_all(&vertex_buffer);
+	if (end || buffer_start + buffer_index + 1 >= KRINK_G2_TSP_BUFFER_SIZE) {
+		buffer_start = 0;
+		buffer_index = 0;
+		rect_verts = kinc_g4_vertex_buffer_lock(&vertex_buffer, 0, KRINK_G2_TSP_BUFFER_SIZE * 4);
+	}
+	else {
+		buffer_start = buffer_index;
+		rect_verts = kinc_g4_vertex_buffer_lock(&vertex_buffer, buffer_start, (KRINK_G2_TSP_BUFFER_SIZE - buffer_start) * 4);
+	}
 }
 
 void krink_g2_tsp_set_bilinear_filter(bool bilinear) {
@@ -187,7 +195,7 @@ void krink_g2_tsp_set_font_size(int size) {
 void krink_g2_tsp_draw_string(const char *text, float opacity, unsigned int color, float x, float y, kinc_matrix3x3_t transformation) {
 	kinc_g4_texture_t *tex = krink_ttf_get_texture(active_font, font_size);
 
-	if (last_texture != NULL && tex != last_texture) krink_g2_tsp_draw_buffer();
+	if (last_texture != NULL && tex != last_texture) krink_g2_tsp_draw_buffer(false);
 	last_texture = tex;
 
 	float xpos = x;
@@ -196,7 +204,7 @@ void krink_g2_tsp_draw_string(const char *text, float opacity, unsigned int colo
 	for (int i = 0; text[i] != 0; ++i) {
 		int char_code = (unsigned int)text[i];
 		if (krink_ttf_get_baked_quad(active_font, font_size, &q, char_code, xpos, ypos)) {
-			if (buffer_index + 1 >= KRINK_G2_TSP_BUFFER_SIZE) krink_g2_tsp_draw_buffer();
+			if (buffer_index + 1 >= KRINK_G2_TSP_BUFFER_SIZE) krink_g2_tsp_draw_buffer(false);
 			krink_g2_tsp_set_rect_colors(opacity, color);
 			krink_g2_tsp_set_rect_tex_coords(q.s0, q.t0, q.s1, q.t1);
 			kinc_vector3_t p0 = kinc_matrix3x3_multiply_vector(&transformation, (kinc_vector3_t){q.x0, q.y1, 0.0f}); // bottom-left
@@ -213,7 +221,7 @@ void krink_g2_tsp_draw_string(const char *text, float opacity, unsigned int colo
 void krink_g2_tsp_draw_characters(int *text, int start, int length, float opacity, unsigned int color, float x, float y, kinc_matrix3x3_t transformation) {
 	kinc_g4_texture_t *tex = krink_ttf_get_texture(active_font, font_size);
 
-	if (last_texture != NULL && tex != last_texture) krink_g2_tsp_draw_buffer();
+	if (last_texture != NULL && tex != last_texture) krink_g2_tsp_draw_buffer(false);
 	last_texture = tex;
 
 	float xpos = x;
@@ -221,7 +229,7 @@ void krink_g2_tsp_draw_characters(int *text, int start, int length, float opacit
 	krink_ttf_aligned_quad_t q;
 	for (int i = start; i < start + length; ++i) {
 		if (krink_ttf_get_baked_quad(active_font, font_size, &q, text[i], xpos, ypos)) {
-			if (buffer_index + 1 >= KRINK_G2_TSP_BUFFER_SIZE) krink_g2_tsp_draw_buffer();
+			if (buffer_index + 1 >= KRINK_G2_TSP_BUFFER_SIZE) krink_g2_tsp_draw_buffer(false);
 			krink_g2_tsp_set_rect_colors(opacity, color);
 			krink_g2_tsp_set_rect_tex_coords(q.s0, q.t0, q.s1, q.t1);
 			kinc_vector3_t p0 = kinc_matrix3x3_multiply_vector(&transformation, (kinc_vector3_t){q.x0, q.y1, 0.0f}); // bottom-left
@@ -236,6 +244,6 @@ void krink_g2_tsp_draw_characters(int *text, int start, int length, float opacit
 }
 
 void krink_g2_tsp_end(void) {
-	if (buffer_index > 0) krink_g2_tsp_draw_buffer();
+	if (buffer_index > 0) krink_g2_tsp_draw_buffer(true);
 	last_texture = NULL;
 }
