@@ -185,13 +185,17 @@ void krink_g2_isp_set_projection_matrix(kinc_matrix4x4_t mat) {
 }
 
 void krink_g2_isp_draw_scaled_sub_image(krink_image_t *img, float sx, float sy, float sw, float sh, float dx, float dy, float dw, float dh, float opacity,
-                                        unsigned int color) {
+                                        unsigned int color,  kinc_matrix3x3_t transformation) {
 	kinc_g4_texture_t *tex = &(img->tex);
 	if (buffer_index + 1 >= KRINK_G2_ISP_BUFFER_SIZE || (last_texture != NULL && tex != last_texture)) krink_g2_isp_draw_buffer(false);
 
 	krink_g2_isp_set_rect_tex_coords(sx / img->real_width, sy / img->real_height, (sx + sw) / img->real_width, (sy + sh) / img->real_height);
 	krink_g2_isp_set_rect_colors(opacity, color);
-	krink_g2_isp_set_rect_verts(dx, dy + dh, dx, dy, dx + dw, dy, dx + dw, dy + dh);
+	kinc_vector3_t p0 = kinc_matrix3x3_multiply_vector(&transformation, (kinc_vector3_t){dx, dy + dh, 0.0f}); // bottom-left
+	kinc_vector3_t p1 = kinc_matrix3x3_multiply_vector(&transformation, (kinc_vector3_t){dx, dy, 0.0f}); // top-left
+	kinc_vector3_t p2 = kinc_matrix3x3_multiply_vector(&transformation, (kinc_vector3_t){dx + dw, dy, 0.0f}); // top-right
+	kinc_vector3_t p3 = kinc_matrix3x3_multiply_vector(&transformation, (kinc_vector3_t){dx + dw, dy + dh, 0.0f}); // bottom-right
+	krink_g2_isp_set_rect_verts(p0.x, p0.y, p1.x, p1.y, p2.x, p2.y, p3.x, p3.y);
 
 	++buffer_index;
 	last_texture = tex;
