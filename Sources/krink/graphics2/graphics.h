@@ -3,14 +3,11 @@
 #include <kinc/math/matrix.h>
 #include <kinc/math/vector.h>
 #include <krink/image.h>
+#include "sdfpainter.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-typedef struct krink_sdf_corner_radius {
-	float top_left, bottom_left, bottom_right, top_right;
-} krink_sdf_corner_radius_t;
 
 /// <summary>
 /// Initialize krink_g2.
