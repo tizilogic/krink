@@ -62,7 +62,7 @@ static void build_rect_pipeline(void) {
 	}
 	kinc_g4_vertex_structure_t structure;
 	kinc_g4_vertex_structure_init(&structure);
-    kinc_g4_vertex_structure_add(&structure, "pos", KINC_G4_VERTEX_DATA_FLOAT3);
+	kinc_g4_vertex_structure_add(&structure, "pos", KINC_G4_VERTEX_DATA_FLOAT3);
 	kinc_g4_vertex_structure_add(&structure, "tex", KINC_G4_VERTEX_DATA_FLOAT2);
 	kinc_g4_vertex_structure_add(&structure, "box", KINC_G4_VERTEX_DATA_FLOAT2);
 	kinc_g4_vertex_structure_add(&structure, "rCol", KINC_G4_VERTEX_DATA_FLOAT4);
@@ -83,10 +83,12 @@ static void build_rect_pipeline(void) {
 
 	rect_proj_mat_loc = kinc_g4_pipeline_get_constant_location(&rect_pipeline, "projectionMatrix");
 
-	kinc_g4_vertex_buffer_init(&rect_vertex_buffer, KRINK_G2_SDF_BUFFER_SIZE * 4, &structure, KINC_G4_USAGE_DYNAMIC, 0);
+	kinc_g4_vertex_buffer_init(&rect_vertex_buffer, KRINK_G2_SDF_BUFFER_SIZE * 4, &structure,
+	                           KINC_G4_USAGE_DYNAMIC, 0);
 	rect_rect_verts = kinc_g4_vertex_buffer_lock_all(&rect_vertex_buffer);
 
-	kinc_g4_index_buffer_init(&rect_index_buffer, KRINK_G2_SDF_BUFFER_SIZE * 3 * 2, KINC_G4_USAGE_STATIC);
+	kinc_g4_index_buffer_init(&rect_index_buffer, KRINK_G2_SDF_BUFFER_SIZE * 3 * 2,
+	                          KINC_G4_USAGE_STATIC);
 	int *indices = kinc_g4_index_buffer_lock(&rect_index_buffer);
 	for (int i = 0; i < KRINK_G2_SDF_BUFFER_SIZE; ++i) {
 		indices[i * 3 * 2 + 0] = i * 4 + 0;
@@ -124,7 +126,7 @@ static void build_circle_pipeline(void) {
 	}
 	kinc_g4_vertex_structure_t structure;
 	kinc_g4_vertex_structure_init(&structure);
-    kinc_g4_vertex_structure_add(&structure, "pos", KINC_G4_VERTEX_DATA_FLOAT3);
+	kinc_g4_vertex_structure_add(&structure, "pos", KINC_G4_VERTEX_DATA_FLOAT3);
 	kinc_g4_vertex_structure_add(&structure, "tex", KINC_G4_VERTEX_DATA_FLOAT2);
 	kinc_g4_vertex_structure_add(&structure, "rCol", KINC_G4_VERTEX_DATA_FLOAT4);
 	kinc_g4_vertex_structure_add(&structure, "bCol", KINC_G4_VERTEX_DATA_FLOAT3);
@@ -141,12 +143,15 @@ static void build_circle_pipeline(void) {
 	circle_pipeline.alpha_blend_destination = KINC_G4_BLEND_INV_SOURCE_ALPHA;
 	kinc_g4_pipeline_compile(&circle_pipeline);
 
-	circle_proj_mat_loc = kinc_g4_pipeline_get_constant_location(&circle_pipeline, "projectionMatrix");
+	circle_proj_mat_loc =>
+	    kinc_g4_pipeline_get_constant_location(&circle_pipeline, "projectionMatrix");
 
-	kinc_g4_vertex_buffer_init(&circle_vertex_buffer, KRINK_G2_SDF_BUFFER_SIZE * 4, &structure, KINC_G4_USAGE_DYNAMIC, 0);
+	kinc_g4_vertex_buffer_init(&circle_vertex_buffer, KRINK_G2_SDF_BUFFER_SIZE * 4, &structure,
+	                           KINC_G4_USAGE_DYNAMIC, 0);
 	circle_rect_verts = kinc_g4_vertex_buffer_lock_all(&circle_vertex_buffer);
 
-	kinc_g4_index_buffer_init(&circle_index_buffer, KRINK_G2_SDF_BUFFER_SIZE * 3 * 2, KINC_G4_USAGE_STATIC);
+	kinc_g4_index_buffer_init(&circle_index_buffer, KRINK_G2_SDF_BUFFER_SIZE * 3 * 2,
+	                          KINC_G4_USAGE_STATIC);
 	int *indices = kinc_g4_index_buffer_lock(&circle_index_buffer);
 	for (int i = 0; i < KRINK_G2_SDF_BUFFER_SIZE; ++i) {
 		indices[i * 3 * 2 + 0] = i * 4 + 0;
@@ -184,7 +189,7 @@ static void build_line_pipeline(void) {
 	}
 	kinc_g4_vertex_structure_t structure;
 	kinc_g4_vertex_structure_init(&structure);
-    kinc_g4_vertex_structure_add(&structure, "pos", KINC_G4_VERTEX_DATA_FLOAT3);
+	kinc_g4_vertex_structure_add(&structure, "pos", KINC_G4_VERTEX_DATA_FLOAT3);
 	kinc_g4_vertex_structure_add(&structure, "tex", KINC_G4_VERTEX_DATA_FLOAT2);
 	kinc_g4_vertex_structure_add(&structure, "color", KINC_G4_VERTEX_DATA_FLOAT4);
 	kinc_g4_vertex_structure_add(&structure, "dim", KINC_G4_VERTEX_DATA_FLOAT2);
@@ -202,10 +207,12 @@ static void build_line_pipeline(void) {
 
 	line_proj_mat_loc = kinc_g4_pipeline_get_constant_location(&line_pipeline, "projectionMatrix");
 
-	kinc_g4_vertex_buffer_init(&line_vertex_buffer, KRINK_G2_SDF_BUFFER_SIZE * 4, &structure, KINC_G4_USAGE_DYNAMIC, 0);
+	kinc_g4_vertex_buffer_init(&line_vertex_buffer, KRINK_G2_SDF_BUFFER_SIZE * 4, &structure,
+	                           KINC_G4_USAGE_DYNAMIC, 0);
 	line_rect_verts = kinc_g4_vertex_buffer_lock_all(&line_vertex_buffer);
 
-	kinc_g4_index_buffer_init(&line_index_buffer, KRINK_G2_SDF_BUFFER_SIZE * 3 * 2, KINC_G4_USAGE_STATIC);
+	kinc_g4_index_buffer_init(&line_index_buffer, KRINK_G2_SDF_BUFFER_SIZE * 3 * 2,
+	                          KINC_G4_USAGE_STATIC);
 	int *indices = kinc_g4_index_buffer_lock(&line_index_buffer);
 	for (int i = 0; i < KRINK_G2_SDF_BUFFER_SIZE; ++i) {
 		indices[i * 3 * 2 + 0] = i * 4 + 0;
@@ -219,12 +226,13 @@ static void build_line_pipeline(void) {
 }
 
 void krink_g2_sdf_init(void) {
-    build_rect_pipeline();
-    build_circle_pipeline();
-    build_line_pipeline();
+	build_rect_pipeline();
+	build_circle_pipeline();
+	build_line_pipeline();
 }
 
-void sdf_rect_set_rect_verts(float btlx, float btly, float tplx, float tply, float tprx, float tpry, float btrx, float btry) {
+void sdf_rect_set_rect_verts(float btlx, float btly, float tplx, float tply, float tprx, float tpry,
+                             float btrx, float btry) {
 	int base_idx = rect_buffer_index * 20 * 4;
 	rect_rect_verts[base_idx + 0] = btlx;
 	rect_rect_verts[base_idx + 1] = btly;
@@ -317,7 +325,7 @@ void sdf_rect_set_rect_colors(float opacity, unsigned int color, unsigned int bo
 }
 
 void sdf_rect_set_rect_corner(krink_sdf_corner_radius_t c) {
-    int base_idx = rect_buffer_index * 20 * 4;
+	int base_idx = rect_buffer_index * 20 * 4;
 	rect_rect_verts[base_idx + 14] = c.bottom_right;
 	rect_rect_verts[base_idx + 15] = c.top_right;
 	rect_rect_verts[base_idx + 16] = c.bottom_left;
@@ -355,10 +363,10 @@ void sdf_rect_set_border_smooth(float b, float s) {
 }
 
 static void sdf_rect_draw_buffer(bool end) {
-    if (!end) {
-        sdf_circle_end();
-        sdf_line_end();
-    }
+	if (!end) {
+		sdf_circle_end();
+		sdf_line_end();
+	}
 	if (rect_buffer_index - rect_buffer_start == 0) return;
 	kinc_g4_vertex_buffer_unlock(&rect_vertex_buffer, (rect_buffer_index - rect_buffer_start) * 4);
 	kinc_g4_set_pipeline(&rect_pipeline);
@@ -370,11 +378,14 @@ static void sdf_rect_draw_buffer(bool end) {
 	if (end || rect_buffer_start + rect_buffer_index + 1 >= KRINK_G2_SDF_BUFFER_SIZE) {
 		rect_buffer_start = 0;
 		rect_buffer_index = 0;
-		rect_rect_verts = kinc_g4_vertex_buffer_lock(&rect_vertex_buffer, 0, KRINK_G2_SDF_BUFFER_SIZE * 4);
+		rect_rect_verts =
+		    kinc_g4_vertex_buffer_lock(&rect_vertex_buffer, 0, KRINK_G2_SDF_BUFFER_SIZE * 4);
 	}
 	else {
 		rect_buffer_start = rect_buffer_index;
-		rect_rect_verts = kinc_g4_vertex_buffer_lock(&rect_vertex_buffer, rect_buffer_start, (KRINK_G2_SDF_BUFFER_SIZE - rect_buffer_start) * 4);
+		rect_rect_verts =
+		    kinc_g4_vertex_buffer_lock(&rect_vertex_buffer, rect_buffer_start,
+		                               (KRINK_G2_SDF_BUFFER_SIZE - rect_buffer_start) * 4);
 	}
 }
 
@@ -382,35 +393,119 @@ void krink_g2_sdf_set_projection_matrix(kinc_matrix4x4_t mat) {
 	projection_matrix = mat;
 }
 
-void krink_g2_sdf_draw_rect(float x, float y, float width, float height, krink_sdf_corner_radius_t corner, float border, float smooth, unsigned int color,
-                            unsigned int border_color, kinc_matrix3x3_t transformation) {
+void krink_g2_sdf_draw_rect(float x, float y, float width, float height,
+                            krink_sdf_corner_radius_t corner, float border, float smooth,
+                            unsigned int color, unsigned int border_color,
+                            kinc_matrix3x3_t transformation) {
+	/*
+	var p1 = transformation.multvec(new FastVector2(x, y + height));
+	        var p2 = transformation.multvec(new FastVector2(x, y));
+	        var p3 = transformation.multvec(new FastVector2(x + width, y));
+	        var p4 = transformation.multvec(new FastVector2(x + width, y + height));
+	        var w = p3.sub(p2).length;
+	        var h = p1.sub(p2).length;
+	        var u = w / Math.max(w, h);
+	        var v = h / Math.max(w, h);
+	        var f = (u >= v ? u / w : v / h) * Math.max(w / width, h / height);
+	        corner.br = corner.br != null ? corner.br : corner.tr;
+	        corner.tl = corner.tl != null ? corner.tl : corner.tr;
+	        corner.bl = corner.bl != null ? corner.bl : corner.tr;
+	        corner.tr *= f;
+	        corner.br *= f;
+	        corner.tl *= f;
+	        corner.bl *= f;
+	        sdfRectPainter.drawSDFRect(opacity, color, borderColor, p1.x, p1.y, p2.x, p2.y, p3.x,
+	p3.y, p4.x, p4.y, u, v, corner, border * f, smooth * f);
 
+	setRectColor(rCol.R, rCol.G, rCol.B, rCol.A * opacity, bCol.R, bCol.G, bCol.B);
+	        setRectTexCoords(0, 0, u, v);
+	        setRectVertices(bottomleftx, bottomlefty, topleftx, toplefty, toprightx, toprighty,
+	bottomrightx, bottomrighty); setRectBox(u / 2, v / 2); setCorner(c); setBorderSmooth(b, s);
+
+	        ++bufferIndex;
+	*/
 }
 
-void krink_g2_sdf_draw_circle(float x, float y, float radius, float border, float smooth, unsigned int color, unsigned int border_color,
-                              kinc_matrix3x3_t transformation) {
+static void sdf_circle_draw_buffer(bool end) {
+	if (!end) {
+		sdf_rect_end();
+		sdf_line_end();
+	}
+	if (circle_buffer_index - circle_buffer_start == 0) return;
+	kinc_g4_vertex_buffer_unlock(&circle_vertex_buffer,
+	                             (circle_buffer_index - circle_buffer_start) * 4);
+	kinc_g4_set_pipeline(&circle_pipeline);
+	kinc_g4_set_matrix4(circle_proj_mat_loc, &projection_matrix);
+	kinc_g4_set_vertex_buffer(&circle_vertex_buffer);
+	kinc_g4_set_index_buffer(&circle_index_buffer);
+	kinc_g4_draw_indexed_vertices_from_to(circle_buffer_start, circle_buffer_index * 4);
 
+	if (end || circle_buffer_start + circle_buffer_index + 1 >= KRINK_G2_SDF_BUFFER_SIZE) {
+		circle_buffer_start = 0;
+		circle_buffer_index = 0;
+		circle_rect_verts =
+		    kinc_g4_vertex_buffer_lock(&circle_vertex_buffer, 0, KRINK_G2_SDF_BUFFER_SIZE * 4);
+	}
+	else {
+		circle_buffer_start = circle_buffer_index;
+		circle_rect_verts =
+		    kinc_g4_vertex_buffer_lock(&circle_vertex_buffer, circle_buffer_start,
+		                               (KRINK_G2_SDF_BUFFER_SIZE - circle_buffer_start) * 4);
+	}
 }
 
-void krink_g2_sdf_draw_line(float x0, float y0, float x1, float y1, float corner_radius, float smooth, unsigned int color, kinc_matrix3x3_t transformation) {
+void krink_g2_sdf_draw_circle(float x, float y, float radius, float border, float smooth,
+                              unsigned int color, unsigned int border_color,
+                              kinc_matrix3x3_t transformation) {}
 
+static void sdf_line_draw_buffer(bool end) {
+	if (!end) {
+		sdf_circle_end();
+		sdf_rect_end();
+	}
+	if (line_buffer_index - line_buffer_start == 0) return;
+	kinc_g4_vertex_buffer_unlock(&line_vertex_buffer, (line_buffer_index - line_buffer_start) * 4);
+	kinc_g4_set_pipeline(&line_pipeline);
+	kinc_g4_set_matrix4(line_proj_mat_loc, &projection_matrix);
+	kinc_g4_set_vertex_buffer(&line_vertex_buffer);
+	kinc_g4_set_index_buffer(&line_index_buffer);
+	kinc_g4_draw_indexed_vertices_from_to(line_buffer_start, line_buffer_index * 4);
+
+	if (end || line_buffer_start + line_buffer_index + 1 >= KRINK_G2_SDF_BUFFER_SIZE) {
+		line_buffer_start = 0;
+		line_buffer_index = 0;
+		line_rect_verts =
+		    kinc_g4_vertex_buffer_lock(&line_vertex_buffer, 0, KRINK_G2_SDF_BUFFER_SIZE * 4);
+	}
+	else {
+		line_buffer_start = line_buffer_index;
+		line_rect_verts =
+		    kinc_g4_vertex_buffer_lock(&line_vertex_buffer, line_buffer_start,
+		                               (KRINK_G2_SDF_BUFFER_SIZE - line_buffer_start) * 4);
+	}
 }
 
-/*void krink_g2_sdf_draw_scaled_sub_image(krink_image_t *img, float sx, float sy, float sw, float sh, float dx, float dy, float dw, float dh, float opacity,
-                                        unsigned int color,  kinc_matrix3x3_t transformation) {
-	kinc_g4_texture_t *tex = &(img->tex);
-	if (buffer_index + 1 >= KRINK_G2_sdf_BUFFER_SIZE || (last_texture != NULL && tex != last_texture)) krink_g2_sdf_draw_buffer(false);
+void krink_g2_sdf_draw_line(float x0, float y0, float x1, float y1, float corner_radius,
+                            float smooth, unsigned int color, kinc_matrix3x3_t transformation) {}
 
-	krink_g2_sdf_set_rect_tex_coords(sx / img->real_width, sy / img->real_height, (sx + sw) / img->real_width, (sy + sh) / img->real_height);
-	krink_g2_sdf_set_rect_colors(opacity, color);
-	kinc_vector3_t p0 = kinc_matrix3x3_multiply_vector(&transformation, (kinc_vector3_t){dx, dy + dh, 0.0f}); // bottom-left
-	kinc_vector3_t p1 = kinc_matrix3x3_multiply_vector(&transformation, (kinc_vector3_t){dx, dy, 0.0f}); // top-left
-	kinc_vector3_t p2 = kinc_matrix3x3_multiply_vector(&transformation, (kinc_vector3_t){dx + dw, dy, 0.0f}); // top-right
-	kinc_vector3_t p3 = kinc_matrix3x3_multiply_vector(&transformation, (kinc_vector3_t){dx + dw, dy + dh, 0.0f}); // bottom-right
-	krink_g2_sdf_set_rect_verts(p0.x, p0.y, p1.x, p1.y, p2.x, p2.y, p3.x, p3.y);
+/*void krink_g2_sdf_draw_scaled_sub_image(krink_image_t *img, float sx, float sy, float sw, float
+sh, float dx, float dy, float dw, float dh, float opacity, unsigned int color,  kinc_matrix3x3_t
+transformation) { kinc_g4_texture_t *tex = &(img->tex); if (buffer_index + 1 >=
+KRINK_G2_sdf_BUFFER_SIZE || (last_texture != NULL && tex != last_texture))
+krink_g2_sdf_draw_buffer(false);
 
-	++buffer_index;
-	last_texture = tex;
+    krink_g2_sdf_set_rect_tex_coords(sx / img->real_width, sy / img->real_height, (sx + sw) /
+img->real_width, (sy + sh) / img->real_height); krink_g2_sdf_set_rect_colors(opacity, color);
+    kinc_vector3_t p0 = kinc_matrix3x3_multiply_vector(&transformation, (kinc_vector3_t){dx, dy +
+dh, 0.0f}); // bottom-left kinc_vector3_t p1 = kinc_matrix3x3_multiply_vector(&transformation,
+(kinc_vector3_t){dx, dy, 0.0f}); // top-left kinc_vector3_t p2 =
+kinc_matrix3x3_multiply_vector(&transformation, (kinc_vector3_t){dx + dw, dy, 0.0f}); // top-right
+    kinc_vector3_t p3 = kinc_matrix3x3_multiply_vector(&transformation, (kinc_vector3_t){dx + dw, dy
++ dh, 0.0f}); // bottom-right krink_g2_sdf_set_rect_verts(p0.x, p0.y, p1.x, p1.y, p2.x, p2.y, p3.x,
+p3.y);
+
+    ++buffer_index;
+    last_texture = tex;
 }*/
 
 static void sdf_rect_end(void) {
@@ -426,7 +521,7 @@ static void sdf_line_end(void) {
 }
 
 void krink_g2_sdf_end(void) {
-    sdf_rect_end();
-    sdf_circle_end();
-    sdf_line_end();
+	sdf_rect_end();
+	sdf_circle_end();
+	sdf_line_end();
 }

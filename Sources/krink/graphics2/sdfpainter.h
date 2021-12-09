@@ -13,9 +13,13 @@ typedef struct krink_sdf_corner_radius {
 
 void krink_g2_sdf_init(void);
 void krink_g2_sdf_set_projection_matrix(kinc_matrix4x4_t mat);
-void krink_g2_sdf_draw_rect(float x, float y, float width, float height, krink_sdf_corner_radius_t corner, float border, float smooth, unsigned int color,
-                            unsigned int border_color, kinc_matrix3x3_t transformation);
-void krink_g2_sdf_draw_circle(float x, float y, float radius, float border, float smooth, unsigned int color, unsigned int border_color,
+void krink_g2_sdf_draw_rect(float x, float y, float width, float height,
+                            krink_sdf_corner_radius_t corner, float border, float smooth,
+                            unsigned int color, unsigned int border_color,
+                            kinc_matrix3x3_t transformation);
+void krink_g2_sdf_draw_circle(float x, float y, float radius, float border, float smooth,
+                              unsigned int color, unsigned int border_color,
                               kinc_matrix3x3_t transformation);
-void krink_g2_sdf_draw_line(float x0, float y0, float x1, float y1, float corner_radius, float smooth, unsigned int color, kinc_matrix3x3_t transformation);
+void krink_g2_sdf_draw_line(float x0, float y0, float x1, float y1, float corner_radius,
+                            float smooth, unsigned int color, kinc_matrix3x3_t transformation);
 void krink_g2_sdf_end(void);
