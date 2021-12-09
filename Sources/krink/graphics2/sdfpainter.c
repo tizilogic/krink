@@ -8,6 +8,7 @@
 #include <kinc/graphics4/vertexstructure.h>
 #include <kinc/io/filereader.h>
 #include <krink/color.h>
+#include <krink/math/vector.h>
 #include <krink/memory.h>
 
 static kinc_g4_vertex_buffer_t rect_vertex_buffer;
@@ -36,6 +37,10 @@ static int line_buffer_index = 0;
 static int line_buffer_start = 0;
 
 static unsigned int color = 0xffffffff;
+
+static float max(float a, float b) {
+	return (a > b ? a : b);
+}
 
 static void build_rect_pipeline(void) {
 	{
@@ -143,7 +148,7 @@ static void build_circle_pipeline(void) {
 	circle_pipeline.alpha_blend_destination = KINC_G4_BLEND_INV_SOURCE_ALPHA;
 	kinc_g4_pipeline_compile(&circle_pipeline);
 
-	circle_proj_mat_loc =>
+	circle_proj_mat_loc =
 	    kinc_g4_pipeline_get_constant_location(&circle_pipeline, "projectionMatrix");
 
 	kinc_g4_vertex_buffer_init(&circle_vertex_buffer, KRINK_G2_SDF_BUFFER_SIZE * 4, &structure,
@@ -373,9 +378,9 @@ static void sdf_rect_draw_buffer(bool end) {
 	kinc_g4_set_matrix4(rect_proj_mat_loc, &projection_matrix);
 	kinc_g4_set_vertex_buffer(&rect_vertex_buffer);
 	kinc_g4_set_index_buffer(&rect_index_buffer);
-	kinc_g4_draw_indexed_vertices_from_to(rect_buffer_start, rect_buffer_index * 4);
+	kinc_g4_draw_indexed_vertices_from_to(rect_buffer_start * 2 * 3, (rect_buffer_index - rect_buffer_start) * 2 * 3);
 
-	if (end || rect_buffer_start + rect_buffer_index + 1 >= KRINK_G2_SDF_BUFFER_SIZE) {
+	if (end || (rect_buffer_start + rect_buffer_index + 1) * 4 >= KRINK_G2_SDF_BUFFER_SIZE) {
 		rect_buffer_start = 0;
 		rect_buffer_index = 0;
 		rect_rect_verts =
@@ -384,7 +389,7 @@ static void sdf_rect_draw_buffer(bool end) {
 	else {
 		rect_buffer_start = rect_buffer_index;
 		rect_rect_verts =
-		    kinc_g4_vertex_buffer_lock(&rect_vertex_buffer, rect_buffer_start,
+		    kinc_g4_vertex_buffer_lock(&rect_vertex_buffer, rect_buffer_start * 4,
 		                               (KRINK_G2_SDF_BUFFER_SIZE - rect_buffer_start) * 4);
 	}
 }
@@ -395,35 +400,46 @@ void krink_g2_sdf_set_projection_matrix(kinc_matrix4x4_t mat) {
 
 void krink_g2_sdf_draw_rect(float x, float y, float width, float height,
                             krink_sdf_corner_radius_t corner, float border, float smooth,
-                            unsigned int color, unsigned int border_color,
+                            unsigned int color, unsigned int border_color, float opacity,
                             kinc_matrix3x3_t transformation) {
-	/*
-	var p1 = transformation.multvec(new FastVector2(x, y + height));
-	        var p2 = transformation.multvec(new FastVector2(x, y));
-	        var p3 = transformation.multvec(new FastVector2(x + width, y));
-	        var p4 = transformation.multvec(new FastVector2(x + width, y + height));
-	        var w = p3.sub(p2).length;
-	        var h = p1.sub(p2).length;
-	        var u = w / Math.max(w, h);
-	        var v = h / Math.max(w, h);
-	        var f = (u >= v ? u / w : v / h) * Math.max(w / width, h / height);
-	        corner.br = corner.br != null ? corner.br : corner.tr;
-	        corner.tl = corner.tl != null ? corner.tl : corner.tr;
-	        corner.bl = corner.bl != null ? corner.bl : corner.tr;
-	        corner.tr *= f;
-	        corner.br *= f;
-	        corner.tl *= f;
-	        corner.bl *= f;
-	        sdfRectPainter.drawSDFRect(opacity, color, borderColor, p1.x, p1.y, p2.x, p2.y, p3.x,
-	p3.y, p4.x, p4.y, u, v, corner, border * f, smooth * f);
+	kinc_vector3_t p0 = kinc_matrix3x3_multiply_vector(
+	    &transformation, (kinc_vector3_t){x, y + height, 0.0f}); // bottom-left
+	kinc_vector3_t p1 =
+	    kinc_matrix3x3_multiply_vector(&transformation, (kinc_vector3_t){x, y, 0.0f}); // top-left
+	kinc_vector3_t p2 = kinc_matrix3x3_multiply_vector(
+	    &transformation, (kinc_vector3_t){x + width, y, 0.0f}); // top-right
+	kinc_vector3_t p3 = kinc_matrix3x3_multiply_vector(
+	    &transformation, (kinc_vector3_t){x + width, y + height, 0.0f}); // bottom-right
+	sdf_rect_set_rect_verts(p0.x, p0.y, p1.x, p1.y, p2.x, p2.y, p3.x, p3.y);
+	float w =
+	    krink_vec2_length(krink_vec2_subv((krink_vec2_t){p2.x, p2.y}, (krink_vec2_t){p1.x, p1.y}));
+	float h =
+	    krink_vec2_length(krink_vec2_subv((krink_vec2_t){p0.x, p0.y}, (krink_vec2_t){p1.x, p1.y}));
+	float u = w / (w > h ? w : h);
+	float v = h / (w > h ? w : h);
+	float f = (u >= v ? u / w : v / h) * max(w / width, h / height);
 
-	setRectColor(rCol.R, rCol.G, rCol.B, rCol.A * opacity, bCol.R, bCol.G, bCol.B);
-	        setRectTexCoords(0, 0, u, v);
-	        setRectVertices(bottomleftx, bottomlefty, topleftx, toplefty, toprightx, toprighty,
-	bottomrightx, bottomrighty); setRectBox(u / 2, v / 2); setCorner(c); setBorderSmooth(b, s);
+	corner.top_right *= f;
+	corner.bottom_right *= f;
+	corner.top_left *= f;
+	corner.bottom_left *= f;
 
-	        ++bufferIndex;
-	*/
+	sdf_rect_set_rect_colors(opacity, color, border_color);
+	sdf_rect_set_rect_tex_coords(0.0f, 0.0f, u, v);
+	sdf_rect_set_rect_box(u / 2.0f, v / 2.0f);
+	sdf_rect_set_rect_corner(corner);
+	sdf_rect_set_border_smooth(border * f, smooth * f);
+
+	++rect_buffer_index;
+}
+
+void krink_g2_sdf_draw_rect_symm(float x, float y, float width, float height, float corner,
+                                 float border, float smooth, unsigned int color,
+                                 unsigned int border_color, float opacity,
+                                 kinc_matrix3x3_t transformation) {
+	krink_g2_sdf_draw_rect(x, y, width, height,
+	                       (krink_sdf_corner_radius_t){corner, corner, corner, corner}, border,
+	                       smooth, color, border_color, opacity, transformation);
 }
 
 static void sdf_circle_draw_buffer(bool end) {
@@ -438,9 +454,9 @@ static void sdf_circle_draw_buffer(bool end) {
 	kinc_g4_set_matrix4(circle_proj_mat_loc, &projection_matrix);
 	kinc_g4_set_vertex_buffer(&circle_vertex_buffer);
 	kinc_g4_set_index_buffer(&circle_index_buffer);
-	kinc_g4_draw_indexed_vertices_from_to(circle_buffer_start, circle_buffer_index * 4);
+	kinc_g4_draw_indexed_vertices_from_to(circle_buffer_start * 2 * 3, (circle_buffer_index - circle_buffer_start) * 2 * 3);
 
-	if (end || circle_buffer_start + circle_buffer_index + 1 >= KRINK_G2_SDF_BUFFER_SIZE) {
+	if (end || (circle_buffer_start + circle_buffer_index + 1) * 4 >= KRINK_G2_SDF_BUFFER_SIZE) {
 		circle_buffer_start = 0;
 		circle_buffer_index = 0;
 		circle_rect_verts =
@@ -449,7 +465,7 @@ static void sdf_circle_draw_buffer(bool end) {
 	else {
 		circle_buffer_start = circle_buffer_index;
 		circle_rect_verts =
-		    kinc_g4_vertex_buffer_lock(&circle_vertex_buffer, circle_buffer_start,
+		    kinc_g4_vertex_buffer_lock(&circle_vertex_buffer, circle_buffer_start * 4,
 		                               (KRINK_G2_SDF_BUFFER_SIZE - circle_buffer_start) * 4);
 	}
 }
@@ -469,9 +485,9 @@ static void sdf_line_draw_buffer(bool end) {
 	kinc_g4_set_matrix4(line_proj_mat_loc, &projection_matrix);
 	kinc_g4_set_vertex_buffer(&line_vertex_buffer);
 	kinc_g4_set_index_buffer(&line_index_buffer);
-	kinc_g4_draw_indexed_vertices_from_to(line_buffer_start, line_buffer_index * 4);
+	kinc_g4_draw_indexed_vertices_from_to(line_buffer_start * 2 * 3, (line_buffer_index - line_buffer_start) * 2 * 3);
 
-	if (end || line_buffer_start + line_buffer_index + 1 >= KRINK_G2_SDF_BUFFER_SIZE) {
+	if (end || (line_buffer_start + line_buffer_index + 1) * 4 >= KRINK_G2_SDF_BUFFER_SIZE) {
 		line_buffer_start = 0;
 		line_buffer_index = 0;
 		line_rect_verts =
@@ -480,7 +496,7 @@ static void sdf_line_draw_buffer(bool end) {
 	else {
 		line_buffer_start = line_buffer_index;
 		line_rect_verts =
-		    kinc_g4_vertex_buffer_lock(&line_vertex_buffer, line_buffer_start,
+		    kinc_g4_vertex_buffer_lock(&line_vertex_buffer, line_buffer_start * 4,
 		                               (KRINK_G2_SDF_BUFFER_SIZE - line_buffer_start) * 4);
 	}
 }
