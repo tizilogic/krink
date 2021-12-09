@@ -236,7 +236,9 @@ void krink_g2_sdf_init(void) {
 	build_line_pipeline();
 }
 
-void sdf_rect_set_rect_verts(float btlx, float btly, float tplx, float tply, float tprx, float tpry,
+// SDF Rect Impl
+
+static void sdf_rect_set_rect_verts(float btlx, float btly, float tplx, float tply, float tprx, float tpry,
                              float btrx, float btry) {
 	int base_idx = (rect_buffer_index - rect_buffer_start) * 20 * 4;
 	rect_rect_verts[base_idx + 0] = btlx;
@@ -256,7 +258,7 @@ void sdf_rect_set_rect_verts(float btlx, float btly, float tplx, float tply, flo
 	rect_rect_verts[base_idx + 62] = -5.0f;
 }
 
-void sdf_rect_set_rect_tex_coords(float left, float top, float right, float bottom) {
+static void sdf_rect_set_rect_tex_coords(float left, float top, float right, float bottom) {
 	int base_idx = (rect_buffer_index - rect_buffer_start) * 20 * 4;
 	rect_rect_verts[base_idx + 3] = left;
 	rect_rect_verts[base_idx + 4] = bottom;
@@ -271,7 +273,7 @@ void sdf_rect_set_rect_tex_coords(float left, float top, float right, float bott
 	rect_rect_verts[base_idx + 64] = bottom;
 }
 
-void sdf_rect_set_rect_box(float u, float v) {
+static void sdf_rect_set_rect_box(float u, float v) {
 	int base_idx = (rect_buffer_index - rect_buffer_start) * 20 * 4;
 	rect_rect_verts[base_idx + 5] = u;
 	rect_rect_verts[base_idx + 6] = v;
@@ -286,7 +288,7 @@ void sdf_rect_set_rect_box(float u, float v) {
 	rect_rect_verts[base_idx + 66] = v;
 }
 
-void sdf_rect_set_rect_colors(float opacity, unsigned int color, unsigned int border_color) {
+static void sdf_rect_set_rect_colors(float opacity, unsigned int color, unsigned int border_color) {
 	int base_idx = (rect_buffer_index - rect_buffer_start) * 20 * 4;
 	float a = opacity * ((float)krink_color_get_channel(color, 'A') / 255.0f);
 	float r = ((float)krink_color_get_channel(color, 'R') / 255.0f);
@@ -329,7 +331,7 @@ void sdf_rect_set_rect_colors(float opacity, unsigned int color, unsigned int bo
 	rect_rect_verts[base_idx + 73] = bb;
 }
 
-void sdf_rect_set_rect_corner(krink_sdf_corner_radius_t c) {
+static void sdf_rect_set_rect_corner(krink_sdf_corner_radius_t c) {
 	int base_idx = (rect_buffer_index - rect_buffer_start) * 20 * 4;
 	rect_rect_verts[base_idx + 14] = c.bottom_right;
 	rect_rect_verts[base_idx + 15] = c.top_right;
@@ -352,7 +354,7 @@ void sdf_rect_set_rect_corner(krink_sdf_corner_radius_t c) {
 	rect_rect_verts[base_idx + 77] = c.top_left;
 }
 
-void sdf_rect_set_border_smooth(float b, float s) {
+static void sdf_rect_set_border_smooth(float b, float s) {
 	int base_idx = (rect_buffer_index - rect_buffer_start) * 20 * 4;
 	rect_rect_verts[base_idx + 18] = b;
 	rect_rect_verts[base_idx + 19] = s;
@@ -378,7 +380,8 @@ static void sdf_rect_draw_buffer(bool end) {
 	kinc_g4_set_matrix4(rect_proj_mat_loc, &projection_matrix);
 	kinc_g4_set_vertex_buffer(&rect_vertex_buffer);
 	kinc_g4_set_index_buffer(&rect_index_buffer);
-	kinc_g4_draw_indexed_vertices_from_to(rect_buffer_start * 2 * 3, (rect_buffer_index - rect_buffer_start) * 2 * 3);
+	kinc_g4_draw_indexed_vertices_from_to(rect_buffer_start * 2 * 3,
+	                                      (rect_buffer_index - rect_buffer_start) * 2 * 3);
 
 	if (end || rect_buffer_index + 1 >= KRINK_G2_SDF_BUFFER_SIZE) {
 		rect_buffer_start = 0;
@@ -442,6 +445,101 @@ void krink_g2_sdf_draw_rect_symm(float x, float y, float width, float height, fl
 	                       smooth, color, border_color, opacity, transformation);
 }
 
+// SDF Circle Impl
+
+static void sdf_circle_set_rect_verts(float btlx, float btly, float tplx, float tply, float tprx, float tpry,
+                             float btrx, float btry) {
+	int base_idx = (circle_buffer_index - circle_buffer_start) * 14 * 4;
+	circle_rect_verts[base_idx + 0] = btlx;
+	circle_rect_verts[base_idx + 1] = btly;
+	circle_rect_verts[base_idx + 2] = -5.0f;
+
+	circle_rect_verts[base_idx + 14] = tplx;
+	circle_rect_verts[base_idx + 15] = tply;
+	circle_rect_verts[base_idx + 16] = -5.0f;
+
+	circle_rect_verts[base_idx + 28] = tprx;
+	circle_rect_verts[base_idx + 29] = tpry;
+	circle_rect_verts[base_idx + 30] = -5.0f;
+
+	circle_rect_verts[base_idx + 42] = btrx;
+	circle_rect_verts[base_idx + 43] = btry;
+	circle_rect_verts[base_idx + 44] = -5.0f;
+}
+
+static void sdf_circle_set_rect_tex_coords(float left, float top, float right, float bottom) {
+	int base_idx = (circle_buffer_index - circle_buffer_start) * 14 * 4;
+	circle_rect_verts[base_idx + 3] = left;
+	circle_rect_verts[base_idx + 4] = bottom;
+
+	circle_rect_verts[base_idx + 17] = left;
+	circle_rect_verts[base_idx + 18] = top;
+
+	circle_rect_verts[base_idx + 31] = right;
+	circle_rect_verts[base_idx + 32] = top;
+
+	circle_rect_verts[base_idx + 45] = right;
+	circle_rect_verts[base_idx + 46] = bottom;
+}
+
+static void sdf_circle_set_rect_colors(float opacity, unsigned int color, unsigned int border_color) {
+	int base_idx = (circle_buffer_index - circle_buffer_start) * 14 * 4;
+	float a = opacity * ((float)krink_color_get_channel(color, 'A') / 255.0f);
+	float r = ((float)krink_color_get_channel(color, 'R') / 255.0f);
+	float g = ((float)krink_color_get_channel(color, 'G') / 255.0f);
+	float b = ((float)krink_color_get_channel(color, 'B') / 255.0f);
+	float br = ((float)krink_color_get_channel(border_color, 'R') / 255.0f);
+	float bg = ((float)krink_color_get_channel(border_color, 'G') / 255.0f);
+	float bb = ((float)krink_color_get_channel(border_color, 'B') / 255.0f);
+
+	circle_rect_verts[base_idx + 5] = r;
+	circle_rect_verts[base_idx + 6] = g;
+	circle_rect_verts[base_idx + 7] = b;
+	circle_rect_verts[base_idx + 8] = a;
+	circle_rect_verts[base_idx + 9] = br;
+	circle_rect_verts[base_idx + 10] = bg;
+	circle_rect_verts[base_idx + 11] = bb;
+
+	circle_rect_verts[base_idx + 19] = r;
+	circle_rect_verts[base_idx + 20] = g;
+	circle_rect_verts[base_idx + 21] = b;
+	circle_rect_verts[base_idx + 22] = a;
+	circle_rect_verts[base_idx + 23] = br;
+	circle_rect_verts[base_idx + 24] = bg;
+	circle_rect_verts[base_idx + 25] = bb;
+
+	circle_rect_verts[base_idx + 33] = r;
+	circle_rect_verts[base_idx + 34] = g;
+	circle_rect_verts[base_idx + 35] = b;
+	circle_rect_verts[base_idx + 36] = a;
+	circle_rect_verts[base_idx + 37] = br;
+	circle_rect_verts[base_idx + 38] = bg;
+	circle_rect_verts[base_idx + 39] = bb;
+
+	circle_rect_verts[base_idx + 47] = r;
+	circle_rect_verts[base_idx + 48] = g;
+	circle_rect_verts[base_idx + 49] = b;
+	circle_rect_verts[base_idx + 50] = a;
+	circle_rect_verts[base_idx + 51] = br;
+	circle_rect_verts[base_idx + 52] = bg;
+	circle_rect_verts[base_idx + 53] = bb;
+}
+
+static void sdf_circle_set_border_smooth(float b, float s) {
+	int base_idx = (circle_buffer_index - circle_buffer_start) * 20 * 4;
+	circle_rect_verts[base_idx + 12] = b;
+	circle_rect_verts[base_idx + 13] = s;
+
+	circle_rect_verts[base_idx + 26] = b;
+	circle_rect_verts[base_idx + 27] = s;
+
+	circle_rect_verts[base_idx + 40] = b;
+	circle_rect_verts[base_idx + 41] = s;
+
+	circle_rect_verts[base_idx + 54] = b;
+	circle_rect_verts[base_idx + 55] = s;
+}
+
 static void sdf_circle_draw_buffer(bool end) {
 	if (!end) {
 		sdf_rect_end();
@@ -454,7 +552,8 @@ static void sdf_circle_draw_buffer(bool end) {
 	kinc_g4_set_matrix4(circle_proj_mat_loc, &projection_matrix);
 	kinc_g4_set_vertex_buffer(&circle_vertex_buffer);
 	kinc_g4_set_index_buffer(&circle_index_buffer);
-	kinc_g4_draw_indexed_vertices_from_to(circle_buffer_start * 2 * 3, (circle_buffer_index - circle_buffer_start) * 2 * 3);
+	kinc_g4_draw_indexed_vertices_from_to(circle_buffer_start * 2 * 3,
+	                                      (circle_buffer_index - circle_buffer_start) * 2 * 3);
 
 	if (end || circle_buffer_index + 1 >= KRINK_G2_SDF_BUFFER_SIZE) {
 		circle_buffer_start = 0;
@@ -471,9 +570,30 @@ static void sdf_circle_draw_buffer(bool end) {
 }
 
 void krink_g2_sdf_draw_circle(float x, float y, float radius, float border, float smooth,
-                              unsigned int color, unsigned int border_color,
+                              unsigned int color, unsigned int border_color, float opacity,
                               kinc_matrix3x3_t transformation) {
+	kinc_vector3_t p0 = kinc_matrix3x3_multiply_vector(
+	    &transformation, (kinc_vector3_t){x - radius, y + radius, 0.0f}); // bottom-left
+	kinc_vector3_t p1 =
+	    kinc_matrix3x3_multiply_vector(&transformation, (kinc_vector3_t){x - radius, y - radius, 0.0f}); // top-left
+	kinc_vector3_t p2 = kinc_matrix3x3_multiply_vector(
+	    &transformation, (kinc_vector3_t){x + radius, y - radius, 0.0f}); // top-right
+	kinc_vector3_t p3 = kinc_matrix3x3_multiply_vector(
+	    &transformation, (kinc_vector3_t){x + radius, y + radius, 0.0f}); // bottom-right
+	sdf_circle_set_rect_verts(p0.x, p0.y, p1.x, p1.y, p2.x, p2.y, p3.x, p3.y);
+	float w =
+	    krink_vec2_length(krink_vec2_subv((krink_vec2_t){p2.x, p2.y}, (krink_vec2_t){p1.x, p1.y}));
+	float h =
+	    krink_vec2_length(krink_vec2_subv((krink_vec2_t){p0.x, p0.y}, (krink_vec2_t){p1.x, p1.y}));
+	float u = w / (w > h ? w : h);
+	float v = h / (w > h ? w : h);
+	float f = (u >= v ? u / w : v / h) * max(w / (2 * radius), h / (2 * radius));
 
+	sdf_circle_set_rect_colors(opacity, color, border_color);
+	sdf_circle_set_rect_tex_coords(0.0f, 0.0f, 1.0f, 1.0f);
+	sdf_circle_set_border_smooth(border * f, smooth * f);
+
+	++circle_buffer_index;
 }
 
 static void sdf_line_draw_buffer(bool end) {
@@ -487,7 +607,8 @@ static void sdf_line_draw_buffer(bool end) {
 	kinc_g4_set_matrix4(line_proj_mat_loc, &projection_matrix);
 	kinc_g4_set_vertex_buffer(&line_vertex_buffer);
 	kinc_g4_set_index_buffer(&line_index_buffer);
-	kinc_g4_draw_indexed_vertices_from_to(line_buffer_start * 2 * 3, (line_buffer_index - line_buffer_start) * 2 * 3);
+	kinc_g4_draw_indexed_vertices_from_to(line_buffer_start * 2 * 3,
+	                                      (line_buffer_index - line_buffer_start) * 2 * 3);
 
 	if (end || line_buffer_index + 1 >= KRINK_G2_SDF_BUFFER_SIZE) {
 		line_buffer_start = 0;
@@ -504,9 +625,8 @@ static void sdf_line_draw_buffer(bool end) {
 }
 
 void krink_g2_sdf_draw_line(float x0, float y0, float x1, float y1, float corner_radius,
-                            float smooth, unsigned int color, kinc_matrix3x3_t transformation) {
-
-}
+                            float smooth, unsigned int color, float opacity,
+                            kinc_matrix3x3_t transformation) {}
 
 static void sdf_rect_end(void) {
 	if (rect_buffer_index - rect_buffer_start > 0) sdf_rect_draw_buffer(true);
