@@ -31,7 +31,8 @@ void krink_ttf_init(int *glyphs, int num_glyphs);
 /// </summary>
 /// <param name="font">Pointer to your font object</param>
 /// <param name="fontpath">Path to the TTF file</param>
-/// <param name="font_index">Font index to determine offset. Silently falls back to 0 if unable to load the specified index</param>
+/// <param name="font_index">Font index to determine offset. Silently falls back to 0 if unable to
+/// load the specified index</param>
 void krink_ttf_font_init(krink_ttf_font_t *font, const char *fontpath, int font_index);
 
 /// <summary>
@@ -64,7 +65,8 @@ float krink_ttf_width(krink_ttf_font_t *font, int size, const char *str);
 /// <param name="characters">Array of codepoints</param>
 /// <param name="start">Start index</param>
 /// <param name="length">Number of characters</param>
-float krink_ttf_width_of_characters(krink_ttf_font_t *font, int size, int *characters, int start, int length);
+float krink_ttf_width_of_characters(krink_ttf_font_t *font, int size, int *characters, int start,
+                                    int length);
 
 /// <summary>
 /// Returns the baseline for a font in pixel. (=Ascent)
@@ -96,7 +98,8 @@ float krink_ttf_line_gap(krink_ttf_font_t *font, int size);
 /// <param name="char_code">Character codepoint</param>
 /// <param name="xpos">x position</param>
 /// <param name="ypos">y position</param>
-bool krink_ttf_get_baked_quad(krink_ttf_font_t *font, int size, krink_ttf_aligned_quad_t *q, int char_code, float xpos, float ypos);
+bool krink_ttf_get_baked_quad(krink_ttf_font_t *font, int size, krink_ttf_aligned_quad_t *q,
+                              int char_code, float xpos, float ypos);
 
 /// <summary>
 /// Get the baked texture of the font.

@@ -145,11 +145,13 @@ void krink_ttf_load(krink_ttf_font_t *font, int size) {
 	if (font->m_capacity <= font->m_images_len) {
 		size_t new_capacity = 2;
 		if (font->m_capacity == 0) {
-			font->images = (krink_ttf_image_t *)krink_malloc(new_capacity * sizeof(krink_ttf_image_t));
+			font->images =
+			    (krink_ttf_image_t *)krink_malloc(new_capacity * sizeof(krink_ttf_image_t));
 		}
 		else {
 			while (font->m_capacity > new_capacity) new_capacity *= 2;
-			font->images = (krink_ttf_image_t *)krink_realloc(font->images, new_capacity * sizeof(krink_ttf_image_t));
+			font->images = (krink_ttf_image_t *)krink_realloc(
+			    font->images, new_capacity * sizeof(krink_ttf_image_t));
 		}
 		assert(font->images != NULL);
 		font->m_capacity = new_capacity;
@@ -160,7 +162,8 @@ void krink_ttf_load(krink_ttf_font_t *font, int size) {
 	font->m_images_len += 1;
 	int width = 64;
 	int height = 32;
-	stbtt_bakedchar *baked = (stbtt_bakedchar *)krink_malloc(krink_ttf_num_glyphs * sizeof(stbtt_bakedchar));
+	stbtt_bakedchar *baked =
+	    (stbtt_bakedchar *)krink_malloc(krink_ttf_num_glyphs * sizeof(stbtt_bakedchar));
 	assert(baked != NULL);
 	unsigned char *pixels = NULL;
 
@@ -175,7 +178,8 @@ void krink_ttf_load(krink_ttf_font_t *font, int size) {
 		else
 			pixels = (unsigned char *)krink_realloc(pixels, width * height);
 		assert(pixels != NULL);
-		status = stbtt_BakeFontBitmapArr(font->blob, font->offset, (float)size, pixels, width, height, krink_ttf_glyphs, krink_ttf_num_glyphs, baked);
+		status = stbtt_BakeFontBitmapArr(font->blob, font->offset, (float)size, pixels, width,
+		                                 height, krink_ttf_glyphs, krink_ttf_num_glyphs, baked);
 	}
 
 	// TODO: Scale pixels down if they exceed the supported texture size
@@ -211,7 +215,8 @@ float krink_ttf_width(krink_ttf_font_t *font, int size, const char *str) {
 	return krink_ttf_get_string_width_internal(img, str);
 }
 
-float krink_ttf_width_of_characters(krink_ttf_font_t *font, int size, int *characters, int start, int length) {
+float krink_ttf_width_of_characters(krink_ttf_font_t *font, int size, int *characters, int start,
+                                    int length) {
 	krink_ttf_image_t *img = krink_ttf_get_image_internal(font, size);
 	assert(img != NULL);
 	float width = 0.0f;
@@ -239,7 +244,8 @@ float krink_ttf_line_gap(krink_ttf_font_t *font, int size) {
 	return img->line_gap;
 }
 
-bool krink_ttf_get_baked_quad(krink_ttf_font_t *font, int size, krink_ttf_aligned_quad_t *q, int char_code, float xpos, float ypos) {
+bool krink_ttf_get_baked_quad(krink_ttf_font_t *font, int size, krink_ttf_aligned_quad_t *q,
+                              int char_code, float xpos, float ypos) {
 	krink_ttf_image_t *img = krink_ttf_get_image_internal(font, size);
 	assert(img != NULL);
 	int char_index = krink_ttf_get_char_index_internal(img, char_code);
