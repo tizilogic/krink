@@ -71,10 +71,12 @@ void krink_g2_tsp_init(void) {
 	texunit = kinc_g4_pipeline_get_texture_unit(&pipeline, "tex");
 	proj_mat_loc = kinc_g4_pipeline_get_constant_location(&pipeline, "projectionMatrix");
 
-	kinc_g4_vertex_buffer_init(&vertex_buffer, KRINK_G2_TSP_BUFFER_SIZE * 4, &structure, KINC_G4_USAGE_DYNAMIC, 0);
+	kinc_g4_vertex_buffer_init(&vertex_buffer, KRINK_G2_TSP_BUFFER_SIZE * 4, &structure,
+	                           KINC_G4_USAGE_DYNAMIC, 0);
 	rect_verts = kinc_g4_vertex_buffer_lock_all(&vertex_buffer);
 
-	kinc_g4_index_buffer_init(&index_buffer, KRINK_G2_TSP_BUFFER_SIZE * 3 * 2, KINC_G4_USAGE_STATIC);
+	kinc_g4_index_buffer_init(&index_buffer, KRINK_G2_TSP_BUFFER_SIZE * 3 * 2,
+	                          KINC_G4_USAGE_STATIC);
 	int *indices = kinc_g4_index_buffer_lock(&index_buffer);
 	for (int i = 0; i < KRINK_G2_TSP_BUFFER_SIZE; ++i) {
 		indices[i * 3 * 2 + 0] = i * 4 + 0;
@@ -87,7 +89,8 @@ void krink_g2_tsp_init(void) {
 	kinc_g4_index_buffer_unlock(&index_buffer);
 }
 
-void krink_g2_tsp_set_rect_verts(float btlx, float btly, float tplx, float tply, float tprx, float tpry, float btrx, float btry) {
+void krink_g2_tsp_set_rect_verts(float btlx, float btly, float tplx, float tply, float tprx,
+                                 float tpry, float btrx, float btry) {
 	int base_idx = buffer_index * 9 * 4;
 	rect_verts[base_idx + 0] = btlx;
 	rect_verts[base_idx + 1] = btly;
@@ -157,21 +160,26 @@ void krink_g2_tsp_draw_buffer(bool end) {
 	kinc_g4_set_vertex_buffer(&vertex_buffer);
 	kinc_g4_set_index_buffer(&index_buffer);
 	kinc_g4_set_texture(texunit, &last_texture);
-	kinc_g4_set_texture_addressing(texunit, KINC_G4_TEXTURE_ADDRESSING_CLAMP, KINC_G4_TEXTURE_ADDRESSING_CLAMP);
+	kinc_g4_set_texture_addressing(texunit, KINC_G4_TEXTURE_ADDRESSING_CLAMP,
+	                               KINC_G4_TEXTURE_ADDRESSING_CLAMP);
 	kinc_g4_set_texture_mipmap_filter(texunit, KINC_G4_MIPMAP_FILTER_NONE);
-	kinc_g4_set_texture_minification_filter(texunit, bilinear_filter ? KINC_G4_TEXTURE_FILTER_LINEAR : KINC_G4_TEXTURE_FILTER_POINT);
-	kinc_g4_set_texture_magnification_filter(texunit, bilinear_filter ? KINC_G4_TEXTURE_FILTER_LINEAR : KINC_G4_TEXTURE_FILTER_POINT);
-	kinc_g4_draw_indexed_vertices_from_to(buffer_start, buffer_index * 4);
+	kinc_g4_set_texture_minification_filter(
+	    texunit, bilinear_filter ? KINC_G4_TEXTURE_FILTER_LINEAR : KINC_G4_TEXTURE_FILTER_POINT);
+	kinc_g4_set_texture_magnification_filter(
+	    texunit, bilinear_filter ? KINC_G4_TEXTURE_FILTER_LINEAR : KINC_G4_TEXTURE_FILTER_POINT);
+	kinc_g4_draw_indexed_vertices_from_to(buffer_start * 2 * 3,
+	                                      (buffer_index - buffer_start) * 2 * 3);
 
 	kinc_g4_set_texture(texunit, NULL);
-	if (end || buffer_start + buffer_index + 1 >= KRINK_G2_TSP_BUFFER_SIZE) {
+	if (end || buffer_index + 1 >= KRINK_G2_TSP_BUFFER_SIZE) {
 		buffer_start = 0;
 		buffer_index = 0;
 		rect_verts = kinc_g4_vertex_buffer_lock(&vertex_buffer, 0, KRINK_G2_TSP_BUFFER_SIZE * 4);
 	}
 	else {
 		buffer_start = buffer_index;
-		rect_verts = kinc_g4_vertex_buffer_lock(&vertex_buffer, buffer_start, (KRINK_G2_TSP_BUFFER_SIZE - buffer_start) * 4);
+		rect_verts = kinc_g4_vertex_buffer_lock(&vertex_buffer, buffer_start * 4,
+		                                        (KRINK_G2_TSP_BUFFER_SIZE - buffer_start) * 4);
 	}
 }
 
@@ -192,7 +200,8 @@ void krink_g2_tsp_set_font_size(int size) {
 	font_size = size;
 }
 
-void krink_g2_tsp_draw_string(const char *text, float opacity, unsigned int color, float x, float y, kinc_matrix3x3_t transformation) {
+void krink_g2_tsp_draw_string(const char *text, float opacity, unsigned int color, float x, float y,
+                              kinc_matrix3x3_t transformation) {
 	kinc_g4_texture_t *tex = krink_ttf_get_texture(active_font, font_size);
 
 	if (last_texture != NULL && tex != last_texture) krink_g2_tsp_draw_buffer(false);
@@ -207,10 +216,14 @@ void krink_g2_tsp_draw_string(const char *text, float opacity, unsigned int colo
 			if (buffer_index + 1 >= KRINK_G2_TSP_BUFFER_SIZE) krink_g2_tsp_draw_buffer(false);
 			krink_g2_tsp_set_rect_colors(opacity, color);
 			krink_g2_tsp_set_rect_tex_coords(q.s0, q.t0, q.s1, q.t1);
-			kinc_vector3_t p0 = kinc_matrix3x3_multiply_vector(&transformation, (kinc_vector3_t){q.x0, q.y1, 0.0f}); // bottom-left
-			kinc_vector3_t p1 = kinc_matrix3x3_multiply_vector(&transformation, (kinc_vector3_t){q.x0, q.y0, 0.0f}); // top-left
-			kinc_vector3_t p2 = kinc_matrix3x3_multiply_vector(&transformation, (kinc_vector3_t){q.x1, q.y0, 0.0f}); // top-right
-			kinc_vector3_t p3 = kinc_matrix3x3_multiply_vector(&transformation, (kinc_vector3_t){q.x1, q.y1, 0.0f}); // bottom-right
+			kinc_vector3_t p0 = kinc_matrix3x3_multiply_vector(
+			    &transformation, (kinc_vector3_t){q.x0, q.y1, 0.0f}); // bottom-left
+			kinc_vector3_t p1 = kinc_matrix3x3_multiply_vector(
+			    &transformation, (kinc_vector3_t){q.x0, q.y0, 0.0f}); // top-left
+			kinc_vector3_t p2 = kinc_matrix3x3_multiply_vector(
+			    &transformation, (kinc_vector3_t){q.x1, q.y0, 0.0f}); // top-right
+			kinc_vector3_t p3 = kinc_matrix3x3_multiply_vector(
+			    &transformation, (kinc_vector3_t){q.x1, q.y1, 0.0f}); // bottom-right
 			krink_g2_tsp_set_rect_verts(p0.x, p0.y, p1.x, p1.y, p2.x, p2.y, p3.x, p3.y);
 			xpos += q.xadvance;
 			++buffer_index;
@@ -218,7 +231,9 @@ void krink_g2_tsp_draw_string(const char *text, float opacity, unsigned int colo
 	}
 }
 
-void krink_g2_tsp_draw_characters(int *text, int start, int length, float opacity, unsigned int color, float x, float y, kinc_matrix3x3_t transformation) {
+void krink_g2_tsp_draw_characters(int *text, int start, int length, float opacity,
+                                  unsigned int color, float x, float y,
+                                  kinc_matrix3x3_t transformation) {
 	kinc_g4_texture_t *tex = krink_ttf_get_texture(active_font, font_size);
 
 	if (last_texture != NULL && tex != last_texture) krink_g2_tsp_draw_buffer(false);
@@ -232,10 +247,14 @@ void krink_g2_tsp_draw_characters(int *text, int start, int length, float opacit
 			if (buffer_index + 1 >= KRINK_G2_TSP_BUFFER_SIZE) krink_g2_tsp_draw_buffer(false);
 			krink_g2_tsp_set_rect_colors(opacity, color);
 			krink_g2_tsp_set_rect_tex_coords(q.s0, q.t0, q.s1, q.t1);
-			kinc_vector3_t p0 = kinc_matrix3x3_multiply_vector(&transformation, (kinc_vector3_t){q.x0, q.y1, 0.0f}); // bottom-left
-			kinc_vector3_t p1 = kinc_matrix3x3_multiply_vector(&transformation, (kinc_vector3_t){q.x0, q.y0, 0.0f}); // top-left
-			kinc_vector3_t p2 = kinc_matrix3x3_multiply_vector(&transformation, (kinc_vector3_t){q.x1, q.y0, 0.0f}); // top-right
-			kinc_vector3_t p3 = kinc_matrix3x3_multiply_vector(&transformation, (kinc_vector3_t){q.x1, q.y1, 0.0f}); // bottom-right
+			kinc_vector3_t p0 = kinc_matrix3x3_multiply_vector(
+			    &transformation, (kinc_vector3_t){q.x0, q.y1, 0.0f}); // bottom-left
+			kinc_vector3_t p1 = kinc_matrix3x3_multiply_vector(
+			    &transformation, (kinc_vector3_t){q.x0, q.y0, 0.0f}); // top-left
+			kinc_vector3_t p2 = kinc_matrix3x3_multiply_vector(
+			    &transformation, (kinc_vector3_t){q.x1, q.y0, 0.0f}); // top-right
+			kinc_vector3_t p3 = kinc_matrix3x3_multiply_vector(
+			    &transformation, (kinc_vector3_t){q.x1, q.y1, 0.0f}); // bottom-right
 			krink_g2_tsp_set_rect_verts(p0.x, p0.y, p1.x, p1.y, p2.x, p2.y, p3.x, p3.y);
 			xpos += q.xadvance;
 			++buffer_index;
