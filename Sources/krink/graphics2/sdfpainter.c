@@ -238,8 +238,8 @@ void krink_g2_sdf_init(void) {
 
 // SDF Rect Impl
 
-static void sdf_rect_set_rect_verts(float btlx, float btly, float tplx, float tply, float tprx, float tpry,
-                             float btrx, float btry) {
+static void sdf_rect_set_rect_verts(float btlx, float btly, float tplx, float tply, float tprx,
+                                    float tpry, float btrx, float btry) {
 	int base_idx = (rect_buffer_index - rect_buffer_start) * 20 * 4;
 	rect_rect_verts[base_idx + 0] = btlx;
 	rect_rect_verts[base_idx + 1] = btly;
@@ -447,8 +447,8 @@ void krink_g2_sdf_draw_rect_symm(float x, float y, float width, float height, fl
 
 // SDF Circle Impl
 
-static void sdf_circle_set_rect_verts(float btlx, float btly, float tplx, float tply, float tprx, float tpry,
-                             float btrx, float btry) {
+static void sdf_circle_set_rect_verts(float btlx, float btly, float tplx, float tply, float tprx,
+                                      float tpry, float btrx, float btry) {
 	int base_idx = (circle_buffer_index - circle_buffer_start) * 14 * 4;
 	circle_rect_verts[base_idx + 0] = btlx;
 	circle_rect_verts[base_idx + 1] = btly;
@@ -482,7 +482,8 @@ static void sdf_circle_set_rect_tex_coords(float left, float top, float right, f
 	circle_rect_verts[base_idx + 46] = bottom;
 }
 
-static void sdf_circle_set_rect_colors(float opacity, unsigned int color, unsigned int border_color) {
+static void sdf_circle_set_rect_colors(float opacity, unsigned int color,
+                                       unsigned int border_color) {
 	int base_idx = (circle_buffer_index - circle_buffer_start) * 14 * 4;
 	float a = opacity * ((float)krink_color_get_channel(color, 'A') / 255.0f);
 	float r = ((float)krink_color_get_channel(color, 'R') / 255.0f);
@@ -526,7 +527,7 @@ static void sdf_circle_set_rect_colors(float opacity, unsigned int color, unsign
 }
 
 static void sdf_circle_set_border_smooth(float b, float s) {
-	int base_idx = (circle_buffer_index - circle_buffer_start) * 20 * 4;
+	int base_idx = (circle_buffer_index - circle_buffer_start) * 14 * 4;
 	circle_rect_verts[base_idx + 12] = b;
 	circle_rect_verts[base_idx + 13] = s;
 
@@ -574,8 +575,8 @@ void krink_g2_sdf_draw_circle(float x, float y, float radius, float border, floa
                               kinc_matrix3x3_t transformation) {
 	kinc_vector3_t p0 = kinc_matrix3x3_multiply_vector(
 	    &transformation, (kinc_vector3_t){x - radius, y + radius, 0.0f}); // bottom-left
-	kinc_vector3_t p1 =
-	    kinc_matrix3x3_multiply_vector(&transformation, (kinc_vector3_t){x - radius, y - radius, 0.0f}); // top-left
+	kinc_vector3_t p1 = kinc_matrix3x3_multiply_vector(
+	    &transformation, (kinc_vector3_t){x - radius, y - radius, 0.0f}); // top-left
 	kinc_vector3_t p2 = kinc_matrix3x3_multiply_vector(
 	    &transformation, (kinc_vector3_t){x + radius, y - radius, 0.0f}); // top-right
 	kinc_vector3_t p3 = kinc_matrix3x3_multiply_vector(
@@ -594,6 +595,97 @@ void krink_g2_sdf_draw_circle(float x, float y, float radius, float border, floa
 	sdf_circle_set_border_smooth(border * f, smooth * f);
 
 	++circle_buffer_index;
+}
+
+// SDF Line Impl
+
+static void sdf_line_set_rect_verts(float btlx, float btly, float tplx, float tply, float tprx,
+                                    float tpry, float btrx, float btry) {
+	int base_idx = (line_buffer_index - line_buffer_start) * 12 * 4;
+	line_rect_verts[base_idx + 0] = btlx;
+	line_rect_verts[base_idx + 1] = btly;
+	line_rect_verts[base_idx + 2] = -5.0f;
+
+	line_rect_verts[base_idx + 12] = tplx;
+	line_rect_verts[base_idx + 13] = tply;
+	line_rect_verts[base_idx + 14] = -5.0f;
+
+	line_rect_verts[base_idx + 24] = tprx;
+	line_rect_verts[base_idx + 25] = tpry;
+	line_rect_verts[base_idx + 26] = -5.0f;
+
+	line_rect_verts[base_idx + 36] = btrx;
+	line_rect_verts[base_idx + 37] = btry;
+	line_rect_verts[base_idx + 38] = -5.0f;
+}
+
+static void sdf_line_set_rect_tex_coords(float left, float top, float right, float bottom) {
+	int base_idx = (line_buffer_index - line_buffer_start) * 12 * 4;
+	line_rect_verts[base_idx + 3] = left;
+	line_rect_verts[base_idx + 4] = bottom;
+
+	line_rect_verts[base_idx + 15] = left;
+	line_rect_verts[base_idx + 16] = top;
+
+	line_rect_verts[base_idx + 27] = right;
+	line_rect_verts[base_idx + 28] = top;
+
+	line_rect_verts[base_idx + 39] = right;
+	line_rect_verts[base_idx + 40] = bottom;
+}
+
+static void sdf_line_set_rect_colors(float opacity, unsigned int color) {
+	int base_idx = (line_buffer_index - line_buffer_start) * 12 * 4;
+	float a = opacity * ((float)krink_color_get_channel(color, 'A') / 255.0f);
+	float r = ((float)krink_color_get_channel(color, 'R') / 255.0f);
+	float g = ((float)krink_color_get_channel(color, 'G') / 255.0f);
+	float b = ((float)krink_color_get_channel(color, 'B') / 255.0f);
+
+	line_rect_verts[base_idx + 5] = r;
+	line_rect_verts[base_idx + 6] = g;
+	line_rect_verts[base_idx + 7] = b;
+	line_rect_verts[base_idx + 8] = a;
+
+	line_rect_verts[base_idx + 17] = r;
+	line_rect_verts[base_idx + 18] = g;
+	line_rect_verts[base_idx + 19] = b;
+	line_rect_verts[base_idx + 20] = a;
+
+	line_rect_verts[base_idx + 29] = r;
+	line_rect_verts[base_idx + 30] = g;
+	line_rect_verts[base_idx + 31] = b;
+	line_rect_verts[base_idx + 32] = a;
+
+	line_rect_verts[base_idx + 41] = r;
+	line_rect_verts[base_idx + 42] = g;
+	line_rect_verts[base_idx + 43] = b;
+	line_rect_verts[base_idx + 44] = a;
+}
+
+static void sdf_line_set_dim(float u, float v) {
+	int base_idx = (line_buffer_index - line_buffer_start) * 12 * 4;
+	line_rect_verts[base_idx + 9] = u;
+	line_rect_verts[base_idx + 10] = v;
+
+	line_rect_verts[base_idx + 21] = u;
+	line_rect_verts[base_idx + 22] = v;
+
+	line_rect_verts[base_idx + 33] = u;
+	line_rect_verts[base_idx + 34] = v;
+
+	line_rect_verts[base_idx + 45] = u;
+	line_rect_verts[base_idx + 46] = v;
+}
+
+static void sdf_line_set_smooth(float s) {
+	int base_idx = (line_buffer_index - line_buffer_start) * 12 * 4;
+	line_rect_verts[base_idx + 11] = s;
+
+	line_rect_verts[base_idx + 23] = s;
+
+	line_rect_verts[base_idx + 35] = s;
+
+	line_rect_verts[base_idx + 47] = s;
 }
 
 static void sdf_line_draw_buffer(bool end) {
@@ -624,9 +716,51 @@ static void sdf_line_draw_buffer(bool end) {
 	}
 }
 
-void krink_g2_sdf_draw_line(float x0, float y0, float x1, float y1, float corner_radius,
-                            float smooth, unsigned int color, float opacity,
-                            kinc_matrix3x3_t transformation) {}
+static kinc_vector3_t get_corner_vec(krink_vec2_t a, krink_vec2_t d0, krink_vec2_t d1) {
+	a = krink_vec2_addv(krink_vec2_addv(a, d0), d1);
+	return (kinc_vector3_t){a.x, a.y, 0.0f};
+}
+
+void krink_g2_sdf_draw_line(float x0, float y0, float x1, float y1, float strength, float smooth,
+                            unsigned int color, float opacity, kinc_matrix3x3_t transformation) {
+	krink_vec2_t a = x0 <= x1 ? ((krink_vec2_t){x0, y0}) : ((krink_vec2_t){x1, y1});
+	krink_vec2_t b = x0 <= x1 ? ((krink_vec2_t){x1, y1}) : ((krink_vec2_t){x0, y0});
+	krink_vec2_t fw = krink_vec2_normalized(krink_vec2_subv(b, a));
+	krink_vec2_t bw = krink_vec2_mult(fw, -1.0f);
+	krink_vec2_t up = (krink_vec2_t){fw.y, -fw.x};
+	krink_vec2_t down = krink_vec2_mult(up, -1.0f);
+	float hs = strength / 2.0;
+	fw = krink_vec2_mult(fw, hs);
+	bw = krink_vec2_mult(bw, hs);
+	up = krink_vec2_mult(up, hs);
+	down = krink_vec2_mult(down, hs);
+
+	kinc_vector3_t p0 =
+	    kinc_matrix3x3_multiply_vector(&transformation, get_corner_vec(a, down, bw)); // bottom-left
+	kinc_vector3_t p1 =
+	    kinc_matrix3x3_multiply_vector(&transformation, get_corner_vec(a, up, bw)); // top-left
+	kinc_vector3_t p2 =
+	    kinc_matrix3x3_multiply_vector(&transformation, get_corner_vec(b, up, fw)); // top-right
+	kinc_vector3_t p3 = kinc_matrix3x3_multiply_vector(&transformation,
+	                                                   get_corner_vec(b, down, fw)); // bottom-right
+
+	float w =
+	    krink_vec2_length(krink_vec2_subv((krink_vec2_t){p2.x, p2.y}, (krink_vec2_t){p1.x, p1.y}));
+	float h =
+	    krink_vec2_length(krink_vec2_subv((krink_vec2_t){p0.x, p0.y}, (krink_vec2_t){p1.x, p1.y}));
+	float u = w / (w > h ? w : h);
+	float v = h / (w > h ? w : h);
+	float wd = krink_vec2_length(krink_vec2_subv(a, b));
+	float f = (u >= v ? u / w : v / h) * max(w / wd, h / strength);
+
+	sdf_line_set_rect_verts(p0.x, p0.y, p1.x, p1.y, p2.x, p2.y, p3.x, p3.y);
+	sdf_line_set_rect_colors(opacity, color);
+	sdf_line_set_rect_tex_coords(0.0f, 0.0f, u, v);
+	sdf_line_set_dim(u / 2.0f, v / 2.0);
+	sdf_line_set_smooth(smooth * f);
+
+	++line_buffer_index;
+}
 
 static void sdf_rect_end(void) {
 	if (rect_buffer_index - rect_buffer_start > 0) sdf_rect_draw_buffer(true);
