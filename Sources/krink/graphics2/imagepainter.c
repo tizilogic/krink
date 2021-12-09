@@ -90,7 +90,7 @@ void krink_g2_isp_init(void) {
 
 void krink_g2_isp_set_rect_verts(float btlx, float btly, float tplx, float tply, float tprx,
                                  float tpry, float btrx, float btry) {
-	int base_idx = buffer_index * 9 * 4;
+	int base_idx = (buffer_index - buffer_start) * 9 * 4;
 	rect_verts[base_idx + 0] = btlx;
 	rect_verts[base_idx + 1] = btly;
 	rect_verts[base_idx + 2] = -5.0f;
@@ -109,7 +109,7 @@ void krink_g2_isp_set_rect_verts(float btlx, float btly, float tplx, float tply,
 }
 
 void krink_g2_isp_set_rect_tex_coords(float left, float top, float right, float bottom) {
-	int base_idx = buffer_index * 9 * 4;
+	int base_idx = (buffer_index - buffer_start) * 9 * 4;
 	rect_verts[base_idx + 3] = left;
 	rect_verts[base_idx + 4] = bottom;
 
@@ -124,7 +124,7 @@ void krink_g2_isp_set_rect_tex_coords(float left, float top, float right, float 
 }
 
 void krink_g2_isp_set_rect_colors(float opacity, unsigned int color) {
-	int base_idx = buffer_index * 9 * 4;
+	int base_idx = (buffer_index - buffer_start) * 9 * 4;
 	float a = opacity * ((float)krink_color_get_channel(color, 'A') / 255.0f);
 	float r = ((float)krink_color_get_channel(color, 'R') / 255.0f);
 	float g = ((float)krink_color_get_channel(color, 'G') / 255.0f);
