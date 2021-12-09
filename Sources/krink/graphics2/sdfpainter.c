@@ -380,7 +380,7 @@ static void sdf_rect_draw_buffer(bool end) {
 	kinc_g4_set_index_buffer(&rect_index_buffer);
 	kinc_g4_draw_indexed_vertices_from_to(rect_buffer_start * 2 * 3, (rect_buffer_index - rect_buffer_start) * 2 * 3);
 
-	if (end || (rect_buffer_start + rect_buffer_index + 1) * 4 >= KRINK_G2_SDF_BUFFER_SIZE) {
+	if (end || rect_buffer_index + 1 >= KRINK_G2_SDF_BUFFER_SIZE) {
 		rect_buffer_start = 0;
 		rect_buffer_index = 0;
 		rect_rect_verts =
@@ -456,7 +456,7 @@ static void sdf_circle_draw_buffer(bool end) {
 	kinc_g4_set_index_buffer(&circle_index_buffer);
 	kinc_g4_draw_indexed_vertices_from_to(circle_buffer_start * 2 * 3, (circle_buffer_index - circle_buffer_start) * 2 * 3);
 
-	if (end || (circle_buffer_start + circle_buffer_index + 1) * 4 >= KRINK_G2_SDF_BUFFER_SIZE) {
+	if (end || circle_buffer_index + 1 >= KRINK_G2_SDF_BUFFER_SIZE) {
 		circle_buffer_start = 0;
 		circle_buffer_index = 0;
 		circle_rect_verts =
@@ -487,7 +487,7 @@ static void sdf_line_draw_buffer(bool end) {
 	kinc_g4_set_index_buffer(&line_index_buffer);
 	kinc_g4_draw_indexed_vertices_from_to(line_buffer_start * 2 * 3, (line_buffer_index - line_buffer_start) * 2 * 3);
 
-	if (end || (line_buffer_start + line_buffer_index + 1) * 4 >= KRINK_G2_SDF_BUFFER_SIZE) {
+	if (end || line_buffer_index + 1 >= KRINK_G2_SDF_BUFFER_SIZE) {
 		line_buffer_start = 0;
 		line_buffer_index = 0;
 		line_rect_verts =
