@@ -124,7 +124,7 @@ void krink_g2_tsp_set_rect_tex_coords(float left, float top, float right, float 
 	rect_verts[base_idx + 31] = bottom;
 }
 
-void krink_g2_tsp_set_rect_colors(float opacity, unsigned int color) {
+void krink_g2_tsp_set_rect_colors(float opacity, uint32_t color) {
 	int base_idx = (buffer_index - buffer_start) * 9 * 4;
 	float a = opacity * ((float)krink_color_get_channel(color, 'A') / 255.0f);
 	float r = ((float)krink_color_get_channel(color, 'R') / 255.0f);
@@ -200,7 +200,7 @@ void krink_g2_tsp_set_font_size(int size) {
 	font_size = size;
 }
 
-void krink_g2_tsp_draw_string(const char *text, float opacity, unsigned int color, float x, float y,
+void krink_g2_tsp_draw_string(const char *text, float opacity, uint32_t color, float x, float y,
                               kinc_matrix3x3_t transformation) {
 	kinc_g4_texture_t *tex = krink_ttf_get_texture(active_font, font_size);
 
@@ -231,9 +231,8 @@ void krink_g2_tsp_draw_string(const char *text, float opacity, unsigned int colo
 	}
 }
 
-void krink_g2_tsp_draw_characters(int *text, int start, int length, float opacity,
-                                  unsigned int color, float x, float y,
-                                  kinc_matrix3x3_t transformation) {
+void krink_g2_tsp_draw_characters(int *text, int start, int length, float opacity, uint32_t color,
+                                  float x, float y, kinc_matrix3x3_t transformation) {
 	kinc_g4_texture_t *tex = krink_ttf_get_texture(active_font, font_size);
 
 	if (last_texture != NULL && tex != last_texture) krink_g2_tsp_draw_buffer(false);

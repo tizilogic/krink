@@ -286,7 +286,7 @@ static void sdf_rect_set_rect_box(float u, float v) {
 	rect_rect_verts[base_idx + 66] = v;
 }
 
-static void sdf_rect_set_rect_colors(float opacity, unsigned int color, unsigned int border_color) {
+static void sdf_rect_set_rect_colors(float opacity, uint32_t color, uint32_t border_color) {
 	int base_idx = (rect_buffer_index - rect_buffer_start) * 20 * 4;
 	float a = opacity * ((float)krink_color_get_channel(color, 'A') / 255.0f);
 	float r = ((float)krink_color_get_channel(color, 'R') / 255.0f);
@@ -401,7 +401,7 @@ void krink_g2_sdf_set_projection_matrix(kinc_matrix4x4_t mat) {
 
 void krink_g2_sdf_draw_rect(float x, float y, float width, float height,
                             krink_sdf_corner_radius_t corner, float border, float smooth,
-                            unsigned int color, unsigned int border_color, float opacity,
+                            uint32_t color, uint32_t border_color, float opacity,
                             kinc_matrix3x3_t transformation) {
 	kinc_vector3_t p0 = kinc_matrix3x3_multiply_vector(
 	    &transformation, (kinc_vector3_t){x, y + height, 0.0f}); // bottom-left
@@ -435,9 +435,8 @@ void krink_g2_sdf_draw_rect(float x, float y, float width, float height,
 }
 
 void krink_g2_sdf_draw_rect_symm(float x, float y, float width, float height, float corner,
-                                 float border, float smooth, unsigned int color,
-                                 unsigned int border_color, float opacity,
-                                 kinc_matrix3x3_t transformation) {
+                                 float border, float smooth, uint32_t color, uint32_t border_color,
+                                 float opacity, kinc_matrix3x3_t transformation) {
 	krink_g2_sdf_draw_rect(x, y, width, height,
 	                       (krink_sdf_corner_radius_t){corner, corner, corner, corner}, border,
 	                       smooth, color, border_color, opacity, transformation);
@@ -480,8 +479,7 @@ static void sdf_circle_set_rect_tex_coords(float left, float top, float right, f
 	circle_rect_verts[base_idx + 46] = bottom;
 }
 
-static void sdf_circle_set_rect_colors(float opacity, unsigned int color,
-                                       unsigned int border_color) {
+static void sdf_circle_set_rect_colors(float opacity, uint32_t color, uint32_t border_color) {
 	int base_idx = (circle_buffer_index - circle_buffer_start) * 14 * 4;
 	float a = opacity * ((float)krink_color_get_channel(color, 'A') / 255.0f);
 	float r = ((float)krink_color_get_channel(color, 'R') / 255.0f);
@@ -569,7 +567,7 @@ static void sdf_circle_draw_buffer(bool end) {
 }
 
 void krink_g2_sdf_draw_circle(float x, float y, float radius, float border, float smooth,
-                              unsigned int color, unsigned int border_color, float opacity,
+                              uint32_t color, uint32_t border_color, float opacity,
                               kinc_matrix3x3_t transformation) {
 	kinc_vector3_t p0 = kinc_matrix3x3_multiply_vector(
 	    &transformation, (kinc_vector3_t){x - radius, y + radius, 0.0f}); // bottom-left
@@ -632,7 +630,7 @@ static void sdf_line_set_rect_tex_coords(float left, float top, float right, flo
 	line_rect_verts[base_idx + 40] = bottom;
 }
 
-static void sdf_line_set_rect_colors(float opacity, unsigned int color) {
+static void sdf_line_set_rect_colors(float opacity, uint32_t color) {
 	int base_idx = (line_buffer_index - line_buffer_start) * 12 * 4;
 	float a = opacity * ((float)krink_color_get_channel(color, 'A') / 255.0f);
 	float r = ((float)krink_color_get_channel(color, 'R') / 255.0f);
@@ -720,7 +718,7 @@ static kinc_vector3_t get_corner_vec(krink_vec2_t a, krink_vec2_t d0, krink_vec2
 }
 
 void krink_g2_sdf_draw_line(float x0, float y0, float x1, float y1, float strength, float smooth,
-                            unsigned int color, float opacity, kinc_matrix3x3_t transformation) {
+                            uint32_t color, float opacity, kinc_matrix3x3_t transformation) {
 	krink_vec2_t a = x0 <= x1 ? ((krink_vec2_t){x0, y0}) : ((krink_vec2_t){x1, y1});
 	krink_vec2_t b = x0 <= x1 ? ((krink_vec2_t){x1, y1}) : ((krink_vec2_t){x0, y0});
 	krink_vec2_t fw = krink_vec2_normalized(krink_vec2_subv(b, a));

@@ -125,7 +125,7 @@ static void csp_rect_set_verts(float btlx, float btly, float tplx, float tply, f
 	rect_verts[base_idx + 23] = -5.0f;
 }
 
-static void csp_rect_set_colors(float opacity, unsigned int color) {
+static void csp_rect_set_colors(float opacity, uint32_t color) {
 	int base_idx = (rect_buffer_index - rect_buffer_start) * 7 * 4;
 	float a = opacity * ((float)krink_color_get_channel(color, 'A') / 255.0f);
 	float r = ((float)krink_color_get_channel(color, 'R') / 255.0f);
@@ -198,7 +198,7 @@ static void csp_tris_set_verts(float x0, float y0, float x1, float y1, float x2,
 	tris_verts[base_idx + 16] = -5.0f;
 }
 
-static void csp_tris_set_colors(float opacity, unsigned int color) {
+static void csp_tris_set_colors(float opacity, uint32_t color) {
 	int base_idx = (tris_buffer_index - tris_buffer_start) * 7 * 3;
 	float a = opacity * ((float)krink_color_get_channel(color, 'A') / 255.0f);
 	float r = ((float)krink_color_get_channel(color, 'R') / 255.0f);
@@ -253,7 +253,7 @@ void krink_g2_csp_set_projection_matrix(kinc_matrix4x4_t mat) {
 	projection_matrix = mat;
 }
 
-void krink_g2_csp_fill_rect(float x, float y, float width, float height, unsigned int color,
+void krink_g2_csp_fill_rect(float x, float y, float width, float height, uint32_t color,
                             float opacity, kinc_matrix3x3_t transformation) {
 	if (tris_buffer_index - tris_buffer_start > 0)
 		csp_tris_draw_buffer(true); // Flush other buffer for right render order
@@ -276,8 +276,7 @@ void krink_g2_csp_fill_rect(float x, float y, float width, float height, unsigne
 }
 
 void krink_g2_csp_fill_triangle(float x0, float y0, float x1, float y1, float x2, float y2,
-                                unsigned int color, float opacity,
-                                kinc_matrix3x3_t transformation) {
+                                uint32_t color, float opacity, kinc_matrix3x3_t transformation) {
 	if (rect_buffer_index - rect_buffer_start > 0)
 		csp_rect_draw_buffer(true); // Flush other buffer for right render order
 

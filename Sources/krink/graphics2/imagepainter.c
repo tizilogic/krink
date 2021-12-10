@@ -122,7 +122,7 @@ void krink_g2_isp_set_rect_tex_coords(float left, float top, float right, float 
 	rect_verts[base_idx + 31] = bottom;
 }
 
-void krink_g2_isp_set_rect_colors(float opacity, unsigned int color) {
+void krink_g2_isp_set_rect_colors(float opacity, uint32_t color) {
 	int base_idx = (buffer_index - buffer_start) * 9 * 4;
 	float a = opacity * ((float)krink_color_get_channel(color, 'A') / 255.0f);
 	float r = ((float)krink_color_get_channel(color, 'R') / 255.0f);
@@ -193,7 +193,7 @@ void krink_g2_isp_set_projection_matrix(kinc_matrix4x4_t mat) {
 
 void krink_g2_isp_draw_scaled_sub_image(krink_image_t *img, float sx, float sy, float sw, float sh,
                                         float dx, float dy, float dw, float dh, float opacity,
-                                        unsigned int color, kinc_matrix3x3_t transformation) {
+                                        uint32_t color, kinc_matrix3x3_t transformation) {
 	kinc_g4_texture_t *tex = &(img->tex);
 	if (buffer_start + buffer_index + 1 >= KRINK_G2_ISP_BUFFER_SIZE ||
 	    (last_texture != NULL && tex != last_texture))
