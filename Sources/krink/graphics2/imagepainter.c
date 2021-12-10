@@ -26,7 +26,6 @@ static int buffer_index = 0;
 static int buffer_start = 0;
 
 static bool bilinear_filter = false;
-static unsigned int color = 0xffffffff;
 
 void krink_g2_isp_init(void) {
 	{

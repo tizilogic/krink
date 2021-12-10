@@ -36,8 +36,6 @@ static int circle_buffer_start = 0;
 static int line_buffer_index = 0;
 static int line_buffer_start = 0;
 
-static unsigned int color = 0xffffffff;
-
 static float max(float a, float b) {
 	return (a > b ? a : b);
 }
