@@ -1,5 +1,6 @@
 #pragma once
 #include "sdfpainter.h"
+#include "ttf.h"
 #include <kinc/global.h>
 #include <kinc/math/matrix.h>
 #include <kinc/math/vector.h>
@@ -12,7 +13,31 @@ extern "C" {
 /// <summary>
 /// Initialize krink_g2.
 /// </summary>
-void krink_g2_init(void);
+/// <param name="window_width"></param>
+/// <param name="window_height"></param>
+void krink_g2_init(int window_width, int window_height);
+
+/// <summary>
+/// Change window size.
+/// </summary>
+/// <param name="window_width"></param>
+/// <param name="window_height"></param>
+void krink_g2_set_window_size(int window_width, int window_height);
+
+/// <summary>
+/// Amount of pixels per unit.
+/// </summary>
+float krink_g2_get_ppx(void);
+
+/// <summary>
+/// 1..n unit size of the X-dimension.
+/// </summary>
+float krink_g2_get_unit_width(void);
+
+/// <summary>
+/// 1..n unit size of the Y-dimension.
+/// </summary>
+float krink_g2_get_unit_height(void);
 
 /// <summary>
 /// Destroy krink_g2.
@@ -40,6 +65,12 @@ void krink_g2_clear(uint32_t color);
 /// </summary>
 /// <param name="color">The color-value to draw with</param>
 void krink_g2_set_color(uint32_t color);
+
+/// <summary>
+/// Set opacity for following draw calls.
+/// </summary>
+/// <param name="opacity">0..1</param>
+void krink_g2_set_opacity(float opacity);
 
 /// <summary>
 /// Draw a rectangle.
@@ -126,9 +157,9 @@ void krink_g2_set_transform(kinc_matrix3x3_t m);
 kinc_matrix3x3_t krink_g2_get_transform(void);
 
 /// <summary>
-/// Get the font path of the current font.
+/// Get the font ptr of the current font.
 /// </summary>
-const char *krink_g2_get_font(void);
+krink_ttf_font_t *krink_g2_get_font(void);
 
 /// <summary>
 /// Get the current font size.
@@ -138,9 +169,9 @@ float krink_g2_get_font_size(void);
 /// <summary>
 /// Set the current font and font size.
 /// </summary>
-/// <param name="font">Path to the TTF file</param>
+/// <param name="font">Ptr to `krink_ttf_font_t`</param>
 /// <param name="size">Font size in unit height</param>
-void krink_g2_set_font(const char *font, float size);
+void krink_g2_set_font(krink_ttf_font_t *font, float size);
 
 /// <summary>
 /// Draw SDF rect.
