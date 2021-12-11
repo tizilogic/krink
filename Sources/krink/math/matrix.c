@@ -86,7 +86,7 @@ krink_matrix3x3_t krink_matrix3x3_inverse(krink_matrix3x3_t m) {
 	float c02 = krink_matrix3x3_cofactor(m.m10, m.m20, m.m11, m.m21);
 
 	float det = m.m00 * c00 - m.m01 * c01 + m.m02 * c02;
-	if (absf(det) < 0.000001f) return krink_matrix3x3_empty();
+	if (fabsf(det) < 0.000001f) return krink_matrix3x3_empty();
 
 	float c10 = krink_matrix3x3_cofactor(m.m01, m.m21, m.m02, m.m22);
 	float c11 = krink_matrix3x3_cofactor(m.m00, m.m20, m.m02, m.m22);
@@ -319,7 +319,7 @@ krink_matrix4x4_t krink_matrix4x4_inverse(krink_matrix4x4_t m) {
 	    krink_matrix4x4_cofactor(m.m10, m.m20, m.m30, m.m11, m.m21, m.m31, m.m12, m.m22, m.m32);
 
 	float det = m.m00 * c00 - m.m01 * c01 + m.m02 * c02 - m.m03 * c03;
-	if (absf(det) < 0.000001f) {
+	if (fabsf(det) < 0.000001f) {
 		return krink_matrix4x4_empty();
 	}
 

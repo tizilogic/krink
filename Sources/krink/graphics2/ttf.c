@@ -12,7 +12,7 @@ static int *krink_ttf_glyphs = NULL;
 static int krink_ttf_num_glyph_blocks = -1;
 static int krink_ttf_num_glyphs = -1;
 
-static float round(float v) {
+static float myround(float v) {
 	return (float)((int)(v + 0.5f));
 }
 
@@ -190,9 +190,9 @@ void krink_ttf_load(krink_ttf_font_t *font, int size) {
 	stbtt_GetFontVMetrics(&info, &ascent, &descent, &line_gap);
 	float scale = stbtt_ScaleForPixelHeight(&info, (float)size);
 	img->m_size = (float)size;
-	img->baseline = round((float)ascent * scale);
-	img->descent = round((float)descent * scale);
-	img->line_gap = round((float)line_gap * scale);
+	img->baseline = myround((float)ascent * scale);
+	img->descent = myround((float)descent * scale);
+	img->line_gap = myround((float)line_gap * scale);
 	img->width = (float)width;
 	img->height = (float)height;
 	img->chars = baked;

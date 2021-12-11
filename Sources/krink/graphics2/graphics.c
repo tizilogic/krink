@@ -7,6 +7,7 @@
 #include <stdbool.h>
 
 #include <kinc/graphics4/graphics.h>
+#include <krink/math/matrix.h>
 #include <krink/math/vector.h>
 
 static bool begin = false;
@@ -14,6 +15,7 @@ static uint32_t g2_color = 0;
 static float g2_opacity = 1.0f;
 static kinc_matrix3x3_t g2_transformation;
 static krink_ttf_font_t *g2_font = NULL;
+static kinc_matrix4x4_t g2_projection_matrix;
 static float g2_font_size;
 static float g2_ppx, g2_unit_width, g2_unit_height;
 
@@ -31,7 +33,16 @@ void krink_g2_set_window_size(int window_width, int window_height) {
 	g2_unit_width = (float)window_width / g2_ppx;
 	g2_unit_height = (float)window_height / g2_ppx;
 
-	// TODO: compute projection matrix;
+	if (!kinc_g4_render_targets_inverted_y()) {
+		g2_projection_matrix = krink_matrix4x4_to_kinc(krink_matrix4x4_orthogonal_projection(0.0f, g2_unit_width, 0.0f, g2_unit_height, 0.1f, 1000.0f));
+	}
+	else {
+		g2_projection_matrix = krink_matrix4x4_to_kinc(krink_matrix4x4_orthogonal_projection(0.0f, g2_unit_width, g2_unit_height, 0.0f, 0.1f, 1000.0f));
+	}
+	krink_g2_isp_set_projection_matrix(g2_projection_matrix);
+	krink_g2_tsp_set_projection_matrix(g2_projection_matrix);
+	krink_g2_csp_set_projection_matrix(g2_projection_matrix);
+	krink_g2_sdf_set_projection_matrix(g2_projection_matrix);
 }
 
 float krink_g2_get_ppx(void) {
@@ -82,11 +93,11 @@ void krink_g2_draw_rect(float x, float y, float width, float height, float stren
 	krink_g2_sdf_end();
 
 	float hs = strength / 2.0f;
-	krink_g2_csp_fill_rect(x - hs, y - hs, width + hs, strength, g2_color, g2_opacity,
+	krink_g2_csp_fill_rect(x - hs, y - hs, width + strength, strength, g2_color, g2_opacity,
 	                       g2_transformation);
 	krink_g2_csp_fill_rect(x - hs, y + hs, strength, height - hs, g2_color, g2_opacity,
 	                       g2_transformation);
-	krink_g2_csp_fill_rect(x - hs, y + height - hs, width + hs, strength, g2_color, g2_opacity,
+	krink_g2_csp_fill_rect(x - hs, y + height - hs, width + strength, strength, g2_color, g2_opacity,
 	                       g2_transformation);
 	krink_g2_csp_fill_rect(x + width - hs, y + hs, strength, height - hs, g2_color, g2_opacity,
 	                       g2_transformation);
