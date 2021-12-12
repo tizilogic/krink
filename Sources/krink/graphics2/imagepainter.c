@@ -168,8 +168,6 @@ void krink_g2_isp_draw_buffer(bool end) {
 	kinc_g4_draw_indexed_vertices_from_to(buffer_start * 2 * 3,
 	                                      (buffer_index - buffer_start) * 2 * 3);
 
-	kinc_g4_set_texture(texunit, NULL);
-
 	if (end || buffer_index + 1 >= KRINK_G2_ISP_BUFFER_SIZE) {
 		buffer_start = 0;
 		buffer_index = 0;
