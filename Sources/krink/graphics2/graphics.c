@@ -55,7 +55,7 @@ float krink_g2_get_unit_width(void) {
 }
 
 float krink_g2_get_unit_height(void) {
-	return g2_unit_width;
+	return g2_unit_height;
 }
 
 void krink_g2_destroy(void) {
