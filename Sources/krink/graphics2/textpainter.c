@@ -25,10 +25,11 @@ static float *rect_verts = NULL;
 static int buffer_index = 0;
 static int buffer_start = 0;
 static float g2_ppu;
+static float g2_upp;
 
 static krink_ttf_font_t *active_font = NULL;
 static bool bilinear_filter = false;
-static int font_size;
+static int font_size = 0;
 
 void krink_g2_tsp_init(void) {
 	{
@@ -92,6 +93,7 @@ void krink_g2_tsp_init(void) {
 
 void krink_g2_tsp_set_ppu(float ppu) {
 	g2_ppu = ppu;
+	g2_upp = 1.0f / ppu;
 }
 
 void krink_g2_tsp_set_rect_verts(float btlx, float btly, float tplx, float tply, float tprx,
@@ -175,7 +177,7 @@ void krink_g2_tsp_draw_buffer(bool end) {
 	kinc_g4_draw_indexed_vertices_from_to(buffer_start * 2 * 3,
 	                                      (buffer_index - buffer_start) * 2 * 3);
 
-	kinc_g4_set_texture(texunit, NULL);
+	// kinc_g4_set_texture(texunit, NULL);
 	if (end || buffer_index + 1 >= KRINK_G2_TSP_BUFFER_SIZE) {
 		buffer_start = 0;
 		buffer_index = 0;
@@ -201,8 +203,9 @@ void krink_g2_tsp_set_font(krink_ttf_font_t *font) {
 	active_font = font;
 }
 
-void krink_g2_tsp_set_font_size(int size) {
-	font_size = size;
+void krink_g2_tsp_set_font_size(float size) {
+	font_size = (int)(size * g2_ppu + 0.5f);
+	if (active_font != NULL) krink_ttf_load(active_font, (int)(g2_ppu * size + 0.5f));
 }
 
 void krink_g2_tsp_draw_string(const char *text, float opacity, uint32_t color, float x, float y,
@@ -217,20 +220,23 @@ void krink_g2_tsp_draw_string(const char *text, float opacity, uint32_t color, f
 	krink_ttf_aligned_quad_t q;
 	for (int i = 0; text[i] != 0; ++i) {
 		int char_code = (unsigned int)text[i];
-		if (krink_ttf_get_baked_quad(active_font, font_size, &q, char_code, xpos, ypos)) {
+		if (krink_ttf_get_baked_quad(active_font, font_size, &q, char_code, xpos * g2_ppu,
+		                             ypos * g2_ppu)) {
 			if (buffer_index + 1 >= KRINK_G2_TSP_BUFFER_SIZE) krink_g2_tsp_draw_buffer(false);
 			krink_g2_tsp_set_rect_colors(opacity, color);
 			krink_g2_tsp_set_rect_tex_coords(q.s0, q.t0, q.s1, q.t1);
 			kinc_vector3_t p0 = kinc_matrix3x3_multiply_vector(
-			    &transformation, (kinc_vector3_t){q.x0, q.y1, 0.0f}); // bottom-left
+			    &transformation, (kinc_vector3_t){q.x0 * g2_upp, q.y1 * g2_upp, 0.0f});
+			// bottom-left
 			kinc_vector3_t p1 = kinc_matrix3x3_multiply_vector(
-			    &transformation, (kinc_vector3_t){q.x0, q.y0, 0.0f}); // top-left
+			    &transformation, (kinc_vector3_t){q.x0 * g2_upp, q.y0 * g2_upp, 0.0f}); // top-left
 			kinc_vector3_t p2 = kinc_matrix3x3_multiply_vector(
-			    &transformation, (kinc_vector3_t){q.x1, q.y0, 0.0f}); // top-right
+			    &transformation, (kinc_vector3_t){q.x1 * g2_upp, q.y0 * g2_upp, 0.0f}); // top-right
 			kinc_vector3_t p3 = kinc_matrix3x3_multiply_vector(
-			    &transformation, (kinc_vector3_t){q.x1, q.y1, 0.0f}); // bottom-right
+			    &transformation,
+			    (kinc_vector3_t){q.x1 * g2_upp, q.y1 * g2_upp, 0.0f}); // bottom-right
 			krink_g2_tsp_set_rect_verts(p0.x, p0.y, p1.x, p1.y, p2.x, p2.y, p3.x, p3.y);
-			xpos += q.xadvance;
+			xpos += q.xadvance * g2_upp;
 			++buffer_index;
 		}
 	}
@@ -252,15 +258,17 @@ void krink_g2_tsp_draw_characters(int *text, int start, int length, float opacit
 			krink_g2_tsp_set_rect_colors(opacity, color);
 			krink_g2_tsp_set_rect_tex_coords(q.s0, q.t0, q.s1, q.t1);
 			kinc_vector3_t p0 = kinc_matrix3x3_multiply_vector(
-			    &transformation, (kinc_vector3_t){q.x0, q.y1, 0.0f}); // bottom-left
+			    &transformation,
+			    (kinc_vector3_t){q.x0 * g2_upp, q.y1 * g2_upp, 0.0f}); // bottom-left
 			kinc_vector3_t p1 = kinc_matrix3x3_multiply_vector(
-			    &transformation, (kinc_vector3_t){q.x0, q.y0, 0.0f}); // top-left
+			    &transformation, (kinc_vector3_t){q.x0 * g2_upp, q.y0 * g2_upp, 0.0f}); // top-left
 			kinc_vector3_t p2 = kinc_matrix3x3_multiply_vector(
-			    &transformation, (kinc_vector3_t){q.x1, q.y0, 0.0f}); // top-right
+			    &transformation, (kinc_vector3_t){q.x1 * g2_upp, q.y0 * g2_upp, 0.0f}); // top-right
 			kinc_vector3_t p3 = kinc_matrix3x3_multiply_vector(
-			    &transformation, (kinc_vector3_t){q.x1, q.y1, 0.0f}); // bottom-right
+			    &transformation,
+			    (kinc_vector3_t){q.x1 * g2_upp, q.y1 * g2_upp, 0.0f}); // bottom-right
 			krink_g2_tsp_set_rect_verts(p0.x, p0.y, p1.x, p1.y, p2.x, p2.y, p3.x, p3.y);
-			xpos += q.xadvance;
+			xpos += q.xadvance * g2_upp;
 			++buffer_index;
 		}
 	}

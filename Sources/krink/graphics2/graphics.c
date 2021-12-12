@@ -203,7 +203,7 @@ void krink_g2_set_font(krink_ttf_font_t *font, float size) {
 	g2_font = font;
 	g2_font_size = size;
 	krink_g2_tsp_set_font(font);
-	krink_g2_tsp_set_font_size((int)(size * g2_ppu));
+	krink_g2_tsp_set_font_size(size);
 }
 
 void krink_g2_draw_sdf_rect(float x, float y, float width, float height,
