@@ -11,6 +11,7 @@
 #endif
 
 void krink_g2_tsp_init(void);
+void krink_g2_tsp_set_ppu(float ppu);
 void krink_g2_tsp_draw_buffer(bool end);
 void krink_g2_tsp_set_bilinear_filter(bool bilinear);
 void krink_g2_tsp_set_projection_matrix(kinc_matrix4x4_t mat);

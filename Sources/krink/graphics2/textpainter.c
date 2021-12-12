@@ -24,6 +24,7 @@ static kinc_matrix4x4_t projection_matrix;
 static float *rect_verts = NULL;
 static int buffer_index = 0;
 static int buffer_start = 0;
+static float g2_ppu;
 
 static krink_ttf_font_t *active_font = NULL;
 static bool bilinear_filter = false;
@@ -87,6 +88,10 @@ void krink_g2_tsp_init(void) {
 		indices[i * 3 * 2 + 5] = i * 4 + 3;
 	}
 	kinc_g4_index_buffer_unlock(&index_buffer);
+}
+
+void krink_g2_tsp_set_ppu(float ppu) {
+	g2_ppu = ppu;
 }
 
 void krink_g2_tsp_set_rect_verts(float btlx, float btly, float tplx, float tply, float tprx,
@@ -159,7 +164,7 @@ void krink_g2_tsp_draw_buffer(bool end) {
 	kinc_g4_set_matrix4(proj_mat_loc, &projection_matrix);
 	kinc_g4_set_vertex_buffer(&vertex_buffer);
 	kinc_g4_set_index_buffer(&index_buffer);
-	kinc_g4_set_texture(texunit, &last_texture);
+	kinc_g4_set_texture(texunit, last_texture);
 	kinc_g4_set_texture_addressing(texunit, KINC_G4_TEXTURE_ADDRESSING_CLAMP,
 	                               KINC_G4_TEXTURE_ADDRESSING_CLAMP);
 	kinc_g4_set_texture_mipmap_filter(texunit, KINC_G4_MIPMAP_FILTER_NONE);

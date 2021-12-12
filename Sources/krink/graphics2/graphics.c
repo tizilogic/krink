@@ -17,7 +17,7 @@ static kinc_matrix3x3_t g2_transformation;
 static krink_ttf_font_t *g2_font = NULL;
 static kinc_matrix4x4_t g2_projection_matrix;
 static float g2_font_size;
-static float g2_ppx, g2_unit_width, g2_unit_height;
+static float g2_ppu, g2_unit_width, g2_unit_height;
 
 void krink_g2_init(int window_width, int window_height) {
 	krink_g2_isp_init();
@@ -29,9 +29,9 @@ void krink_g2_init(int window_width, int window_height) {
 }
 
 void krink_g2_set_window_size(int window_width, int window_height) {
-	g2_ppx = window_width >= window_height ? (float)window_height : (float)window_width;
-	g2_unit_width = (float)window_width / g2_ppx;
-	g2_unit_height = (float)window_height / g2_ppx;
+	g2_ppu = window_width >= window_height ? (float)window_height : (float)window_width;
+	g2_unit_width = (float)window_width / g2_ppu;
+	g2_unit_height = (float)window_height / g2_ppu;
 
 	if (!kinc_g4_render_targets_inverted_y()) {
 		g2_projection_matrix = krink_matrix4x4_to_kinc(krink_matrix4x4_orthogonal_projection(0.0f, g2_unit_width, 0.0f, g2_unit_height, 0.1f, 1000.0f));
@@ -41,12 +41,13 @@ void krink_g2_set_window_size(int window_width, int window_height) {
 	}
 	krink_g2_isp_set_projection_matrix(g2_projection_matrix);
 	krink_g2_tsp_set_projection_matrix(g2_projection_matrix);
+	krink_g2_tsp_set_ppu(g2_ppu);
 	krink_g2_csp_set_projection_matrix(g2_projection_matrix);
 	krink_g2_sdf_set_projection_matrix(g2_projection_matrix);
 }
 
 float krink_g2_get_ppx(void) {
-	return g2_ppx;
+	return g2_ppu;
 }
 
 float krink_g2_get_unit_width(void) {
@@ -70,6 +71,10 @@ void krink_g2_begin(void) {
 void krink_g2_end(void) {
 	assert(begin);
 	kinc_g4_end(0);
+	krink_g2_csp_end();
+	krink_g2_tsp_end();
+	krink_g2_isp_end();
+	krink_g2_sdf_end();
 	begin = false;
 }
 
@@ -198,7 +203,7 @@ void krink_g2_set_font(krink_ttf_font_t *font, float size) {
 	g2_font = font;
 	g2_font_size = size;
 	krink_g2_tsp_set_font(font);
-	krink_g2_tsp_set_font_size((int)(size * g2_ppx));
+	krink_g2_tsp_set_font_size((int)(size * g2_ppu));
 }
 
 void krink_g2_draw_sdf_rect(float x, float y, float width, float height,
@@ -246,7 +251,7 @@ void krink_g2_draw_sdf_line(float x1, float y1, float x2, float y2, float streng
 }
 
 void krink_g2_scissor(float x, float y, float w, float h) {
-	kinc_g4_scissor((int)(x * g2_ppx), (int)(y * g2_ppx), (int)(w * g2_ppx), (int)(h * g2_ppx));
+	kinc_g4_scissor((int)(x * g2_ppu), (int)(y * g2_ppu), (int)(w * g2_ppu), (int)(h * g2_ppu));
 }
 
 void krink_g2_disable_scissor(void) {

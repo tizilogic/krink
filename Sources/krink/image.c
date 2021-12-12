@@ -12,11 +12,11 @@ void krink_image_init(krink_image_t *img) {
 	img->loaded = false;
 }
 
-void krink_image_load(krink_image_t *img, const char *path, bool keep_in_memory) {
+void krink_image_load(krink_image_t *img, char *path, bool keep_in_memory) {
+	krink_image_init(img);
 	img->path = path;
 	img->image = (kinc_image_t *)krink_malloc(sizeof(kinc_image_t));
 	assert(img->image != NULL);
-	krink_image_init(img->image);
 
 	void *image_mem = krink_malloc(kinc_image_size_from_file(img->path));
 	assert(image_mem != NULL);

@@ -14,5 +14,5 @@ typedef struct krink_image {
 } krink_image_t;
 
 void krink_image_init(krink_image_t *img);
-void krink_image_load(krink_image_t *img, const char *path, bool keep_in_memory);
+void krink_image_load(krink_image_t *img, char *path, bool keep_in_memory);
 void krink_image_destroy(krink_image_t *img);
