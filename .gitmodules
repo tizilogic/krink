@@ -1,3 +1,6 @@
 [submodule "Libraries/tlsf"]
 	path = Libraries/tlsf
 	url = https://github.com/mattconte/tlsf.git
+[submodule "Libraries/Nuklear"]
+	path = Libraries/Nuklear
+	url = https://github.com/Immediate-Mode-UI/Nuklear.git
