@@ -131,10 +131,10 @@ static void csp_rect_set_colors(float opacity, uint32_t color) {
 	a = (uint32_t)((float)a * opacity);
 	color = krink_color_set_channel(color, 'A', a);
 
-	rect_verts[base_idx + 3] = (float)color;
-	rect_verts[base_idx + 7] = (float)color;
-	rect_verts[base_idx + 11] = (float)color;
-	rect_verts[base_idx + 15] = (float)color;
+	rect_verts[base_idx + 3] = *(float*)&color;
+	rect_verts[base_idx + 7] = *(float*)&color;
+	rect_verts[base_idx + 11] = *(float*)&color;
+	rect_verts[base_idx + 15] = *(float*)&color;
 }
 
 static void csp_rect_draw_buffer(bool tris_done) {
@@ -188,9 +188,9 @@ static void csp_tris_set_colors(float opacity, uint32_t color) {
 	a = (uint32_t)((float)a * opacity);
 	color = krink_color_set_channel(color, 'A', a);
 
-	tris_verts[base_idx + 3] = (float)color;
-	tris_verts[base_idx + 7] = (float)color;
-	tris_verts[base_idx + 11] = (float)color;
+	tris_verts[base_idx + 3] = *(float*)&color;
+	tris_verts[base_idx + 7] = *(float*)&color;
+	tris_verts[base_idx + 11] = *(float*)&color;
 }
 
 static void csp_tris_draw_buffer(bool rect_done) {

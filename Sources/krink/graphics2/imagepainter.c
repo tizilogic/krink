@@ -128,10 +128,14 @@ void krink_g2_isp_set_rect_colors(float opacity, uint32_t color) {
 	a = (uint32_t)((float)a * opacity);
 	color = krink_color_set_channel(color, 'A', a);
 
-	rect_verts[base_idx + 5] = (float)color;
-	rect_verts[base_idx + 11] = (float)color;
-	rect_verts[base_idx + 17] = (float)color;
-	rect_verts[base_idx + 23] = (float)color;
+	rect_verts[base_idx + 5] = *(float *)&color;
+	;
+	rect_verts[base_idx + 11] = *(float *)&color;
+	;
+	rect_verts[base_idx + 17] = *(float *)&color;
+	;
+	rect_verts[base_idx + 23] = *(float *)&color;
+	;
 }
 
 void krink_g2_isp_draw_buffer(bool end) {

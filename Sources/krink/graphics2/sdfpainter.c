@@ -303,17 +303,25 @@ static void sdf_rect_set_rect_colors(float opacity, uint32_t color, uint32_t bor
 	a = (uint32_t)((float)a * opacity);
 	border_color = krink_color_set_channel(border_color, 'A', a);
 
-	rect_rect_verts[base_idx + 7] = (float)color;
-	rect_rect_verts[base_idx + 8] = (float)border_color;
+	rect_rect_verts[base_idx + 7] = *(float *)&color;
+	;
+	rect_rect_verts[base_idx + 8] = *(float *)&border_color;
+	;
 
-	rect_rect_verts[base_idx + 22] = (float)color;
-	rect_rect_verts[base_idx + 23] = (float)border_color;
+	rect_rect_verts[base_idx + 22] = *(float *)&color;
+	;
+	rect_rect_verts[base_idx + 23] = *(float *)&border_color;
+	;
 
-	rect_rect_verts[base_idx + 37] = (float)color;
-	rect_rect_verts[base_idx + 38] = (float)border_color;
+	rect_rect_verts[base_idx + 37] = *(float *)&color;
+	;
+	rect_rect_verts[base_idx + 38] = *(float *)&border_color;
+	;
 
-	rect_rect_verts[base_idx + 52] = (float)color;
-	rect_rect_verts[base_idx + 53] = (float)border_color;
+	rect_rect_verts[base_idx + 52] = *(float *)&color;
+	;
+	rect_rect_verts[base_idx + 53] = *(float *)&border_color;
+	;
 }
 
 static void sdf_rect_set_rect_corner(krink_sdf_corner_radius_t c) {
@@ -478,17 +486,25 @@ static void sdf_circle_set_rect_colors(float opacity, uint32_t color, uint32_t b
 	a = (uint32_t)((float)a * opacity);
 	border_color = krink_color_set_channel(border_color, 'A', a);
 
-	circle_rect_verts[base_idx + 5] = (float)color;
-	circle_rect_verts[base_idx + 6] = (float)border_color;
+	circle_rect_verts[base_idx + 5] = *(float *)&color;
+	;
+	circle_rect_verts[base_idx + 6] = *(float *)&border_color;
+	;
 
-	circle_rect_verts[base_idx + 14] = (float)color;
-	circle_rect_verts[base_idx + 15] = (float)border_color;
+	circle_rect_verts[base_idx + 14] = *(float *)&color;
+	;
+	circle_rect_verts[base_idx + 15] = *(float *)&border_color;
+	;
 
-	circle_rect_verts[base_idx + 23] = (float)color;
-	circle_rect_verts[base_idx + 24] = (float)border_color;
+	circle_rect_verts[base_idx + 23] = *(float *)&color;
+	;
+	circle_rect_verts[base_idx + 24] = *(float *)&border_color;
+	;
 
-	circle_rect_verts[base_idx + 32] = (float)color;
-	circle_rect_verts[base_idx + 33] = (float)border_color;
+	circle_rect_verts[base_idx + 32] = *(float *)&color;
+	;
+	circle_rect_verts[base_idx + 33] = *(float *)&border_color;
+	;
 }
 
 static void sdf_circle_set_border_smooth(float b, float s) {
@@ -608,10 +624,14 @@ static void sdf_line_set_rect_colors(float opacity, uint32_t color) {
 	a = (uint32_t)((float)a * opacity);
 	color = krink_color_set_channel(color, 'A', a);
 
-	line_rect_verts[base_idx + 5] = (float)color;
-	line_rect_verts[base_idx + 14] = (float)color;
-	line_rect_verts[base_idx + 23] = (float)color;
-	line_rect_verts[base_idx + 32] = (float)color;
+	line_rect_verts[base_idx + 5] = *(float *)&color;
+	;
+	line_rect_verts[base_idx + 14] = *(float *)&color;
+	;
+	line_rect_verts[base_idx + 23] = *(float *)&color;
+	;
+	line_rect_verts[base_idx + 32] = *(float *)&color;
+	;
 }
 
 static void sdf_line_set_dim(float u, float v) {
