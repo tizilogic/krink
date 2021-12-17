@@ -3,12 +3,12 @@
 in vec3 pos;
 in vec2 tex;
 in vec4 rCol;
-in vec3 bCol;
+in vec4 bCol;
 in float border;
 in float smth;
 out vec2 texcoord;
 out vec4 rectColor;
-out vec3 borderColor;
+out vec4 borderColor;
 out float bd;
 out float sm;
 

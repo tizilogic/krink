@@ -57,7 +57,7 @@ void krink_g2_csp_init(void) {
 	kinc_g4_vertex_structure_t structure;
 	kinc_g4_vertex_structure_init(&structure);
 	kinc_g4_vertex_structure_add(&structure, "vertexPosition", KINC_G4_VERTEX_DATA_FLOAT3);
-	kinc_g4_vertex_structure_add(&structure, "vertexColor", KINC_G4_VERTEX_DATA_FLOAT4);
+	kinc_g4_vertex_structure_add(&structure, "vertexColor", KINC_G4_VERTEX_DATA_U8_4X_NORMALIZED);
 	kinc_g4_pipeline_init(&pipeline);
 	pipeline.input_layout[0] = &structure;
 	pipeline.input_layout[1] = NULL;
@@ -107,50 +107,34 @@ void krink_g2_csp_init(void) {
 
 static void csp_rect_set_verts(float btlx, float btly, float tplx, float tply, float tprx,
                                float tpry, float btrx, float btry) {
-	int base_idx = (rect_buffer_index - rect_buffer_start) * 7 * 4;
+	int base_idx = (rect_buffer_index - rect_buffer_start) * 4 * 4;
 	rect_verts[base_idx + 0] = btlx;
 	rect_verts[base_idx + 1] = btly;
 	rect_verts[base_idx + 2] = -5.0f;
 
-	rect_verts[base_idx + 7] = tplx;
-	rect_verts[base_idx + 8] = tply;
-	rect_verts[base_idx + 9] = -5.0f;
+	rect_verts[base_idx + 4] = tplx;
+	rect_verts[base_idx + 5] = tply;
+	rect_verts[base_idx + 6] = -5.0f;
 
-	rect_verts[base_idx + 14] = tprx;
-	rect_verts[base_idx + 15] = tpry;
-	rect_verts[base_idx + 16] = -5.0f;
+	rect_verts[base_idx + 8] = tprx;
+	rect_verts[base_idx + 9] = tpry;
+	rect_verts[base_idx + 10] = -5.0f;
 
-	rect_verts[base_idx + 21] = btrx;
-	rect_verts[base_idx + 22] = btry;
-	rect_verts[base_idx + 23] = -5.0f;
+	rect_verts[base_idx + 12] = btrx;
+	rect_verts[base_idx + 13] = btry;
+	rect_verts[base_idx + 14] = -5.0f;
 }
 
 static void csp_rect_set_colors(float opacity, uint32_t color) {
-	int base_idx = (rect_buffer_index - rect_buffer_start) * 7 * 4;
-	float a = opacity * ((float)krink_color_get_channel(color, 'A') / 255.0f);
-	float r = ((float)krink_color_get_channel(color, 'R') / 255.0f);
-	float g = ((float)krink_color_get_channel(color, 'G') / 255.0f);
-	float b = ((float)krink_color_get_channel(color, 'B') / 255.0f);
+	int base_idx = (rect_buffer_index - rect_buffer_start) * 4 * 4;
+	uint32_t a = krink_color_get_channel(color, 'A');
+	a = (uint32_t)((float)a * opacity);
+	color = krink_color_set_channel(color, 'A', a);
 
-	rect_verts[base_idx + 3] = r;
-	rect_verts[base_idx + 4] = g;
-	rect_verts[base_idx + 5] = b;
-	rect_verts[base_idx + 6] = a;
-
-	rect_verts[base_idx + 10] = r;
-	rect_verts[base_idx + 11] = g;
-	rect_verts[base_idx + 12] = b;
-	rect_verts[base_idx + 13] = a;
-
-	rect_verts[base_idx + 17] = r;
-	rect_verts[base_idx + 18] = g;
-	rect_verts[base_idx + 19] = b;
-	rect_verts[base_idx + 20] = a;
-
-	rect_verts[base_idx + 24] = r;
-	rect_verts[base_idx + 25] = g;
-	rect_verts[base_idx + 26] = b;
-	rect_verts[base_idx + 27] = a;
+	rect_verts[base_idx + 3] = (float)color;
+	rect_verts[base_idx + 7] = (float)color;
+	rect_verts[base_idx + 11] = (float)color;
+	rect_verts[base_idx + 15] = (float)color;
 }
 
 static void csp_rect_draw_buffer(bool tris_done) {
@@ -184,41 +168,29 @@ static void csp_rect_draw_buffer(bool tris_done) {
 // Tris Impl
 
 static void csp_tris_set_verts(float x0, float y0, float x1, float y1, float x2, float y2) {
-	int base_idx = (tris_buffer_index - tris_buffer_start) * 7 * 3;
+	int base_idx = (tris_buffer_index - tris_buffer_start) * 4 * 3;
 	tris_verts[base_idx + 0] = x0;
 	tris_verts[base_idx + 1] = y0;
 	tris_verts[base_idx + 2] = -5.0f;
 
-	tris_verts[base_idx + 7] = x1;
-	tris_verts[base_idx + 8] = y1;
-	tris_verts[base_idx + 9] = -5.0f;
+	tris_verts[base_idx + 4] = x1;
+	tris_verts[base_idx + 5] = y1;
+	tris_verts[base_idx + 6] = -5.0f;
 
-	tris_verts[base_idx + 14] = x2;
-	tris_verts[base_idx + 15] = y2;
-	tris_verts[base_idx + 16] = -5.0f;
+	tris_verts[base_idx + 8] = x2;
+	tris_verts[base_idx + 9] = y2;
+	tris_verts[base_idx + 10] = -5.0f;
 }
 
 static void csp_tris_set_colors(float opacity, uint32_t color) {
-	int base_idx = (tris_buffer_index - tris_buffer_start) * 7 * 3;
-	float a = opacity * ((float)krink_color_get_channel(color, 'A') / 255.0f);
-	float r = ((float)krink_color_get_channel(color, 'R') / 255.0f);
-	float g = ((float)krink_color_get_channel(color, 'G') / 255.0f);
-	float b = ((float)krink_color_get_channel(color, 'B') / 255.0f);
+	int base_idx = (tris_buffer_index - tris_buffer_start) * 4 * 3;
+	uint32_t a = krink_color_get_channel(color, 'A');
+	a = (uint32_t)((float)a * opacity);
+	color = krink_color_set_channel(color, 'A', a);
 
-	tris_verts[base_idx + 3] = r;
-	tris_verts[base_idx + 4] = g;
-	tris_verts[base_idx + 5] = b;
-	tris_verts[base_idx + 6] = a;
-
-	tris_verts[base_idx + 10] = r;
-	tris_verts[base_idx + 11] = g;
-	tris_verts[base_idx + 12] = b;
-	tris_verts[base_idx + 13] = a;
-
-	tris_verts[base_idx + 17] = r;
-	tris_verts[base_idx + 18] = g;
-	tris_verts[base_idx + 19] = b;
-	tris_verts[base_idx + 20] = a;
+	tris_verts[base_idx + 3] = (float)color;
+	tris_verts[base_idx + 7] = (float)color;
+	tris_verts[base_idx + 11] = (float)color;
 }
 
 static void csp_tris_draw_buffer(bool rect_done) {

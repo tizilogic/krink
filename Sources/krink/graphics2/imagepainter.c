@@ -54,7 +54,7 @@ void krink_g2_isp_init(void) {
 	kinc_g4_vertex_structure_init(&structure);
 	kinc_g4_vertex_structure_add(&structure, "vertexPosition", KINC_G4_VERTEX_DATA_FLOAT3);
 	kinc_g4_vertex_structure_add(&structure, "vertexUV", KINC_G4_VERTEX_DATA_FLOAT2);
-	kinc_g4_vertex_structure_add(&structure, "vertexColor", KINC_G4_VERTEX_DATA_FLOAT4);
+	kinc_g4_vertex_structure_add(&structure, "vertexColor", KINC_G4_VERTEX_DATA_U8_4X_NORMALIZED);
 	kinc_g4_pipeline_init(&pipeline);
 	pipeline.input_layout[0] = &structure;
 	pipeline.input_layout[1] = NULL;
@@ -89,65 +89,49 @@ void krink_g2_isp_init(void) {
 
 void krink_g2_isp_set_rect_verts(float btlx, float btly, float tplx, float tply, float tprx,
                                  float tpry, float btrx, float btry) {
-	int base_idx = (buffer_index - buffer_start) * 9 * 4;
+	int base_idx = (buffer_index - buffer_start) * 6 * 4;
 	rect_verts[base_idx + 0] = btlx;
 	rect_verts[base_idx + 1] = btly;
 	rect_verts[base_idx + 2] = -5.0f;
 
-	rect_verts[base_idx + 9] = tplx;
-	rect_verts[base_idx + 10] = tply;
-	rect_verts[base_idx + 11] = -5.0f;
+	rect_verts[base_idx + 6] = tplx;
+	rect_verts[base_idx + 7] = tply;
+	rect_verts[base_idx + 8] = -5.0f;
 
-	rect_verts[base_idx + 18] = tprx;
-	rect_verts[base_idx + 19] = tpry;
+	rect_verts[base_idx + 12] = tprx;
+	rect_verts[base_idx + 13] = tpry;
+	rect_verts[base_idx + 14] = -5.0f;
+
+	rect_verts[base_idx + 18] = btrx;
+	rect_verts[base_idx + 19] = btry;
 	rect_verts[base_idx + 20] = -5.0f;
-
-	rect_verts[base_idx + 27] = btrx;
-	rect_verts[base_idx + 28] = btry;
-	rect_verts[base_idx + 29] = -5.0f;
 }
 
 void krink_g2_isp_set_rect_tex_coords(float left, float top, float right, float bottom) {
-	int base_idx = (buffer_index - buffer_start) * 9 * 4;
+	int base_idx = (buffer_index - buffer_start) * 6 * 4;
 	rect_verts[base_idx + 3] = left;
 	rect_verts[base_idx + 4] = bottom;
 
-	rect_verts[base_idx + 12] = left;
-	rect_verts[base_idx + 13] = top;
+	rect_verts[base_idx + 9] = left;
+	rect_verts[base_idx + 10] = top;
+
+	rect_verts[base_idx + 15] = right;
+	rect_verts[base_idx + 16] = top;
 
 	rect_verts[base_idx + 21] = right;
-	rect_verts[base_idx + 22] = top;
-
-	rect_verts[base_idx + 30] = right;
-	rect_verts[base_idx + 31] = bottom;
+	rect_verts[base_idx + 22] = bottom;
 }
 
 void krink_g2_isp_set_rect_colors(float opacity, uint32_t color) {
-	int base_idx = (buffer_index - buffer_start) * 9 * 4;
-	float a = opacity * ((float)krink_color_get_channel(color, 'A') / 255.0f);
-	float r = ((float)krink_color_get_channel(color, 'R') / 255.0f);
-	float g = ((float)krink_color_get_channel(color, 'G') / 255.0f);
-	float b = ((float)krink_color_get_channel(color, 'B') / 255.0f);
+	int base_idx = (buffer_index - buffer_start) * 6 * 4;
+	uint32_t a = krink_color_get_channel(color, 'A');
+	a = (uint32_t)((float)a * opacity);
+	color = krink_color_set_channel(color, 'A', a);
 
-	rect_verts[base_idx + 5] = r;
-	rect_verts[base_idx + 6] = g;
-	rect_verts[base_idx + 7] = b;
-	rect_verts[base_idx + 8] = a;
-
-	rect_verts[base_idx + 14] = r;
-	rect_verts[base_idx + 15] = g;
-	rect_verts[base_idx + 16] = b;
-	rect_verts[base_idx + 17] = a;
-
-	rect_verts[base_idx + 23] = r;
-	rect_verts[base_idx + 24] = g;
-	rect_verts[base_idx + 25] = b;
-	rect_verts[base_idx + 26] = a;
-
-	rect_verts[base_idx + 32] = r;
-	rect_verts[base_idx + 33] = g;
-	rect_verts[base_idx + 34] = b;
-	rect_verts[base_idx + 35] = a;
+	rect_verts[base_idx + 5] = (float)color;
+	rect_verts[base_idx + 11] = (float)color;
+	rect_verts[base_idx + 17] = (float)color;
+	rect_verts[base_idx + 23] = (float)color;
 }
 
 void krink_g2_isp_draw_buffer(bool end) {

@@ -3,7 +3,7 @@
 in vec2 texcoord;
 in vec2 bx;
 in vec4 rectColor;
-in vec3 borderColor;
+in vec4 borderColor;
 in vec4 cn;
 in float bd;
 in float sm;
@@ -24,10 +24,10 @@ vec4 framedBox(vec4 fgCol, vec4 bdCol, vec2 p, vec2 b, vec4 r, float border, flo
 	dA = 1.0 - smoothstep(0.0, s, clamp(-dA, 0.0, 1.0));
 	dB = 1.0 - smoothstep(0.0, s, clamp(-dB, 0.0, 1.0));
 	fgCol = mix(bdCol, fgCol, dB);
-	return mix(fgCol, bgColor, dA) * rectColor.a;
+	return mix(fgCol, bgColor, dA);
 }
 
 
 void main() {
-	FragColor = framedBox(rectColor, vec4(borderColor, rectColor.a), texcoord - bx, bx, cn, bd, sm);
+	FragColor = framedBox(rectColor, borderColor, texcoord - bx, bx, cn, bd, sm);
 }

@@ -23,5 +23,5 @@ vec4 framedCircle(vec4 fgCol, vec4 bdCol, vec2 p, float r, float border, float s
 }
 
 void main() {
-	FragColor = framedCircle(rectColor, vec4(borderColor, rectColor.a), texcoord - 0.5, 0.5, bd, sm);
+	FragColor = framedCircle(rectColor, borderColor, texcoord - 0.5, 0.5, bd, sm);
 }
