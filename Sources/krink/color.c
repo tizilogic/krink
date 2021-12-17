@@ -14,7 +14,6 @@ uint32_t krink_color_get_channel(uint32_t color, const char ch) {
 	return 0;
 }
 
-
 uint32_t krink_color_set_channel(uint32_t color, const char ch, uint32_t value) {
 	switch (ch) {
 	case 'A':

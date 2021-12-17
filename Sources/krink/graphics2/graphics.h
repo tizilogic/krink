@@ -6,48 +6,52 @@
 #include <kinc/math/vector.h>
 #include <krink/image.h>
 
+#ifndef KRINK_G2_MAX_WIN
+#define KRINK_G2_MAX_WIN 8
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 /// <summary>
-/// Initialize krink_g2.
+/// Initialize a framebuffer for krink_g2.
 /// </summary>
+/// <param name="window"></param>
 /// <param name="window_width"></param>
 /// <param name="window_height"></param>
-void krink_g2_init(int window_width, int window_height);
+void krink_g2_init(int window, int window_width, int window_height);
 
 /// <summary>
 /// Change window size.
 /// </summary>
+/// <param name="window"></param>
 /// <param name="window_width"></param>
 /// <param name="window_height"></param>
-void krink_g2_set_window_size(int window_width, int window_height);
+void krink_g2_set_window_size(int window, int window_width, int window_height);
 
 /// <summary>
-/// Amount of pixels per unit.
+/// Width of a given window.
 /// </summary>
-float krink_g2_get_ppx(void);
+/// <param name="window"></param>
+float krink_g2_get_width(int window);
 
 /// <summary>
-/// 1..n unit size of the X-dimension.
+/// Height of a given window.
 /// </summary>
-float krink_g2_get_unit_width(void);
+/// <param name="window"></param>
+float krink_g2_get_height(int window);
 
 /// <summary>
-/// 1..n unit size of the Y-dimension.
-/// </summary>
-float krink_g2_get_unit_height(void);
-
-/// <summary>
-/// Destroy krink_g2.
+/// Destroy krink_g2. Currently does nothing!
 /// </summary>
 void krink_g2_destroy(void);
 
 /// <summary>
 /// Needs to be called before rendering to a window. Typically called at the start of each frame.
 /// </summary>
-void krink_g2_begin(void);
+/// <param name="window"></param>
+void krink_g2_begin(int window);
 
 /// <summary>
 /// Needs to be called after rendering to a window. Typically called at the end of each frame.
@@ -164,14 +168,14 @@ krink_ttf_font_t *krink_g2_get_font(void);
 /// <summary>
 /// Get the current font size.
 /// </summary>
-float krink_g2_get_font_size(void);
+int krink_g2_get_font_size(void);
 
 /// <summary>
 /// Set the current font and font size.
 /// </summary>
 /// <param name="font">Ptr to `krink_ttf_font_t`</param>
-/// <param name="size">Font size in unit height</param>
-void krink_g2_set_font(krink_ttf_font_t *font, float size);
+/// <param name="size">Font size in pixel</param>
+void krink_g2_set_font(krink_ttf_font_t *font, int size);
 
 /// <summary>
 /// Draw SDF rect.
