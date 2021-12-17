@@ -1,5 +1,6 @@
 #include "textpainter.h"
 
+#include <assert.h>
 #include <kinc/graphics4/graphics.h>
 #include <kinc/graphics4/indexbuffer.h>
 #include <kinc/graphics4/pipeline.h>
@@ -182,7 +183,9 @@ void krink_g2_tsp_set_font(krink_ttf_font_t *font) {
 }
 
 void krink_g2_tsp_set_font_size(int size) {
-	if (active_font != NULL) krink_ttf_load(active_font, size);
+	assert(active_font != NULL);
+	krink_ttf_load(active_font, size);
+	font_size = size;
 }
 
 void krink_g2_tsp_draw_string(const char *text, float opacity, uint32_t color, float x, float y,
