@@ -24,6 +24,7 @@ vec4 framedBox(vec4 fgCol, vec4 bdCol, vec2 p, vec2 b, vec4 r, float border, flo
 	dA = 1.0 - smoothstep(0.0, s, clamp(-dA, 0.0, 1.0));
 	dB = 1.0 - smoothstep(0.0, s, clamp(-dB, 0.0, 1.0));
 	fgCol = mix(bdCol, fgCol, dB);
+	fgCol.a = dB <= 0.5f ? borderColor.a : rectColor.a;
 	return mix(fgCol, bgColor, dA);
 }
 
