@@ -155,7 +155,7 @@ void kr_g2_draw_triangle(float x1, float y1, float x2, float y2, float x3, float
 	kr_sdf_end();
 
 	center_radius_t c = barycenter(x1, y1, x2, y2, x3, y3);
-	float s = strength / c.r;
+	float s = (strength / 2.0f) / c.r;
 	kr_vec2_t ia, ib, ic, oa, ob, oc;
 	ia = comp_corner(x1, y1, c, 1.0f - s);
 	ib = comp_corner(x2, y2, c, 1.0f - s);
