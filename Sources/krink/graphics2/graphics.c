@@ -7,6 +7,7 @@
 #include <stdbool.h>
 
 #include <kinc/graphics4/graphics.h>
+#include <kinc/math/core.h>
 #include <krink/math/matrix.h>
 #include <krink/math/vector.h>
 
@@ -120,6 +121,55 @@ void kr_g2_fill_rect(float x, float y, float width, float height) {
 	kr_sdf_end();
 
 	kr_csp_fill_rect(x, y, width, height, g2_color, g2_opacity, g2_transformation);
+}
+
+typedef struct center_radius {
+	float x, y, r;
+} center_radius_t;
+
+static center_radius_t barycenter(float x1, float y1, float x2, float y2, float x3, float y3) {
+	float la, lb, lc;
+	la = kr_vec2_length(kr_vec2_subv((kr_vec2_t){x2, y2}, (kr_vec2_t){x3, y3}));
+	lb = kr_vec2_length(kr_vec2_subv((kr_vec2_t){x1, y1}, (kr_vec2_t){x3, y3}));
+	lc = kr_vec2_length(kr_vec2_subv((kr_vec2_t){x1, y1}, (kr_vec2_t){x2, y2}));
+	center_radius_t c;
+	c.x = (la * x1 + lb * x2 + lc * x3) / (la + lb + lc);
+	c.y = (la * y1 + lb * y2 + lc * y3) / (la + lb + lc);
+
+	float s = (la + lb + lc) / 2.0f;
+	c.r = kinc_sqrt(((s - la) * (s - lb) * (s - lc)) / s);
+	return c;
+}
+
+static kr_vec2_t comp_corner(float x, float y, center_radius_t c, float f) {
+	kr_vec2_t cv = (kr_vec2_t){c.x, c.y};
+	kr_vec2_t v = (kr_vec2_t){x, y};
+	return kr_vec2_addv(cv, kr_vec2_mult(kr_vec2_subv(v, cv), f));
+}
+
+void kr_g2_draw_triangle(float x1, float y1, float x2, float y2, float x3, float y3,
+                         float strength) {
+	assert(begin);
+	kr_isp_end();
+	kr_tsp_end();
+	kr_sdf_end();
+
+	center_radius_t c = barycenter(x1, y1, x2, y2, x3, y3);
+	float s = strength / c.r;
+	kr_vec2_t ia, ib, ic, oa, ob, oc;
+	ia = comp_corner(x1, y1, c, 1.0f - s);
+	ib = comp_corner(x2, y2, c, 1.0f - s);
+	ic = comp_corner(x3, y3, c, 1.0f - s);
+	oa = comp_corner(x1, y1, c, 1.0f + s);
+	ob = comp_corner(x2, y2, c, 1.0f + s);
+	oc = comp_corner(x3, y3, c, 1.0f + s);
+
+	kr_g2_fill_triangle(oa.x, oa.y, ia.x, ia.y, oc.x, oc.y);
+	kr_g2_fill_triangle(ia.x, ia.y, ic.x, ic.y, oc.x, oc.y);
+	kr_g2_fill_triangle(oc.x, oc.y, ic.x, ic.y, ob.x, ob.y);
+	kr_g2_fill_triangle(ic.x, ic.y, ib.x, ib.y, ob.x, ob.y);
+	kr_g2_fill_triangle(ob.x, ob.y, ib.x, ib.y, ia.x, ia.y);
+	kr_g2_fill_triangle(oa.x, oa.y, ob.x, ob.y, ib.x, ib.y);
 }
 
 void kr_g2_fill_triangle(float x1, float y1, float x2, float y2, float x3, float y3) {

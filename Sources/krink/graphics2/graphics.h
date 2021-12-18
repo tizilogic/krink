@@ -107,6 +107,18 @@ void kr_g2_fill_rect(float x, float y, float width, float height);
 void kr_g2_fill_triangle(float x1, float y1, float x2, float y2, float x3, float y3);
 
 /// <summary>
+/// Draw a triangle.
+/// </summary>
+/// <param name="x1"></param>
+/// <param name="y1"></param>
+/// <param name="x2"></param>
+/// <param name="y2"></param>
+/// <param name="x3"></param>
+/// <param name="y3"></param>
+/// <param name="strength"></param>
+void kr_g2_draw_triangle(float x1, float y1, float x2, float y2, float x3, float y3, float strength);
+
+/// <summary>
 /// Draw a string.
 /// </summary>
 /// <param name="text"></param>
