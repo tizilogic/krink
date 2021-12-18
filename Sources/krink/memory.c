@@ -2,32 +2,32 @@
 #include "util/tlsf.h"
 #include <assert.h>
 
-static void *krink_heap = NULL;
-static tlsf_t krink_tlsf;
+static void *kr_heap = NULL;
+static tlsf_t kr_tlsf;
 
-void krink_memory_init(void *ptr, size_t size) {
-	assert(krink_heap == NULL);
+void kr_memory_init(void *ptr, size_t size) {
+	assert(kr_heap == NULL);
 	assert(ptr != NULL);
-	krink_heap = ptr;
-	krink_tlsf = tlsf_create_with_pool(ptr, size);
+	kr_heap = ptr;
+	kr_tlsf = tlsf_create_with_pool(ptr, size);
 }
 
-void *krink_malloc(size_t size) {
-	assert(krink_heap != NULL);
-	return tlsf_malloc(krink_tlsf, size);
+void *kr_malloc(size_t size) {
+	assert(kr_heap != NULL);
+	return tlsf_malloc(kr_tlsf, size);
 }
 
-void krink_free(void *ptr) {
-	assert(krink_heap != NULL);
-	tlsf_free(krink_tlsf, ptr);
+void kr_free(void *ptr) {
+	assert(kr_heap != NULL);
+	tlsf_free(kr_tlsf, ptr);
 }
 
-void *krink_calloc(size_t n, size_t size) {
+void *kr_calloc(size_t n, size_t size) {
 	assert(0 && "Not implemented");
 	return NULL;
 }
 
-void *krink_realloc(void *ptr, size_t size) {
-	assert(krink_heap != NULL);
-	return tlsf_realloc(krink_tlsf, ptr, size);
+void *kr_realloc(void *ptr, size_t size) {
+	assert(kr_heap != NULL);
+	return tlsf_realloc(kr_tlsf, ptr, size);
 }

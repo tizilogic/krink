@@ -15,12 +15,12 @@ extern "C" {
 #endif
 
 /// <summary>
-/// Initialize a framebuffer for krink_g2.
+/// Initialize a framebuffer for kr_g2.
 /// </summary>
 /// <param name="window"></param>
 /// <param name="window_width"></param>
 /// <param name="window_height"></param>
-void krink_g2_init(int window, int window_width, int window_height);
+void kr_g2_init(int window, int window_width, int window_height);
 
 /// <summary>
 /// Change window size.
@@ -28,53 +28,53 @@ void krink_g2_init(int window, int window_width, int window_height);
 /// <param name="window"></param>
 /// <param name="window_width"></param>
 /// <param name="window_height"></param>
-void krink_g2_set_window_size(int window, int window_width, int window_height);
+void kr_g2_set_window_size(int window, int window_width, int window_height);
 
 /// <summary>
 /// Width of a given window.
 /// </summary>
 /// <param name="window"></param>
-float krink_g2_get_width(int window);
+float kr_g2_get_width(int window);
 
 /// <summary>
 /// Height of a given window.
 /// </summary>
 /// <param name="window"></param>
-float krink_g2_get_height(int window);
+float kr_g2_get_height(int window);
 
 /// <summary>
-/// Destroy krink_g2. Currently does nothing!
+/// Destroy kr_g2. Currently does nothing!
 /// </summary>
-void krink_g2_destroy(void);
+void kr_g2_destroy(void);
 
 /// <summary>
 /// Needs to be called before rendering to a window. Typically called at the start of each frame.
 /// </summary>
 /// <param name="window"></param>
-void krink_g2_begin(int window);
+void kr_g2_begin(int window);
 
 /// <summary>
 /// Needs to be called after rendering to a window. Typically called at the end of each frame.
 /// </summary>
-void krink_g2_end(void);
+void kr_g2_end(void);
 
 /// <summary>
 /// Clears the color, depth and/or stencil-components of the current framebuffer or render-target.
 /// </summary>
 /// <param name="color">The color-value to clear to</param>
-void krink_g2_clear(uint32_t color);
+void kr_g2_clear(uint32_t color);
 
 /// <summary>
 /// Set vertex color for following draw calls.
 /// </summary>
 /// <param name="color">The color-value to draw with</param>
-void krink_g2_set_color(uint32_t color);
+void kr_g2_set_color(uint32_t color);
 
 /// <summary>
 /// Set opacity for following draw calls.
 /// </summary>
 /// <param name="opacity">0..1</param>
-void krink_g2_set_opacity(float opacity);
+void kr_g2_set_opacity(float opacity);
 
 /// <summary>
 /// Draw a rectangle.
@@ -84,7 +84,7 @@ void krink_g2_set_opacity(float opacity);
 /// <param name="width"></param>
 /// <param name="height"></param>
 /// <param name="strength"></param>
-void krink_g2_draw_rect(float x, float y, float width, float height, float strength);
+void kr_g2_draw_rect(float x, float y, float width, float height, float strength);
 
 /// <summary>
 /// Fill a rectangle.
@@ -93,7 +93,7 @@ void krink_g2_draw_rect(float x, float y, float width, float height, float stren
 /// <param name="y"></param>
 /// <param name="width"></param>
 /// <param name="height"></param>
-void krink_g2_fill_rect(float x, float y, float width, float height);
+void kr_g2_fill_rect(float x, float y, float width, float height);
 
 /// <summary>
 /// Fill a triangle.
@@ -104,7 +104,7 @@ void krink_g2_fill_rect(float x, float y, float width, float height);
 /// <param name="y2"></param>
 /// <param name="x3"></param>
 /// <param name="y3"></param>
-void krink_g2_fill_triangle(float x1, float y1, float x2, float y2, float x3, float y3);
+void kr_g2_fill_triangle(float x1, float y1, float x2, float y2, float x3, float y3);
 
 /// <summary>
 /// Draw a string.
@@ -112,7 +112,7 @@ void krink_g2_fill_triangle(float x1, float y1, float x2, float y2, float x3, fl
 /// <param name="text"></param>
 /// <param name="x"></param>
 /// <param name="y"></param>
-void krink_g2_draw_string(const char *text, float x, float y);
+void kr_g2_draw_string(const char *text, float x, float y);
 
 /// <summary>
 /// Draw an array of characters.
@@ -122,7 +122,7 @@ void krink_g2_draw_string(const char *text, float x, float y);
 /// <param name="length">Number of characters</param>
 /// <param name="x"></param>
 /// <param name="y"></param>
-void krink_g2_draw_characters(int *text, int start, int length, float x, float y);
+void kr_g2_draw_characters(int *text, int start, int length, float x, float y);
 
 /// <summary>
 /// Draw a line.
@@ -132,7 +132,7 @@ void krink_g2_draw_characters(int *text, int start, int length, float x, float y
 /// <param name="x2"></param>
 /// <param name="y2"></param>
 /// <param name="strength"></param>
-void krink_g2_draw_line(float x1, float y1, float x2, float y2, float strength);
+void kr_g2_draw_line(float x1, float y1, float x2, float y2, float strength);
 
 /// <summary>
 /// Draw an image.
@@ -146,36 +146,36 @@ void krink_g2_draw_line(float x1, float y1, float x2, float y2, float strength);
 /// <param name="dy">Destination y</param>
 /// <param name="dw">Destination width</param>
 /// <param name="dh">Destination height</param>
-void krink_g2_draw_scaled_sub_image(krink_image_t *img, float sx, float sy, float sw, float sh,
-                                    float dx, float dy, float dw, float dh);
+void kr_g2_draw_scaled_sub_image(kr_image_t *img, float sx, float sy, float sw, float sh, float dx,
+                                 float dy, float dw, float dh);
 
 /// <summary>
 /// Set transformation matrix for the next drawing operations.
 /// </summary>
 /// <param name="m"></param>
-void krink_g2_set_transform(kinc_matrix3x3_t m);
+void kr_g2_set_transform(kinc_matrix3x3_t m);
 
 /// <summary>
 /// Get current transformation matrix.
 /// </summary>
-kinc_matrix3x3_t krink_g2_get_transform(void);
+kinc_matrix3x3_t kr_g2_get_transform(void);
 
 /// <summary>
 /// Get the font ptr of the current font.
 /// </summary>
-krink_ttf_font_t *krink_g2_get_font(void);
+kr_ttf_font_t *kr_g2_get_font(void);
 
 /// <summary>
 /// Get the current font size.
 /// </summary>
-int krink_g2_get_font_size(void);
+int kr_g2_get_font_size(void);
 
 /// <summary>
 /// Set the current font and font size.
 /// </summary>
-/// <param name="font">Ptr to `krink_ttf_font_t`</param>
+/// <param name="font">Ptr to `kr_ttf_font_t`</param>
 /// <param name="size">Font size in pixel</param>
-void krink_g2_set_font(krink_ttf_font_t *font, int size);
+void kr_g2_set_font(kr_ttf_font_t *font, int size);
 
 /// <summary>
 /// Draw SDF rect.
@@ -188,9 +188,8 @@ void krink_g2_set_font(krink_ttf_font_t *font, int size);
 /// <param name="border"></param>
 /// <param name="border_color"></param>
 /// <param name="smooth"></param>
-void krink_g2_draw_sdf_rect(float x, float y, float width, float height,
-                            krink_sdf_corner_radius_t corner, float border, uint32_t border_color,
-                            float smooth);
+void kr_g2_draw_sdf_rect(float x, float y, float width, float height, kr_sdf_corner_radius_t corner,
+                         float border, uint32_t border_color, float smooth);
 
 /// <summary>
 /// Draw SDF rect with same corner radius on all edges.
@@ -203,8 +202,8 @@ void krink_g2_draw_sdf_rect(float x, float y, float width, float height,
 /// <param name="border"></param>
 /// <param name="border_color"></param>
 /// <param name="smooth"></param>
-void krink_g2_draw_sdf_rect_symm(float x, float y, float width, float height, float corner,
-                                 float border, uint32_t border_color, float smooth);
+void kr_g2_draw_sdf_rect_symm(float x, float y, float width, float height, float corner,
+                              float border, uint32_t border_color, float smooth);
 
 /// <summary>
 /// Draw SDF circle.
@@ -215,8 +214,8 @@ void krink_g2_draw_sdf_rect_symm(float x, float y, float width, float height, fl
 /// <param name="border"></param>
 /// <param name="border_color"></param>
 /// <param name="smooth"></param>
-void krink_g2_draw_sdf_circle(float x, float y, float r, float border, uint32_t border_color,
-                              float smooth);
+void kr_g2_draw_sdf_circle(float x, float y, float r, float border, uint32_t border_color,
+                           float smooth);
 
 /// <summary>
 /// Draw SDF line.
@@ -227,7 +226,7 @@ void krink_g2_draw_sdf_circle(float x, float y, float r, float border, uint32_t 
 /// <param name="y2"></param>
 /// <param name="strength"></param>
 /// <param name="smooth"></param>
-void krink_g2_draw_sdf_line(float x1, float y1, float x2, float y2, float strength, float smooth);
+void kr_g2_draw_sdf_line(float x1, float y1, float x2, float y2, float strength, float smooth);
 
 /// <summary>
 /// Enable scissor.
@@ -236,12 +235,12 @@ void krink_g2_draw_sdf_line(float x1, float y1, float x2, float y2, float streng
 /// <param name="y"></param>
 /// <param name="w"></param>
 /// <param name="h"></param>
-void krink_g2_scissor(float x, float y, float w, float h);
+void kr_g2_scissor(float x, float y, float w, float h);
 
 /// <summary>
 /// Disable scissor.
 /// </summary>
-void krink_g2_disable_scissor(void);
+void kr_g2_disable_scissor(void);
 
 #ifdef __cplusplus
 }

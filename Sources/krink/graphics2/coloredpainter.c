@@ -31,24 +31,24 @@ static int tris_buffer_start = 0;
 static void csp_rect_end(bool tris_done);
 static void csp_tris_end(bool rects_done);
 
-void krink_g2_csp_init(void) {
+void kr_csp_init(void) {
 	{
 		kinc_file_reader_t reader;
 		kinc_file_reader_open(&reader, "painter-colored.vert", KINC_FILE_TYPE_ASSET);
 		size_t size = kinc_file_reader_size(&reader);
-		uint8_t *data = krink_malloc(size);
+		uint8_t *data = kr_malloc(size);
 		kinc_file_reader_read(&reader, data, size);
 		kinc_file_reader_close(&reader);
 
 		kinc_g4_shader_init(&vert_shader, data, size, KINC_G4_SHADER_TYPE_VERTEX);
-		krink_free(data);
+		kr_free(data);
 	}
 
 	{
 		kinc_file_reader_t reader;
 		kinc_file_reader_open(&reader, "painter-colored.frag", KINC_FILE_TYPE_ASSET);
 		size_t size = kinc_file_reader_size(&reader);
-		uint8_t *data = krink_malloc(size);
+		uint8_t *data = kr_malloc(size);
 		kinc_file_reader_read(&reader, data, size);
 		kinc_file_reader_close(&reader);
 
@@ -127,14 +127,14 @@ static void csp_rect_set_verts(float btlx, float btly, float tplx, float tply, f
 
 static void csp_rect_set_colors(float opacity, uint32_t color) {
 	int base_idx = (rect_buffer_index - rect_buffer_start) * 4 * 4;
-	uint32_t a = krink_color_get_channel(color, 'A');
+	uint32_t a = kr_color_get_channel(color, 'A');
 	a = (uint32_t)((float)a * opacity);
-	color = krink_color_set_channel(color, 'A', a);
+	color = kr_color_set_channel(color, 'A', a);
 
-	rect_verts[base_idx + 3] = *(float*)&color;
-	rect_verts[base_idx + 7] = *(float*)&color;
-	rect_verts[base_idx + 11] = *(float*)&color;
-	rect_verts[base_idx + 15] = *(float*)&color;
+	rect_verts[base_idx + 3] = *(float *)&color;
+	rect_verts[base_idx + 7] = *(float *)&color;
+	rect_verts[base_idx + 11] = *(float *)&color;
+	rect_verts[base_idx + 15] = *(float *)&color;
 }
 
 static void csp_rect_draw_buffer(bool tris_done) {
@@ -184,13 +184,13 @@ static void csp_tris_set_verts(float x0, float y0, float x1, float y1, float x2,
 
 static void csp_tris_set_colors(float opacity, uint32_t color) {
 	int base_idx = (tris_buffer_index - tris_buffer_start) * 4 * 3;
-	uint32_t a = krink_color_get_channel(color, 'A');
+	uint32_t a = kr_color_get_channel(color, 'A');
 	a = (uint32_t)((float)a * opacity);
-	color = krink_color_set_channel(color, 'A', a);
+	color = kr_color_set_channel(color, 'A', a);
 
-	tris_verts[base_idx + 3] = *(float*)&color;
-	tris_verts[base_idx + 7] = *(float*)&color;
-	tris_verts[base_idx + 11] = *(float*)&color;
+	tris_verts[base_idx + 3] = *(float *)&color;
+	tris_verts[base_idx + 7] = *(float *)&color;
+	tris_verts[base_idx + 11] = *(float *)&color;
 }
 
 static void csp_tris_draw_buffer(bool rect_done) {
@@ -221,12 +221,12 @@ static void csp_tris_draw_buffer(bool rect_done) {
 	}
 }
 
-void krink_g2_csp_set_projection_matrix(kinc_matrix4x4_t mat) {
+void kr_csp_set_projection_matrix(kinc_matrix4x4_t mat) {
 	projection_matrix = mat;
 }
 
-void krink_g2_csp_fill_rect(float x, float y, float width, float height, uint32_t color,
-                            float opacity, kinc_matrix3x3_t transformation) {
+void kr_csp_fill_rect(float x, float y, float width, float height, uint32_t color, float opacity,
+                      kinc_matrix3x3_t transformation) {
 	if (tris_buffer_index - tris_buffer_start > 0)
 		csp_tris_draw_buffer(true); // Flush other buffer for right render order
 
@@ -247,8 +247,8 @@ void krink_g2_csp_fill_rect(float x, float y, float width, float height, uint32_
 	++rect_buffer_index;
 }
 
-void krink_g2_csp_fill_triangle(float x0, float y0, float x1, float y1, float x2, float y2,
-                                uint32_t color, float opacity, kinc_matrix3x3_t transformation) {
+void kr_csp_fill_triangle(float x0, float y0, float x1, float y1, float x2, float y2,
+                          uint32_t color, float opacity, kinc_matrix3x3_t transformation) {
 	if (rect_buffer_index - rect_buffer_start > 0)
 		csp_rect_draw_buffer(true); // Flush other buffer for right render order
 
@@ -275,7 +275,7 @@ static void csp_tris_end(bool rects_done) {
 	if (tris_buffer_index - tris_buffer_start > 0) csp_tris_draw_buffer(rects_done);
 }
 
-void krink_g2_csp_end(void) {
+void kr_csp_end(void) {
 	csp_rect_end(false);
 	csp_tris_end(false);
 }

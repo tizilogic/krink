@@ -12,4 +12,4 @@
 /// glyph array</param>
 /// <param name="num_glyphs">The length of `glyphs` if not `NULL` otherwise this
 /// is ignored</param>
-void krink_init(void *memblk, size_t size, int *glyphs, int num_glyphs);
+void kr_init(void *memblk, size_t size, int *glyphs, int num_glyphs);
