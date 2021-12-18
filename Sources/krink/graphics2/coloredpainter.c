@@ -200,7 +200,7 @@ static void csp_tris_draw_buffer(bool rect_done) {
 
 	if (!rect_done) csp_rect_end(true);
 
-	kinc_g4_vertex_buffer_unlock(&tris_vertex_buffer, (tris_buffer_index - tris_buffer_start) * 4);
+	kinc_g4_vertex_buffer_unlock(&tris_vertex_buffer, (tris_buffer_index - tris_buffer_start) * 3);
 	kinc_g4_set_pipeline(&pipeline);
 	kinc_g4_set_matrix4(proj_mat_loc, &projection_matrix);
 	kinc_g4_set_vertex_buffer(&tris_vertex_buffer);
