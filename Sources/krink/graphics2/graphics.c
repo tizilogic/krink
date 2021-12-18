@@ -107,11 +107,11 @@ void kr_g2_draw_rect(float x, float y, float width, float height, float strength
 	kr_csp_fill_rect(x - hs, y - hs, width + strength, strength, g2_color, g2_opacity,
 	                 g2_transformation); // top
 	kr_csp_fill_rect(x - hs, y + hs, strength, height - strength, g2_color, g2_opacity,
-	                 g2_transformation);
+	                 g2_transformation); // left
 	kr_csp_fill_rect(x - hs, y + height - hs, width + strength, strength, g2_color, g2_opacity,
-	                 g2_transformation);
+	                 g2_transformation); // bottom
 	kr_csp_fill_rect(x + width - hs, y + hs, strength, height - strength, g2_color, g2_opacity,
-	                 g2_transformation);
+	                 g2_transformation); // right
 }
 
 void kr_g2_fill_rect(float x, float y, float width, float height) {
