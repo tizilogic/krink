@@ -169,7 +169,7 @@ void kr_g2_draw_triangle(float x1, float y1, float x2, float y2, float x3, float
 	kr_g2_fill_triangle(oc.x, oc.y, ic.x, ic.y, ob.x, ob.y);
 	kr_g2_fill_triangle(ic.x, ic.y, ib.x, ib.y, ob.x, ob.y);
 	kr_g2_fill_triangle(ob.x, ob.y, ib.x, ib.y, ia.x, ia.y);
-	kr_g2_fill_triangle(oa.x, oa.y, ob.x, ob.y, ib.x, ib.y);
+	kr_g2_fill_triangle(oa.x, oa.y, ob.x, ob.y, ia.x, ia.y);
 }
 
 void kr_g2_fill_triangle(float x1, float y1, float x2, float y2, float x3, float y3) {
