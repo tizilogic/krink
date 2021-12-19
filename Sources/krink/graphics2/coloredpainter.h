@@ -3,8 +3,8 @@
 #include <kinc/math/matrix.h>
 #include <stdint.h>
 
-#ifndef KRINK_G2_CSP_BUFFER_SIZE
-#define KRINK_G2_CSP_BUFFER_SIZE 1000
+#ifndef KR_G2_CSP_BUFFER_SIZE
+#define KR_G2_CSP_BUFFER_SIZE 1000
 #endif
 
 void kr_csp_init(void);

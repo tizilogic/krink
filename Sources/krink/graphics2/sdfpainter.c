@@ -93,14 +93,14 @@ static void build_rect_pipeline(void) {
 
 	rect_proj_mat_loc = kinc_g4_pipeline_get_constant_location(&rect_pipeline, "projectionMatrix");
 
-	kinc_g4_vertex_buffer_init(&rect_vertex_buffer, KRINK_G2_SDF_BUFFER_SIZE * 4, &structure,
+	kinc_g4_vertex_buffer_init(&rect_vertex_buffer, KR_G2_SDF_BUFFER_SIZE * 4, &structure,
 	                           KINC_G4_USAGE_DYNAMIC, 0);
 	rect_rect_verts = kinc_g4_vertex_buffer_lock_all(&rect_vertex_buffer);
 
-	kinc_g4_index_buffer_init(&rect_index_buffer, KRINK_G2_SDF_BUFFER_SIZE * 3 * 2,
+	kinc_g4_index_buffer_init(&rect_index_buffer, KR_G2_SDF_BUFFER_SIZE * 3 * 2,
 	                          KINC_G4_INDEX_BUFFER_FORMAT_32BIT, KINC_G4_USAGE_STATIC);
 	int *indices = kinc_g4_index_buffer_lock(&rect_index_buffer);
-	for (int i = 0; i < KRINK_G2_SDF_BUFFER_SIZE; ++i) {
+	for (int i = 0; i < KR_G2_SDF_BUFFER_SIZE; ++i) {
 		indices[i * 3 * 2 + 0] = i * 4 + 0;
 		indices[i * 3 * 2 + 1] = i * 4 + 1;
 		indices[i * 3 * 2 + 2] = i * 4 + 2;
@@ -156,14 +156,14 @@ static void build_circle_pipeline(void) {
 	circle_proj_mat_loc =
 	    kinc_g4_pipeline_get_constant_location(&circle_pipeline, "projectionMatrix");
 
-	kinc_g4_vertex_buffer_init(&circle_vertex_buffer, KRINK_G2_SDF_BUFFER_SIZE * 4, &structure,
+	kinc_g4_vertex_buffer_init(&circle_vertex_buffer, KR_G2_SDF_BUFFER_SIZE * 4, &structure,
 	                           KINC_G4_USAGE_DYNAMIC, 0);
 	circle_rect_verts = kinc_g4_vertex_buffer_lock_all(&circle_vertex_buffer);
 
-	kinc_g4_index_buffer_init(&circle_index_buffer, KRINK_G2_SDF_BUFFER_SIZE * 3 * 2,
+	kinc_g4_index_buffer_init(&circle_index_buffer, KR_G2_SDF_BUFFER_SIZE * 3 * 2,
 	                          KINC_G4_INDEX_BUFFER_FORMAT_32BIT, KINC_G4_USAGE_STATIC);
 	int *indices = kinc_g4_index_buffer_lock(&circle_index_buffer);
-	for (int i = 0; i < KRINK_G2_SDF_BUFFER_SIZE; ++i) {
+	for (int i = 0; i < KR_G2_SDF_BUFFER_SIZE; ++i) {
 		indices[i * 3 * 2 + 0] = i * 4 + 0;
 		indices[i * 3 * 2 + 1] = i * 4 + 1;
 		indices[i * 3 * 2 + 2] = i * 4 + 2;
@@ -217,14 +217,14 @@ static void build_line_pipeline(void) {
 
 	line_proj_mat_loc = kinc_g4_pipeline_get_constant_location(&line_pipeline, "projectionMatrix");
 
-	kinc_g4_vertex_buffer_init(&line_vertex_buffer, KRINK_G2_SDF_BUFFER_SIZE * 4, &structure,
+	kinc_g4_vertex_buffer_init(&line_vertex_buffer, KR_G2_SDF_BUFFER_SIZE * 4, &structure,
 	                           KINC_G4_USAGE_DYNAMIC, 0);
 	line_rect_verts = kinc_g4_vertex_buffer_lock_all(&line_vertex_buffer);
 
-	kinc_g4_index_buffer_init(&line_index_buffer, KRINK_G2_SDF_BUFFER_SIZE * 3 * 2,
+	kinc_g4_index_buffer_init(&line_index_buffer, KR_G2_SDF_BUFFER_SIZE * 3 * 2,
 	                          KINC_G4_INDEX_BUFFER_FORMAT_32BIT, KINC_G4_USAGE_STATIC);
 	int *indices = kinc_g4_index_buffer_lock(&line_index_buffer);
-	for (int i = 0; i < KRINK_G2_SDF_BUFFER_SIZE; ++i) {
+	for (int i = 0; i < KR_G2_SDF_BUFFER_SIZE; ++i) {
 		indices[i * 3 * 2 + 0] = i * 4 + 0;
 		indices[i * 3 * 2 + 1] = i * 4 + 1;
 		indices[i * 3 * 2 + 2] = i * 4 + 2;
@@ -376,17 +376,17 @@ static void sdf_rect_draw_buffer(bool end) {
 	kinc_g4_draw_indexed_vertices_from_to(rect_buffer_start * 2 * 3,
 	                                      (rect_buffer_index - rect_buffer_start) * 2 * 3);
 
-	if (end || rect_buffer_index + 1 >= KRINK_G2_SDF_BUFFER_SIZE) {
+	if (end || rect_buffer_index + 1 >= KR_G2_SDF_BUFFER_SIZE) {
 		rect_buffer_start = 0;
 		rect_buffer_index = 0;
 		rect_rect_verts =
-		    kinc_g4_vertex_buffer_lock(&rect_vertex_buffer, 0, KRINK_G2_SDF_BUFFER_SIZE * 4);
+		    kinc_g4_vertex_buffer_lock(&rect_vertex_buffer, 0, KR_G2_SDF_BUFFER_SIZE * 4);
 	}
 	else {
 		rect_buffer_start = rect_buffer_index;
 		rect_rect_verts =
 		    kinc_g4_vertex_buffer_lock(&rect_vertex_buffer, rect_buffer_start * 4,
-		                               (KRINK_G2_SDF_BUFFER_SIZE - rect_buffer_start) * 4);
+		                               (KR_G2_SDF_BUFFER_SIZE - rect_buffer_start) * 4);
 	}
 }
 
@@ -533,17 +533,17 @@ static void sdf_circle_draw_buffer(bool end) {
 	kinc_g4_draw_indexed_vertices_from_to(circle_buffer_start * 2 * 3,
 	                                      (circle_buffer_index - circle_buffer_start) * 2 * 3);
 
-	if (end || circle_buffer_index + 1 >= KRINK_G2_SDF_BUFFER_SIZE) {
+	if (end || circle_buffer_index + 1 >= KR_G2_SDF_BUFFER_SIZE) {
 		circle_buffer_start = 0;
 		circle_buffer_index = 0;
 		circle_rect_verts =
-		    kinc_g4_vertex_buffer_lock(&circle_vertex_buffer, 0, KRINK_G2_SDF_BUFFER_SIZE * 4);
+		    kinc_g4_vertex_buffer_lock(&circle_vertex_buffer, 0, KR_G2_SDF_BUFFER_SIZE * 4);
 	}
 	else {
 		circle_buffer_start = circle_buffer_index;
 		circle_rect_verts =
 		    kinc_g4_vertex_buffer_lock(&circle_vertex_buffer, circle_buffer_start * 4,
-		                               (KRINK_G2_SDF_BUFFER_SIZE - circle_buffer_start) * 4);
+		                               (KR_G2_SDF_BUFFER_SIZE - circle_buffer_start) * 4);
 	}
 }
 
@@ -667,17 +667,17 @@ static void sdf_line_draw_buffer(bool end) {
 	kinc_g4_draw_indexed_vertices_from_to(line_buffer_start * 2 * 3,
 	                                      (line_buffer_index - line_buffer_start) * 2 * 3);
 
-	if (end || line_buffer_index + 1 >= KRINK_G2_SDF_BUFFER_SIZE) {
+	if (end || line_buffer_index + 1 >= KR_G2_SDF_BUFFER_SIZE) {
 		line_buffer_start = 0;
 		line_buffer_index = 0;
 		line_rect_verts =
-		    kinc_g4_vertex_buffer_lock(&line_vertex_buffer, 0, KRINK_G2_SDF_BUFFER_SIZE * 4);
+		    kinc_g4_vertex_buffer_lock(&line_vertex_buffer, 0, KR_G2_SDF_BUFFER_SIZE * 4);
 	}
 	else {
 		line_buffer_start = line_buffer_index;
 		line_rect_verts =
 		    kinc_g4_vertex_buffer_lock(&line_vertex_buffer, line_buffer_start * 4,
-		                               (KRINK_G2_SDF_BUFFER_SIZE - line_buffer_start) * 4);
+		                               (KR_G2_SDF_BUFFER_SIZE - line_buffer_start) * 4);
 	}
 }
 

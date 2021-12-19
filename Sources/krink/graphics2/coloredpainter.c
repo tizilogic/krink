@@ -71,14 +71,14 @@ void kr_csp_init(void) {
 
 	proj_mat_loc = kinc_g4_pipeline_get_constant_location(&pipeline, "projectionMatrix");
 
-	kinc_g4_vertex_buffer_init(&rect_vertex_buffer, KRINK_G2_CSP_BUFFER_SIZE * 4, &structure,
+	kinc_g4_vertex_buffer_init(&rect_vertex_buffer, KR_G2_CSP_BUFFER_SIZE * 4, &structure,
 	                           KINC_G4_USAGE_DYNAMIC, 0);
 	rect_verts = kinc_g4_vertex_buffer_lock_all(&rect_vertex_buffer);
 
-	kinc_g4_index_buffer_init(&rect_index_buffer, KRINK_G2_CSP_BUFFER_SIZE * 3 * 2,
+	kinc_g4_index_buffer_init(&rect_index_buffer, KR_G2_CSP_BUFFER_SIZE * 3 * 2,
 	                          KINC_G4_INDEX_BUFFER_FORMAT_32BIT, KINC_G4_USAGE_STATIC);
 	int *indices = kinc_g4_index_buffer_lock(&rect_index_buffer);
-	for (int i = 0; i < KRINK_G2_CSP_BUFFER_SIZE; ++i) {
+	for (int i = 0; i < KR_G2_CSP_BUFFER_SIZE; ++i) {
 		indices[i * 3 * 2 + 0] = i * 4 + 0;
 		indices[i * 3 * 2 + 1] = i * 4 + 1;
 		indices[i * 3 * 2 + 2] = i * 4 + 2;
@@ -88,14 +88,14 @@ void kr_csp_init(void) {
 	}
 	kinc_g4_index_buffer_unlock(&rect_index_buffer);
 
-	kinc_g4_vertex_buffer_init(&tris_vertex_buffer, KRINK_G2_CSP_BUFFER_SIZE * 3, &structure,
+	kinc_g4_vertex_buffer_init(&tris_vertex_buffer, KR_G2_CSP_BUFFER_SIZE * 3, &structure,
 	                           KINC_G4_USAGE_DYNAMIC, 0);
 	tris_verts = kinc_g4_vertex_buffer_lock_all(&tris_vertex_buffer);
 
-	kinc_g4_index_buffer_init(&tris_index_buffer, KRINK_G2_CSP_BUFFER_SIZE * 3,
+	kinc_g4_index_buffer_init(&tris_index_buffer, KR_G2_CSP_BUFFER_SIZE * 3,
 	                          KINC_G4_INDEX_BUFFER_FORMAT_32BIT, KINC_G4_USAGE_STATIC);
 	indices = kinc_g4_index_buffer_lock(&tris_index_buffer);
-	for (int i = 0; i < KRINK_G2_CSP_BUFFER_SIZE; ++i) {
+	for (int i = 0; i < KR_G2_CSP_BUFFER_SIZE; ++i) {
 		indices[i * 3 + 0] = i * 3 + 0;
 		indices[i * 3 + 1] = i * 3 + 1;
 		indices[i * 3 + 2] = i * 3 + 2;
@@ -152,16 +152,15 @@ static void csp_rect_draw_buffer(bool tris_done) {
 	kinc_g4_draw_indexed_vertices_from_to(rect_buffer_start * 2 * 3,
 	                                      (rect_buffer_index - rect_buffer_start) * 2 * 3);
 
-	if (rect_buffer_index + 1 >= KRINK_G2_CSP_BUFFER_SIZE) {
+	if (rect_buffer_index + 1 >= KR_G2_CSP_BUFFER_SIZE) {
 		rect_buffer_start = 0;
 		rect_buffer_index = 0;
-		rect_verts =
-		    kinc_g4_vertex_buffer_lock(&rect_vertex_buffer, 0, KRINK_G2_CSP_BUFFER_SIZE * 4);
+		rect_verts = kinc_g4_vertex_buffer_lock(&rect_vertex_buffer, 0, KR_G2_CSP_BUFFER_SIZE * 4);
 	}
 	else {
 		rect_buffer_start = rect_buffer_index;
 		rect_verts = kinc_g4_vertex_buffer_lock(&rect_vertex_buffer, rect_buffer_start * 4,
-		                                        (KRINK_G2_CSP_BUFFER_SIZE - rect_buffer_start) * 4);
+		                                        (KR_G2_CSP_BUFFER_SIZE - rect_buffer_start) * 4);
 	}
 }
 
@@ -208,16 +207,15 @@ static void csp_tris_draw_buffer(bool rect_done) {
 	kinc_g4_draw_indexed_vertices_from_to(tris_buffer_start * 3,
 	                                      (tris_buffer_index - tris_buffer_start) * 3);
 
-	if (tris_buffer_index + 1 >= KRINK_G2_CSP_BUFFER_SIZE) {
+	if (tris_buffer_index + 1 >= KR_G2_CSP_BUFFER_SIZE) {
 		tris_buffer_start = 0;
 		tris_buffer_index = 0;
-		tris_verts =
-		    kinc_g4_vertex_buffer_lock(&tris_vertex_buffer, 0, KRINK_G2_CSP_BUFFER_SIZE * 3);
+		tris_verts = kinc_g4_vertex_buffer_lock(&tris_vertex_buffer, 0, KR_G2_CSP_BUFFER_SIZE * 3);
 	}
 	else {
 		tris_buffer_start = tris_buffer_index;
 		tris_verts = kinc_g4_vertex_buffer_lock(&tris_vertex_buffer, tris_buffer_start * 3,
-		                                        (KRINK_G2_CSP_BUFFER_SIZE - tris_buffer_start) * 3);
+		                                        (KR_G2_CSP_BUFFER_SIZE - tris_buffer_start) * 3);
 	}
 }
 
@@ -230,7 +228,7 @@ void kr_csp_fill_rect(float x, float y, float width, float height, uint32_t colo
 	if (tris_buffer_index - tris_buffer_start > 0)
 		csp_tris_draw_buffer(true); // Flush other buffer for right render order
 
-	if (rect_buffer_index + 1 >= KRINK_G2_CSP_BUFFER_SIZE) csp_rect_draw_buffer(false);
+	if (rect_buffer_index + 1 >= KR_G2_CSP_BUFFER_SIZE) csp_rect_draw_buffer(false);
 
 	csp_rect_set_colors(opacity, color);
 
@@ -252,7 +250,7 @@ void kr_csp_fill_triangle(float x0, float y0, float x1, float y1, float x2, floa
 	if (rect_buffer_index - rect_buffer_start > 0)
 		csp_rect_draw_buffer(true); // Flush other buffer for right render order
 
-	if (tris_buffer_index + 1 >= KRINK_G2_CSP_BUFFER_SIZE) csp_tris_draw_buffer(false);
+	if (tris_buffer_index + 1 >= KR_G2_CSP_BUFFER_SIZE) csp_tris_draw_buffer(false);
 
 	csp_tris_set_colors(opacity, color);
 

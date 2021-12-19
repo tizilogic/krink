@@ -6,8 +6,8 @@
 #include <kinc/math/vector.h>
 #include <krink/image.h>
 
-#ifndef KRINK_G2_MAX_WIN
-#define KRINK_G2_MAX_WIN 8
+#ifndef KR_G2_MAX_WIN
+#define KR_G2_MAX_WIN 8
 #endif
 
 #ifdef __cplusplus
@@ -116,7 +116,8 @@ void kr_g2_fill_triangle(float x1, float y1, float x2, float y2, float x3, float
 /// <param name="x3"></param>
 /// <param name="y3"></param>
 /// <param name="strength"></param>
-void kr_g2_draw_triangle(float x1, float y1, float x2, float y2, float x3, float y3, float strength);
+void kr_g2_draw_triangle(float x1, float y1, float x2, float y2, float x3, float y3,
+                         float strength);
 
 /// <summary>
 /// Draw a string.

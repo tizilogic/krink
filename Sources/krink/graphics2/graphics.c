@@ -18,7 +18,7 @@ static kinc_matrix3x3_t g2_transformation;
 static kr_ttf_font_t *g2_font = NULL;
 static kinc_matrix4x4_t g2_projection_matrix;
 static int g2_font_size;
-static float g2_width[KRINK_G2_MAX_WIN], g2_height[KRINK_G2_MAX_WIN];
+static float g2_width[KR_G2_MAX_WIN], g2_height[KR_G2_MAX_WIN];
 static bool g2_painters_initialized = false;
 static int g2_active_window = -1;
 
@@ -34,7 +34,7 @@ void kr_g2_init(int window, int window_width, int window_height) {
 }
 
 void kr_g2_set_window_size(int window, int window_width, int window_height) {
-	assert(window >= 0 && window < KRINK_G2_MAX_WIN);
+	assert(window >= 0 && window < KR_G2_MAX_WIN);
 	g2_width[window] = (float)window_width;
 	g2_height[window] = (float)window_height;
 
@@ -53,12 +53,12 @@ void kr_g2_set_window_size(int window, int window_width, int window_height) {
 }
 
 float kr_g2_get_width(int window) {
-	assert(window >= 0 && window < KRINK_G2_MAX_WIN);
+	assert(window >= 0 && window < KR_G2_MAX_WIN);
 	return g2_width[window];
 }
 
 float kr_g2_get_height(int window) {
-	assert(window >= 0 && window < KRINK_G2_MAX_WIN);
+	assert(window >= 0 && window < KR_G2_MAX_WIN);
 	return g2_height[window];
 }
 

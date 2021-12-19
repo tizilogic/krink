@@ -6,8 +6,8 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#ifndef KRINK_G2_TSP_BUFFER_SIZE
-#define KRINK_G2_TSP_BUFFER_SIZE 1000
+#ifndef KR_G2_TSP_BUFFER_SIZE
+#define KR_G2_TSP_BUFFER_SIZE 1000
 #endif
 
 void kr_tsp_init(void);

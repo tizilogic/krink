@@ -69,14 +69,14 @@ void kr_isp_init(void) {
 	texunit = kinc_g4_pipeline_get_texture_unit(&pipeline, "tex");
 	proj_mat_loc = kinc_g4_pipeline_get_constant_location(&pipeline, "projectionMatrix");
 
-	kinc_g4_vertex_buffer_init(&vertex_buffer, KRINK_G2_ISP_BUFFER_SIZE * 4, &structure,
+	kinc_g4_vertex_buffer_init(&vertex_buffer, KR_G2_ISP_BUFFER_SIZE * 4, &structure,
 	                           KINC_G4_USAGE_DYNAMIC, 0);
 	rect_verts = kinc_g4_vertex_buffer_lock_all(&vertex_buffer);
 
-	kinc_g4_index_buffer_init(&index_buffer, KRINK_G2_ISP_BUFFER_SIZE * 3 * 2,
+	kinc_g4_index_buffer_init(&index_buffer, KR_G2_ISP_BUFFER_SIZE * 3 * 2,
 	                          KINC_G4_INDEX_BUFFER_FORMAT_32BIT, KINC_G4_USAGE_STATIC);
 	int *indices = kinc_g4_index_buffer_lock(&index_buffer);
-	for (int i = 0; i < KRINK_G2_ISP_BUFFER_SIZE; ++i) {
+	for (int i = 0; i < KR_G2_ISP_BUFFER_SIZE; ++i) {
 		indices[i * 3 * 2 + 0] = i * 4 + 0;
 		indices[i * 3 * 2 + 1] = i * 4 + 1;
 		indices[i * 3 * 2 + 2] = i * 4 + 2;
@@ -156,15 +156,15 @@ void kr_isp_draw_buffer(bool end) {
 	kinc_g4_draw_indexed_vertices_from_to(buffer_start * 2 * 3,
 	                                      (buffer_index - buffer_start) * 2 * 3);
 
-	if (end || buffer_index + 1 >= KRINK_G2_ISP_BUFFER_SIZE) {
+	if (end || buffer_index + 1 >= KR_G2_ISP_BUFFER_SIZE) {
 		buffer_start = 0;
 		buffer_index = 0;
-		rect_verts = kinc_g4_vertex_buffer_lock(&vertex_buffer, 0, KRINK_G2_ISP_BUFFER_SIZE * 4);
+		rect_verts = kinc_g4_vertex_buffer_lock(&vertex_buffer, 0, KR_G2_ISP_BUFFER_SIZE * 4);
 	}
 	else {
 		buffer_start = buffer_index;
 		rect_verts = kinc_g4_vertex_buffer_lock(&vertex_buffer, buffer_start * 4,
-		                                        (KRINK_G2_ISP_BUFFER_SIZE - buffer_start) * 4);
+		                                        (KR_G2_ISP_BUFFER_SIZE - buffer_start) * 4);
 	}
 }
 
@@ -181,7 +181,7 @@ void kr_isp_draw_scaled_sub_image(kr_image_t *img, float sx, float sy, float sw,
                                   float dy, float dw, float dh, float opacity, uint32_t color,
                                   kinc_matrix3x3_t transformation) {
 	kinc_g4_texture_t *tex = &(img->tex);
-	if (buffer_start + buffer_index + 1 >= KRINK_G2_ISP_BUFFER_SIZE ||
+	if (buffer_start + buffer_index + 1 >= KR_G2_ISP_BUFFER_SIZE ||
 	    (last_texture != NULL && tex != last_texture))
 		kr_isp_draw_buffer(false);
 

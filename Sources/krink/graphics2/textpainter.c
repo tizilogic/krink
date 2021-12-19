@@ -72,14 +72,14 @@ void kr_tsp_init(void) {
 	texunit = kinc_g4_pipeline_get_texture_unit(&pipeline, "tex");
 	proj_mat_loc = kinc_g4_pipeline_get_constant_location(&pipeline, "projectionMatrix");
 
-	kinc_g4_vertex_buffer_init(&vertex_buffer, KRINK_G2_TSP_BUFFER_SIZE * 4, &structure,
+	kinc_g4_vertex_buffer_init(&vertex_buffer, KR_G2_TSP_BUFFER_SIZE * 4, &structure,
 	                           KINC_G4_USAGE_DYNAMIC, 0);
 	rect_verts = kinc_g4_vertex_buffer_lock_all(&vertex_buffer);
 
-	kinc_g4_index_buffer_init(&index_buffer, KRINK_G2_TSP_BUFFER_SIZE * 3 * 2,
+	kinc_g4_index_buffer_init(&index_buffer, KR_G2_TSP_BUFFER_SIZE * 3 * 2,
 	                          KINC_G4_INDEX_BUFFER_FORMAT_32BIT, KINC_G4_USAGE_STATIC);
 	int *indices = kinc_g4_index_buffer_lock(&index_buffer);
-	for (int i = 0; i < KRINK_G2_TSP_BUFFER_SIZE; ++i) {
+	for (int i = 0; i < KR_G2_TSP_BUFFER_SIZE; ++i) {
 		indices[i * 3 * 2 + 0] = i * 4 + 0;
 		indices[i * 3 * 2 + 1] = i * 4 + 1;
 		indices[i * 3 * 2 + 2] = i * 4 + 2;
@@ -161,15 +161,15 @@ void kr_tsp_draw_buffer(bool end) {
 	                                      (buffer_index - buffer_start) * 2 * 3);
 
 	// kinc_g4_set_texture(texunit, NULL);
-	if (end || buffer_index + 1 >= KRINK_G2_TSP_BUFFER_SIZE) {
+	if (end || buffer_index + 1 >= KR_G2_TSP_BUFFER_SIZE) {
 		buffer_start = 0;
 		buffer_index = 0;
-		rect_verts = kinc_g4_vertex_buffer_lock(&vertex_buffer, 0, KRINK_G2_TSP_BUFFER_SIZE * 4);
+		rect_verts = kinc_g4_vertex_buffer_lock(&vertex_buffer, 0, KR_G2_TSP_BUFFER_SIZE * 4);
 	}
 	else {
 		buffer_start = buffer_index;
 		rect_verts = kinc_g4_vertex_buffer_lock(&vertex_buffer, buffer_start * 4,
-		                                        (KRINK_G2_TSP_BUFFER_SIZE - buffer_start) * 4);
+		                                        (KR_G2_TSP_BUFFER_SIZE - buffer_start) * 4);
 	}
 }
 
@@ -205,7 +205,7 @@ void kr_tsp_draw_string(const char *text, float opacity, uint32_t color, float x
 	for (int i = 0; text[i] != 0; ++i) {
 		int char_code = (unsigned int)text[i];
 		if (kr_ttf_get_baked_quad(active_font, font_size, &q, char_code, xpos, ypos)) {
-			if (buffer_index + 1 >= KRINK_G2_TSP_BUFFER_SIZE) kr_tsp_draw_buffer(false);
+			if (buffer_index + 1 >= KR_G2_TSP_BUFFER_SIZE) kr_tsp_draw_buffer(false);
 			kr_tsp_set_rect_colors(opacity, color);
 			kr_tsp_set_rect_tex_coords(q.s0, q.t0, q.s1, q.t1);
 			kinc_vector3_t p0 =
@@ -236,7 +236,7 @@ void kr_tsp_draw_characters(int *text, int start, int length, float opacity, uin
 	kr_ttf_aligned_quad_t q;
 	for (int i = start; i < start + length; ++i) {
 		if (kr_ttf_get_baked_quad(active_font, font_size, &q, text[i], xpos, ypos)) {
-			if (buffer_index + 1 >= KRINK_G2_TSP_BUFFER_SIZE) kr_tsp_draw_buffer(false);
+			if (buffer_index + 1 >= KR_G2_TSP_BUFFER_SIZE) kr_tsp_draw_buffer(false);
 			kr_tsp_set_rect_colors(opacity, color);
 			kr_tsp_set_rect_tex_coords(q.s0, q.t0, q.s1, q.t1);
 			kinc_vector3_t p0 = kinc_matrix3x3_multiply_vector(

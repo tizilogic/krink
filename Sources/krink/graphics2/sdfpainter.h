@@ -4,8 +4,8 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#ifndef KRINK_G2_SDF_BUFFER_SIZE
-#define KRINK_G2_SDF_BUFFER_SIZE 1000
+#ifndef KR_G2_SDF_BUFFER_SIZE
+#define KR_G2_SDF_BUFFER_SIZE 1000
 #endif
 
 typedef struct kr_sdf_corner_radius {
