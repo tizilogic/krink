@@ -5,24 +5,24 @@
 #endif
 
 typedef enum kr_evt_event_type {
-    KEY_DOWN,
-    KEY_UP,
-    KEY_PRESS,
-    MOUSE_MOVE,
-    MOUSE_PRESS,
-    MOUSE_RELEASE,
-    MOUSE_SCROLL,
-    FINGER_MOVE,
-    FINGER_START,
-    FINGER_END,
-    PRIMARY_MOVE,
-    PRIMARY_START,
-    PRIMARY_END,
-    FOREGROUND,
-    BACKGROUND,
-    PAUSE,
-    RESUME,
-    SHUTDOWN
+    KR_EVT_KEY_DOWN,
+    KR_EVT_KEY_UP,
+    KR_EVT_KEY_PRESS,
+    KR_EVT_MOUSE_MOVE,
+    KR_EVT_MOUSE_PRESS,
+    KR_EVT_MOUSE_RELEASE,
+    KR_EVT_MOUSE_SCROLL,
+    KR_EVT_FINGER_MOVE,
+    KR_EVT_FINGER_START,
+    KR_EVT_FINGER_END,
+    KR_EVT_PRIMARY_MOVE,
+    KR_EVT_PRIMARY_START,
+    KR_EVT_PRIMARY_END,
+    KR_EVT_FOREGROUND,
+    KR_EVT_BACKGROUND,
+    KR_EVT_PAUSE,
+    KR_EVT_RESUME,
+    KR_EVT_SHUTDOWN
 } kr_evt_event_type_t;
 
 typedef struct kr_evt_key_event {
