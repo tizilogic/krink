@@ -3,12 +3,12 @@
         {
             "name": "Linux",
             "includePath": [
+                "${workspaceFolder}/Sources",
                 "/home/tc/code/Kinc/Sources",
                 "/home/tc/code/Kinc/Backends/System/Linux/Sources",
                 "/home/tc/code/Kinc/Backends/System/POSIX/Sources",
                 "/home/tc/code/Kinc/Backends/Graphics4/OpenGL/Sources",
-                "/home/tc/code/Kinc/Backends/Graphics5/G5onG4/Sources",
-                "/home/tc/code/krink/Sources"
+                "/home/tc/code/Kinc/Backends/Graphics5/G5onG4/Sources"
             ],
             "defines": [
                 "KORE_G1",
