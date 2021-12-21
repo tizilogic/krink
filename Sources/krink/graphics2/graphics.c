@@ -303,9 +303,19 @@ void kr_g2_draw_sdf_line(float x1, float y1, float x2, float y2, float strength,
 }
 
 void kr_g2_scissor(float x, float y, float w, float h) {
+	assert(begin);
+	kr_isp_end();
+	kr_tsp_end();
+	kr_csp_end();
+	kr_sdf_end();
 	kinc_g4_scissor((int)(x + 0.5f), (int)(y + 0.5f), (int)(w + 0.5f), (int)(h + 0.5f));
 }
 
 void kr_g2_disable_scissor(void) {
+	assert(begin);
+	kr_isp_end();
+	kr_tsp_end();
+	kr_csp_end();
+	kr_sdf_end();
 	kinc_g4_disable_scissor();
 }
