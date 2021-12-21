@@ -76,11 +76,11 @@ static inline void notify(kr_evt_event_type_t evt, void *data) {
 	switch (evt) {
 	case KR_EVT_KEY_DOWN: {
 		kr_evt_key_event_t *k = (kr_evt_key_event_t *)data;
-		nk_input_key(&nkctx, map_kinc_to_nk(k->keycode), true);
+		nk_input_key(&nkctx, map_kinc_to_nk(k->keycode), 1);
 	} break;
 	case KR_EVT_KEY_UP: {
 		kr_evt_key_event_t *k = (kr_evt_key_event_t *)data;
-		nk_input_key(&nkctx, map_kinc_to_nk(k->keycode), false);
+		nk_input_key(&nkctx, map_kinc_to_nk(k->keycode), 0);
 	} break;
 	case KR_EVT_KEY_PRESS: {
 		kr_evt_key_event_press_t *k = (kr_evt_key_event_press_t *)data;
@@ -96,11 +96,11 @@ static inline void notify(kr_evt_event_type_t evt, void *data) {
 	} break;
 	case KR_EVT_PRIMARY_START: {
 		kr_evt_primary_button_event_t *m = (kr_evt_primary_button_event_t *)data;
-		nk_input_button(&nkctx, NK_BUTTON_LEFT, m->x, m->x, 1);
+		nk_input_button(&nkctx, NK_BUTTON_LEFT, m->x, m->y, 1);
 	} break;
 	case KR_EVT_PRIMARY_END: {
 		kr_evt_primary_button_event_t *m = (kr_evt_primary_button_event_t *)data;
-		nk_input_button(&nkctx, NK_BUTTON_LEFT, m->x, m->x, 0);
+		nk_input_button(&nkctx, NK_BUTTON_LEFT, m->x, m->y, 0);
 	} break;
 	case KR_EVT_FOREGROUND:
 	case KR_EVT_BACKGROUND:
