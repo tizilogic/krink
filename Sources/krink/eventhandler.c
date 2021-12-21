@@ -1,7 +1,7 @@
 #include "eventhandler.h"
 #include <assert.h>
-#include <kinc/system.h>
 #include <kinc/input/keyboard.h>
+#include <kinc/system.h>
 #include <stddef.h>
 #include <stdint.h>
 //#define KORE_IOS
@@ -15,7 +15,7 @@ typedef void (*observer_t)(kr_evt_event_type_t, void *);
 static observer_t observers[KR_EVT_MAX_OBSERVER];
 
 static void notify(kr_evt_event_type_t event, void *data) {
-	for (int i=0; i < KR_EVT_MAX_OBSERVER; ++i) {
+	for (int i = 0; i < KR_EVT_MAX_OBSERVER; ++i) {
 		if (observers[i] != NULL) observers[i](event, data);
 	}
 }
