@@ -163,24 +163,26 @@ NK_API void nk_kr_render(int window, struct nk_color clear) {
 			kr_g2_set_color(0);
 			kr_g2_draw_sdf_rect_symm((float)r->x, (float)r->y, (float)r->w, (float)r->h,
 			                         (float)r->rounding, (float)r->line_thickness,
-			                         nk_color_to_uint(r->color), 3.0f);
+			                         nk_color_to_uint(r->color), 2.2f);
 		} break;
 		case NK_COMMAND_RECT_FILLED: {
 			const struct nk_command_rect_filled *r = (const struct nk_command_rect_filled *)cmd;
 			kr_g2_set_color(nk_color_to_uint(r->color));
 			kr_g2_draw_sdf_rect_symm((float)r->x, (float)r->y, (float)r->w, (float)r->h,
-			                         (float)r->rounding, 0.0f, 0, 3.0f);
+			                         (float)r->rounding, 0.0f, 0, 2.2f);
 		} break;
 		case NK_COMMAND_CIRCLE: {
 			const struct nk_command_circle *c = (const struct nk_command_circle *)cmd;
 			kr_g2_set_color(0);
-			kr_g2_draw_sdf_circle((float)c->x, (float)c->y, (float)c->w, (float)c->line_thickness,
-			                      nk_color_to_uint(c->color), 3.0f);
+			float r = (float)(c->h > c->w ? c->h : c->w) / 2.0f;
+			kr_g2_draw_sdf_circle((float)c->x + r, (float)c->y + r, r, (float)c->line_thickness,
+			                      nk_color_to_uint(c->color), 2.2f);
 		} break;
 		case NK_COMMAND_CIRCLE_FILLED: {
 			const struct nk_command_circle_filled *c = (const struct nk_command_circle_filled *)cmd;
 			kr_g2_set_color(nk_color_to_uint(c->color));
-			kr_g2_draw_sdf_circle((float)c->x, (float)c->y, (float)c->w, 0.0f, 0, 3.0f);
+			float r = (float)(c->h > c->w ? c->h : c->w) / 2.0f;
+			kr_g2_draw_sdf_circle((float)c->x + r, (float)c->y + r, r, 0.0f, 0, 2.2f);
 		} break;
 		case NK_COMMAND_TRIANGLE: {
 			const struct nk_command_triangle *t = (const struct nk_command_triangle *)cmd;
@@ -197,12 +199,13 @@ NK_API void nk_kr_render(int window, struct nk_color clear) {
 		} break;
 		case NK_COMMAND_TEXT: {
 			const struct nk_command_text *t = (const struct nk_command_text *)cmd;
-			const kr_ttf_font_t *fnt = (kr_ttf_font_t *)t->font->userdata.ptr;
+			kr_ttf_font_t *fnt = (kr_ttf_font_t *)t->font->userdata.ptr;
 			kr_g2_set_color(nk_color_to_uint(t->background));
 			kr_g2_fill_rect((float)t->x, (float)t->y, (float)t->w, (float)t->h);
 			kr_g2_set_color(nk_color_to_uint(t->foreground));
 			kr_g2_set_font(fnt, (int)t->font->height);
-			kr_g2_draw_string(t->string, (float)t->x, (float)(t->y + kr_ttf_baseline(fnt, (int)t->font->height)));
+			kr_g2_draw_string(t->string, (float)t->x,
+			                  (float)(t->y + kr_ttf_baseline(fnt, (int)t->font->height)));
 		} break;
 		case NK_COMMAND_IMAGE: {
 			const struct nk_command_image *i = (const struct nk_command_image *)cmd;
