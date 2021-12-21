@@ -15,6 +15,7 @@
 static struct nk_context nkctx;
 static struct nk_user_font fnt;
 static bool ctx_input_started = false;
+static bool initialized = false;
 
 static inline uint32_t nk_color_to_uint(struct nk_color color) {
 	uint32_t c = 0;
@@ -95,11 +96,11 @@ static inline void notify(kr_evt_event_type_t evt, void *data) {
 	} break;
 	case KR_EVT_PRIMARY_START: {
 		kr_evt_primary_button_event_t *m = (kr_evt_primary_button_event_t *)data;
-		nk_input_button(&nkctx, NK_BUTTON_LEFT, m->x, m->x, true);
+		nk_input_button(&nkctx, NK_BUTTON_LEFT, m->x, m->x, 1);
 	} break;
 	case KR_EVT_PRIMARY_END: {
 		kr_evt_primary_button_event_t *m = (kr_evt_primary_button_event_t *)data;
-		nk_input_button(&nkctx, NK_BUTTON_LEFT, m->x, m->x, false);
+		nk_input_button(&nkctx, NK_BUTTON_LEFT, m->x, m->x, 0);
 	} break;
 	case KR_EVT_FOREGROUND:
 	case KR_EVT_BACKGROUND:
@@ -124,7 +125,14 @@ void nk_kr_init(kr_ttf_font_t *font, float font_height, void *memory, nk_size si
 	fnt.width = text_width;
 	nk_init_fixed(&nkctx, memory, size, &fnt);
 	ctx_input_started = false;
+	kr_g2_set_font(font, (int)font_height);
 	kr_evt_add_observer(notify);
+	initialized = true;
+}
+
+struct nk_context *nk_kr_get_ctx(void) {
+	assert(initialized);
+	return &nkctx;
 }
 
 NK_API void nk_kr_render(int window, struct nk_color clear) {
@@ -189,11 +197,12 @@ NK_API void nk_kr_render(int window, struct nk_color clear) {
 		} break;
 		case NK_COMMAND_TEXT: {
 			const struct nk_command_text *t = (const struct nk_command_text *)cmd;
+			const kr_ttf_font_t *fnt = (kr_ttf_font_t *)t->font->userdata.ptr;
 			kr_g2_set_color(nk_color_to_uint(t->background));
 			kr_g2_fill_rect((float)t->x, (float)t->y, (float)t->w, (float)t->h);
 			kr_g2_set_color(nk_color_to_uint(t->foreground));
-			kr_g2_set_font((kr_ttf_font_t *)&(t->font->userdata), (int)t->font->height);
-			kr_g2_draw_string(t->string, (float)t->x, (float)t->y);
+			kr_g2_set_font(fnt, (int)t->font->height);
+			kr_g2_draw_string(t->string, (float)t->x, (float)(t->y + kr_ttf_baseline(fnt, (int)t->font->height)));
 		} break;
 		case NK_COMMAND_IMAGE: {
 			const struct nk_command_image *i = (const struct nk_command_image *)cmd;
