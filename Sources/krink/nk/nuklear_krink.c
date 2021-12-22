@@ -71,8 +71,6 @@ static enum nk_keys map_kinc_to_nk(int keycode) {
 }
 
 static inline void notify(kr_evt_event_type_t evt, void *data) {
-	if (!ctx_input_started) begin_input();
-
 	switch (evt) {
 	case KR_EVT_KEY_DOWN: {
 		kr_evt_key_event_t *k = (kr_evt_key_event_t *)data;
@@ -128,6 +126,7 @@ void nk_kr_init(kr_ttf_font_t *font, float font_height, void *memory, nk_size si
 	kr_g2_set_font(font, (int)font_height);
 	kr_evt_add_observer(notify);
 	initialized = true;
+	begin_input();
 }
 
 struct nk_context *nk_kr_get_ctx(void) {
@@ -228,6 +227,7 @@ NK_API void nk_kr_render(int window, struct nk_color clear) {
 		}
 	}
 	nk_clear(&nkctx);
+	begin_input();
 	kr_g2_disable_scissor();
 	kr_g2_end();
 }
