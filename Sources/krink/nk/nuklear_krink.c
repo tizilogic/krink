@@ -4,14 +4,6 @@
 #include <krink/eventhandler.h>
 #include <krink/memory.h>
 
-// Maybe leave out?
-#ifndef NK_KR_DOUBLE_CLICK_LO
-#define NK_KR_DOUBLE_CLICK_LO 20
-#endif
-#ifndef NK_KR_DOUBLE_CLICK_HI
-#define NK_KR_DOUBLE_CLICK_HI 200
-#endif
-
 static struct nk_context nkctx;
 static struct nk_user_font fnt;
 static bool ctx_input_started = false;
@@ -27,7 +19,13 @@ static inline uint32_t nk_color_to_uint(struct nk_color color) {
 }
 
 static inline float text_width(nk_handle handle, float h, const char *text, int len) {
-	return (float)kr_ttf_width((kr_ttf_font_t *)handle.ptr, (int)(h + 0.5f), text);
+	int characters[KR_NK_MAX_CHARACTERS];
+	len = len <= KR_NK_MAX_CHARACTERS ? len : KR_NK_MAX_CHARACTERS;
+	for (int i = 0; i < len; ++i) {
+		characters[i] = (int)(unsigned)text[i];
+	}
+	float w = kr_ttf_width_of_characters((kr_ttf_font_t *)handle.ptr, (int)(h + 0.5f), characters, 0, len);
+	return w;
 }
 
 static inline void begin_input(void) {

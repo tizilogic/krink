@@ -8,6 +8,10 @@
 #include <krink/graphics2/graphics.h>
 #include <krink/graphics2/ttf.h>
 
+#ifndef KR_NK_MAX_CHARACTERS
+#define KR_NK_MAX_CHARACTERS 512
+#endif
+
 void nk_kr_init(kr_ttf_font_t *font, float font_height, void *memory, nk_size size);
 struct nk_context *nk_kr_get_ctx(void);
 NK_API void nk_kr_render(int window, struct nk_color clear);
