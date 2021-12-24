@@ -24,7 +24,8 @@ static inline float text_width(nk_handle handle, float h, const char *text, int 
 	for (int i = 0; i < len; ++i) {
 		characters[i] = (int)(unsigned)text[i];
 	}
-	float w = kr_ttf_width_of_characters((kr_ttf_font_t *)handle.ptr, (int)(h + 0.5f), characters, 0, len);
+	float w = kr_ttf_width_of_characters((kr_ttf_font_t *)handle.ptr, (int)(h + 0.5f), characters,
+	                                     0, len);
 	return w;
 }
 
@@ -115,7 +116,7 @@ static inline void notify(kr_evt_event_type_t evt, void *data) {
 	}
 }
 
-void nk_kr_init(kr_ttf_font_t *font, float font_height, void *memory, nk_size size) {
+void kr_nk_init(kr_ttf_font_t *font, float font_height, void *memory, nk_size size) {
 	fnt.userdata.ptr = (void *)font;
 	fnt.height = font_height;
 	fnt.width = text_width;
@@ -127,12 +128,12 @@ void nk_kr_init(kr_ttf_font_t *font, float font_height, void *memory, nk_size si
 	begin_input();
 }
 
-struct nk_context *nk_kr_get_ctx(void) {
+struct nk_context *kr_nk_get_ctx(void) {
 	assert(initialized);
 	return &nkctx;
 }
 
-NK_API void nk_kr_render(int window, struct nk_color clear) {
+NK_API void kr_nk_render(int window, struct nk_color clear) {
 	const struct nk_command *cmd;
 
 	if (ctx_input_started) {
