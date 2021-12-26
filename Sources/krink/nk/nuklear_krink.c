@@ -85,7 +85,7 @@ static inline void notify(kr_evt_event_type_t evt, void *data) {
 	} break;
 	case KR_EVT_MOUSE_SCROLL: {
 		kr_evt_mouse_scroll_event_t *s = (kr_evt_mouse_scroll_event_t *)data;
-		nk_input_scroll(&nkctx, (struct nk_vec2){s->delta, 0});
+		nk_input_scroll(&nkctx, (struct nk_vec2){0, s->delta});
 	} break;
 	case KR_EVT_PRIMARY_MOVE: {
 		kr_evt_primary_move_event_t *m = (kr_evt_primary_move_event_t *)data;
