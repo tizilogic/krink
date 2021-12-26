@@ -319,3 +319,7 @@ void kr_g2_disable_scissor(void) {
 	kr_sdf_end();
 	kinc_g4_disable_scissor();
 }
+
+void kr_g2_set_bilinear_filter(bool bilinear) {
+	kr_isp_set_bilinear_filter(bilinear);
+}

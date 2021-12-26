@@ -15,4 +15,5 @@ typedef struct kr_image {
 
 void kr_image_init(kr_image_t *img);
 void kr_image_load(kr_image_t *img, char *path, bool keep_in_memory);
+void kr_image_generate_mipmaps(kr_image_t *img, int levels);
 void kr_image_destroy(kr_image_t *img);

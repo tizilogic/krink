@@ -148,7 +148,7 @@ void kr_isp_draw_buffer(bool end) {
 	kinc_g4_set_texture(texunit, last_texture);
 	kinc_g4_set_texture_addressing(texunit, KINC_G4_TEXTURE_ADDRESSING_CLAMP,
 	                               KINC_G4_TEXTURE_ADDRESSING_CLAMP);
-	kinc_g4_set_texture_mipmap_filter(texunit, KINC_G4_MIPMAP_FILTER_NONE);
+	kinc_g4_set_texture_mipmap_filter(texunit, bilinear_filter ? KINC_G4_MIPMAP_FILTER_LINEAR : KINC_G4_MIPMAP_FILTER_NONE);
 	kinc_g4_set_texture_minification_filter(
 	    texunit, bilinear_filter ? KINC_G4_TEXTURE_FILTER_LINEAR : KINC_G4_TEXTURE_FILTER_POINT);
 	kinc_g4_set_texture_magnification_filter(
@@ -169,6 +169,7 @@ void kr_isp_draw_buffer(bool end) {
 }
 
 void kr_isp_set_bilinear_filter(bool bilinear) {
+	if (bilinear_filter == bilinear) return;
 	kr_isp_end();
 	bilinear_filter = bilinear;
 }

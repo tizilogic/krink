@@ -255,6 +255,8 @@ void kr_g2_scissor(float x, float y, float w, float h);
 /// </summary>
 void kr_g2_disable_scissor(void);
 
+void kr_g2_set_bilinear_filter(bool bilinear);
+
 #ifdef __cplusplus
 }
 #endif

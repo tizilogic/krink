@@ -35,6 +35,10 @@ void kr_image_load(kr_image_t *img, char *path, bool keep_in_memory) {
 	}
 }
 
+void kr_image_generate_mipmaps(kr_image_t *img, int levels) {
+	kinc_g4_texture_generate_mipmaps(&img->tex, levels);
+}
+
 void kr_image_destroy(kr_image_t *img) {
 	if (!img->loaded) return;
 	kinc_g4_texture_destroy(&(img->tex));
