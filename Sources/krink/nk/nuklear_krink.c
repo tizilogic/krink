@@ -207,7 +207,7 @@ NK_API void kr_nk_render(int window, struct nk_color clear) {
 		} break;
 		case NK_COMMAND_IMAGE: {
 			const struct nk_command_image *i = (const struct nk_command_image *)cmd;
-			kr_image_t *img = (kr_image_t *)&(i->img.handle);
+			kr_image_t *img = (kr_image_t *)i->img.handle.ptr;
 			kr_g2_set_color(nk_color_to_uint(i->col));
 			kr_g2_draw_scaled_sub_image(img, (float)(i->img.region[0]), (float)(i->img.region[1]),
 			                            (float)(i->img.region[2]), (float)(i->img.region[3]),
