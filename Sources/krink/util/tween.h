@@ -1,5 +1,11 @@
 #pragma once
 
+/*
+This implementation was ported and adapted from Lubos Lenkos' armory3d/iron,
+licensed under zlib/libpng license
+https://github.com/armory3d/iron/blob/a9749a252edd8b4763d4bde10c7f048cfa8479c6/Sources/iron/system/Tween.hx
+*/
+
 #define KR_TWEEN_DEFAULT_OVERSHOOT 1.70158f
 
 typedef enum kr_tween_ease {
