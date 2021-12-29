@@ -170,10 +170,6 @@ static inline float kr_tween_back_in_out(float k) {
 	}
 }
 
-static inline float kr_tween_bounce_in(float k) {
-	return 1.0f - kr_tween_Bounceout(1.0f - k);
-}
-
 static inline float kr_tween_bounce_out(float k) {
 	if (k < (1.0f / 2.75f)) {
 		return 7.5625f * k * k;
@@ -187,9 +183,13 @@ static inline float kr_tween_bounce_out(float k) {
 	return 7.5625f * (k -= (2.625f / 2.75f)) * k + 0.984375f;
 }
 
+static inline float kr_tween_bounce_in(float k) {
+	return 1.0f - kr_tween_bounce_out(1.0f - k);
+}
+
 static inline float kr_tween_bounce_in_out(float k) {
-	return (k < 0.5f) ? kr_tween_Bouncein(k * 2.0f) * 0.5f
-	                  : kr_tween_Bounceout(k * 2.0f - 1.0f) * 0.5f + 0.5f;
+	return (k < 0.5f) ? kr_tween_bounce_in(k * 2.0f) * 0.5f
+	                  : kr_tween_bounce_out(k * 2.0f - 1.0f) * 0.5f + 0.5f;
 }
 
 static inline float kr_tween_elastic_in(float k) {
