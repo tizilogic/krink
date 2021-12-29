@@ -1,22 +1,38 @@
 #include "render_comp.h"
 
-/* Implement a simple move system */
-void Move(ecs_iter_t *it) {}
-
-void SimpleModuleImport(ecs_world_t *world) {
+void ComponentsRenderImport(ecs_world_t *world) {
 	/* Define module */
-	ECS_MODULE(world, SimpleModule);
+	ECS_MODULE(world, ComponentsRender);
 
 	/* Register components */
-	ECS_COMPONENT(world, Position);
-	ECS_COMPONENT(world, Velocity);
-
-	/* Define a system called Move that is executed every frame, and subscribes
-	 * for the 'Position' and 'Velocity' components */
-	ECS_SYSTEM(world, Move, EcsOnUpdate, Position, Velocity);
+	ECS_COMPONENT(world, kr_comp_drawable_t);
+	ECS_COMPONENT(world, kr_comp_color_t);
+	ECS_COMPONENT(world, kr_comp_image_t);
+	ECS_COMPONENT(world, kr_comp_text_t);
+	ECS_COMPONENT(world, kr_comp_stroke_t);
+	ECS_TAG(world, kr_comp_fill_t);
+	ECS_COMPONENT(world, kr_comp_triangle_t);
+	ECS_COMPONENT(world, kr_comp_rect_t);
+	ECS_COMPONENT(world, kr_comp_scissor_t);
+	ECS_COMPONENT(world, kr_comp_corner_t);
+	ECS_COMPONENT(world, kr_comp_corner_asymm_t);
+	ECS_COMPONENT(world, kr_comp_circle_t);
+	ECS_COMPONENT(world, kr_comp_border_t);
+	ECS_COMPONENT(world, kr_comp_line_t);
 
 	/* Export handles to module contents */
-	ECS_SET_COMPONENT(Position);
-	ECS_SET_COMPONENT(Velocity);
-	ECS_SET_ENTITY(Move);
+	ECS_EXPORT_COMPONENT(kr_comp_drawable_t);
+	ECS_EXPORT_COMPONENT(kr_comp_color_t);
+	ECS_EXPORT_COMPONENT(kr_comp_image_t);
+	ECS_EXPORT_COMPONENT(kr_comp_text_t);
+	ECS_EXPORT_COMPONENT(kr_comp_stroke_t);
+	ECS_EXPORT_ENTITY(kr_comp_fill_t);
+	ECS_EXPORT_COMPONENT(kr_comp_triangle_t);
+	ECS_EXPORT_COMPONENT(kr_comp_rect_t);
+	ECS_EXPORT_COMPONENT(kr_comp_scissor_t);
+	ECS_EXPORT_COMPONENT(kr_comp_corner_t);
+	ECS_EXPORT_COMPONENT(kr_comp_corner_asymm_t);
+	ECS_EXPORT_COMPONENT(kr_comp_circle_t);
+	ECS_EXPORT_COMPONENT(kr_comp_border_t);
+	ECS_EXPORT_COMPONENT(kr_comp_line_t);
 }

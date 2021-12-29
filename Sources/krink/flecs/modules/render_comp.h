@@ -2,7 +2,6 @@
 #include <krink/flecs/flecs.h>
 #include <krink/graphics2/ttf.h>
 #include <krink/image.h>
-#include <krink/math/vector.h>
 #include <stdbool.h>
 #include <stdint.h>
 
@@ -31,15 +30,13 @@ typedef struct kr_comp_text {
 
 typedef float kr_comp_stroke_t;
 
-typedef bool kr_comp_fill_t;
-
 typedef struct kr_comp_triangle {
     float x1, y1, x2, y2, x3, y3;
 } kr_comp_triangle_t;
 
 typedef struct kr_comp_rect {
     float x, y, w, h;
-} kr_comp_triangle_t, kr_comp_scissor_t;
+} kr_comp_rect_t, kr_comp_scissor_t;
 
 typedef float kr_comp_corner_t;
 
@@ -49,7 +46,7 @@ typedef struct kr_comp_corner_asymm {
 
 typedef struct kr_comp_circle {
     float x, y, radius;
-} kr_comp_triangle_t;
+} kr_comp_circle_t;
 
 typedef struct kr_comp_border {
     float strength;
@@ -64,23 +61,45 @@ typedef struct kr_comp_line {
  * When the module is loaded, this type will be registered as component, and
  * added to the singleton entity so applications can access module handles from
  * anywhere. */
-typedef struct RenderCompModule {
+typedef struct ComponentsRender {
 	ECS_DECLARE_COMPONENT(kr_comp_drawable_t);
-	ECS_DECLARE_ENTITY(Move);
-} SimpleModule;
+	ECS_DECLARE_COMPONENT(kr_comp_color_t);
+	ECS_DECLARE_COMPONENT(kr_comp_image_t);
+	ECS_DECLARE_COMPONENT(kr_comp_text_t);
+	ECS_DECLARE_COMPONENT(kr_comp_stroke_t);
+	ECS_DECLARE_ENTITY(kr_comp_fill_t);
+	ECS_DECLARE_COMPONENT(kr_comp_triangle_t);
+	ECS_DECLARE_COMPONENT(kr_comp_rect_t);
+	ECS_DECLARE_COMPONENT(kr_comp_scissor_t);
+	ECS_DECLARE_COMPONENT(kr_comp_corner_t);
+	ECS_DECLARE_COMPONENT(kr_comp_corner_asymm_t);
+	ECS_DECLARE_COMPONENT(kr_comp_circle_t);
+	ECS_DECLARE_COMPONENT(kr_comp_border_t);
+	ECS_DECLARE_COMPONENT(kr_comp_line_t);
+} ComponentsRender;
 
 /* This is the function that implements the module loader. It is automatically
  * invoked by the ECS_IMPORT macro. */
-void SimpleModuleImport(ecs_world_t *world);
+void ComponentsRenderImport(ecs_world_t *world);
 
 /* This macro is used to declare variables that contain the handles inside the
  * module. It is invoked by the ECS_IMPORT macro to declare variables in the
  * scope where the macro is invoked so the contents of the module can be used
  * after the ECS_IMPORT macro. */
-#define SimpleModuleImportHandles(handles)                                                         \
-	ECS_IMPORT_COMPONENT(handles, Position);                                                       \
-	ECS_IMPORT_COMPONENT(handles, Velocity);                                                       \
-	ECS_IMPORT_ENTITY(handles, Move);
+#define ComponentsRenderImportHandles(handles)\
+	ECS_IMPORT_COMPONENT(handles, kr_comp_drawable_t);\
+	ECS_IMPORT_COMPONENT(handles, kr_comp_color_t);\
+	ECS_IMPORT_COMPONENT(handles, kr_comp_image_t);\
+	ECS_IMPORT_COMPONENT(handles, kr_comp_text_t);\
+	ECS_IMPORT_COMPONENT(handles, kr_comp_stroke_t);\
+	ECS_IMPORT_ENTITY(handles, kr_comp_fill_t);\
+	ECS_IMPORT_COMPONENT(handles, kr_comp_triangle_t);\
+	ECS_IMPORT_COMPONENT(handles, kr_comp_rect_t);\
+	ECS_IMPORT_COMPONENT(handles, kr_comp_corner_t);\
+	ECS_IMPORT_COMPONENT(handles, kr_comp_corner_asymm_t);\
+	ECS_IMPORT_COMPONENT(handles, kr_comp_circle_t);\
+	ECS_IMPORT_COMPONENT(handles, kr_comp_border_t);\
+	ECS_IMPORT_COMPONENT(handles, kr_comp_line_t);
 
 #ifdef __cplusplus
 }
