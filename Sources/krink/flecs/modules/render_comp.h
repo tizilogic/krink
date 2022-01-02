@@ -5,6 +5,12 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+// Reflection system boilerplate
+#undef ECS_META_IMPL
+#ifndef COMPONENTS_RENDER_IMPL
+#define ECS_META_IMPL EXTERN // Ensure meta symbols are only defined once
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -12,136 +18,91 @@ extern "C" {
 typedef enum kr_comp_pipeline {
 	KR_COMP_PP_IMAGE = 0,
 	KR_COMP_PP_TEXT,
-	KR_COMP_PP_COLOR_TRIS,
-	KR_COMP_PP_COLOR_QUAD,
+	KR_COMP_PP_LINE,
+	KR_COMP_PP_COLOR_TRIS_STROKE,
+	KR_COMP_PP_COLOR_TRIS_FILL,
+	KR_COMP_PP_COLOR_QUAD_STROKE,
+	KR_COMP_PP_COLOR_QUAD_FILL,
 	KR_COMP_PP_SDF_RECT,
+	KR_COMP_PP_SDF_RECT_ASYMM,
+	KR_COMP_PP_SDF_RECT_WBORDER,
+	KR_COMP_PP_SDF_RECT_ASYMM_WBORDER,
 	KR_COMP_PP_SDF_CIRCLE,
+	KR_COMP_PP_SDF_CIRCLE_WBORDER,
 	KR_COMP_PP_SDF_LINE,
 } kr_comp_pipeline_t;
 
+/* Tags */
+
+extern ECS_DECLARE(KrCompVisible);
+
 /* Component types */
-typedef struct kr_comp_drawable {
-	int depth, sort_extra;
+ECS_STRUCT(KrCompDrawable, {
+	int32_t depth, sort_extra;
 	kr_comp_pipeline_t pipeline;
-	bool visible;
-} kr_comp_drawable_t;
+});
 
-typedef uint32_t kr_comp_color_t;
+ECS_STRUCT(KrSingletonClearColor, { uint32_t color; });
 
-typedef struct kr_comp_image {
+ECS_STRUCT(KrCompColor, { uint32_t color; });
+
+ECS_STRUCT(KrCompPos2, {
+	float x;
+	float y;
+});
+
+ECS_STRUCT(KrCompImage, {
 	kr_image_t *image;
-	float sx, sy, sw, sh, dx, dy, dw, dh;
-} kr_comp_image_t;
+	float sx; float sy; float sw; float sh; float dw; float dh;
+});
 
-typedef struct kr_comp_text {
+ECS_STRUCT(KrCompText, {
 	const char *text;
 	kr_ttf_font_t *font;
-	float size;
-} kr_comp_text_t;
+	int32_t size;
+});
 
-typedef float kr_comp_stroke_t;
-typedef float kr_comp_smooth_t;
+ECS_STRUCT(KrCompStroke, { float strength; });
 
-typedef struct kr_comp_triangle {
-	float x1, y1, x2, y2, x3, y3;
-} kr_comp_triangle_t;
+ECS_STRUCT(KrCompSmooth, { float px; });
 
-typedef struct kr_comp_rect {
-	float x, y, w, h;
-} kr_comp_rect_t, kr_comp_scissor_t;
+ECS_STRUCT(KrCompTriangle, { float x1; float y1; float x2; float y2; float x3; float y3; });
 
-typedef float kr_comp_corner_t;
+ECS_STRUCT(KrCompRect, { float w; float h; });
 
-typedef struct kr_comp_corner_asymm {
-	float tl, bl, tr, br;
-} kr_comp_corner_asymm_t;
+ECS_STRUCT(KrCompScissor, { float x; float y; float w; float h; });
 
-typedef struct kr_comp_circle {
-	float x, y, radius;
-} kr_comp_circle_t;
+ECS_STRUCT(KrCompCorner, { float radius; });
 
-typedef struct kr_comp_border {
+ECS_STRUCT(KrCompCornerAsymm, { float tl; float bl; float tr; float br; });
+
+ECS_STRUCT(KrCompCircle, { float radius; });
+
+ECS_STRUCT(KrCompBorder, {
 	float strength;
 	uint32_t color;
-} kr_comp_border_t;
+});
 
-typedef struct kr_comp_line {
-	float x1, y1, x2, y2;
-} kr_comp_line_t;
+ECS_STRUCT(KrCompLine, { float x_to; float y_to; });
 
-/* This type is used to store handles to everything that the module contains.
- * When the module is loaded, this type will be registered as component, and
- * added to the singleton entity so applications can access module handles from
- * anywhere. */
-typedef struct ComponentsRender {
-	ECS_DECLARE_COMPONENT(kr_comp_drawable_t);
-	ECS_DECLARE_COMPONENT(kr_comp_color_t);
-	ECS_DECLARE_COMPONENT(kr_comp_image_t);
-	ECS_DECLARE_COMPONENT(kr_comp_text_t);
-	ECS_DECLARE_COMPONENT(kr_comp_stroke_t);
-	ECS_DECLARE_COMPONENT(kr_comp_smooth_t);
-	ECS_DECLARE_ENTITY(kr_comp_fill_t);
-	ECS_DECLARE_COMPONENT(kr_comp_triangle_t);
-	ECS_DECLARE_COMPONENT(kr_comp_rect_t);
-	ECS_DECLARE_COMPONENT(kr_comp_scissor_t);
-	ECS_DECLARE_COMPONENT(kr_comp_corner_t);
-	ECS_DECLARE_COMPONENT(kr_comp_corner_asymm_t);
-	ECS_DECLARE_COMPONENT(kr_comp_circle_t);
-	ECS_DECLARE_COMPONENT(kr_comp_border_t);
-	ECS_DECLARE_COMPONENT(kr_comp_line_t);
+/* Prefabs */
 
-	// Prefabs
-	ECS_DECLARE_ENTITY(kr_prefab_sprite_t);
-	ECS_DECLARE_ENTITY(kr_prefab_text_t);
-	ECS_DECLARE_ENTITY(kr_prefab_stroked_rect_t);
-	ECS_DECLARE_ENTITY(kr_prefab_filled_rect_t);
-	ECS_DECLARE_ENTITY(kr_prefab_stroked_triangle_t);
-	ECS_DECLARE_ENTITY(kr_prefab_filled_triangle_t);
-	ECS_DECLARE_ENTITY(kr_prefab_line_t);
-	ECS_DECLARE_ENTITY(kr_prefab_sdf_rect_t);
-	ECS_DECLARE_ENTITY(kr_prefab_sdf_asymm_rect_t);
-	ECS_DECLARE_ENTITY(kr_prefab_sdf_rect_wborder_t);
-	ECS_DECLARE_ENTITY(kr_prefab_sdf_asymm_rect_wborder_t);
-	ECS_DECLARE_ENTITY(kr_prefab_sdf_circle_t);
-	ECS_DECLARE_ENTITY(kr_prefab_sdf_circle_wborder_t);
-} ComponentsRender;
+extern ECS_DECLARE(KrPrefabSprite);
+extern ECS_DECLARE(KrPrefabText);
+extern ECS_DECLARE(KrPrefabStrokedRect);
+extern ECS_DECLARE(KrPrefabFilledRect);
+extern ECS_DECLARE(KrPrefabStrokedTriangle);
+extern ECS_DECLARE(KrPrefabFilledTriangle);
+extern ECS_DECLARE(KrPrefabLine);
+extern ECS_DECLARE(KrPrefabSdfRect);
+extern ECS_DECLARE(KrPrefabSdfRectAsymm);
+extern ECS_DECLARE(KrPrefabSdfRectWborder);
+extern ECS_DECLARE(KrPrefabSdfRectAsymmWborder);
+extern ECS_DECLARE(KrPrefabSdfCircle);
+extern ECS_DECLARE(KrPrefabSdfCircleWborder);
 
-/* This is the function that implements the module loader. It is automatically
- * invoked by the ECS_IMPORT macro. */
+
 void ComponentsRenderImport(ecs_world_t *world);
-
-/* This macro is used to declare variables that contain the handles inside the
- * module. It is invoked by the ECS_IMPORT macro to declare variables in the
- * scope where the macro is invoked so the contents of the module can be used
- * after the ECS_IMPORT macro. */
-#define ComponentsRenderImportHandles(handles)                                                     \
-	ECS_IMPORT_COMPONENT(handles, kr_comp_drawable_t);                                             \
-	ECS_IMPORT_COMPONENT(handles, kr_comp_color_t);                                                \
-	ECS_IMPORT_COMPONENT(handles, kr_comp_image_t);                                                \
-	ECS_IMPORT_COMPONENT(handles, kr_comp_text_t);                                                 \
-	ECS_IMPORT_COMPONENT(handles, kr_comp_stroke_t);                                               \
-	ECS_IMPORT_COMPONENT(handles, kr_comp_smooth_t);                                               \
-	ECS_IMPORT_ENTITY(handles, kr_comp_fill_t);                                                    \
-	ECS_IMPORT_COMPONENT(handles, kr_comp_triangle_t);                                             \
-	ECS_IMPORT_COMPONENT(handles, kr_comp_rect_t);                                                 \
-	ECS_IMPORT_COMPONENT(handles, kr_comp_corner_t);                                               \
-	ECS_IMPORT_COMPONENT(handles, kr_comp_corner_asymm_t);                                         \
-	ECS_IMPORT_COMPONENT(handles, kr_comp_circle_t);                                               \
-	ECS_IMPORT_COMPONENT(handles, kr_comp_border_t);                                               \
-	ECS_IMPORT_COMPONENT(handles, kr_comp_line_t);                                                 \
-	ECS_IMPORT_ENTITY(handles, kr_prefab_sprite_t);                                                \
-	ECS_IMPORT_ENTITY(handles, kr_prefab_text_t);                                                  \
-	ECS_IMPORT_ENTITY(handles, kr_prefab_stroked_rect_t);                                          \
-	ECS_IMPORT_ENTITY(handles, kr_prefab_filled_rect_t);                                           \
-	ECS_IMPORT_ENTITY(handles, kr_prefab_stroked_triangle_t);                                      \
-	ECS_IMPORT_ENTITY(handles, kr_prefab_filled_triangle_t);                                       \
-	ECS_IMPORT_ENTITY(handles, kr_prefab_line_t);                                                  \
-	ECS_IMPORT_ENTITY(handles, kr_prefab_sdf_rect_t);                                              \
-	ECS_IMPORT_ENTITY(handles, kr_prefab_sdf_asymm_rect_t);                                        \
-	ECS_IMPORT_ENTITY(handles, kr_prefab_sdf_rect_wborder_t);                                      \
-	ECS_IMPORT_ENTITY(handles, kr_prefab_sdf_asymm_rect_wborder_t);                                \
-	ECS_IMPORT_ENTITY(handles, kr_prefab_sdf_circle_t);                                            \
-	ECS_IMPORT_ENTITY(handles, kr_prefab_sdf_circle_wborder_t);
 
 #ifdef __cplusplus
 }
