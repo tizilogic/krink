@@ -38,8 +38,9 @@ extern ECS_DECLARE(KrCompVisible);
 
 /* Component types */
 ECS_STRUCT(KrCompDrawable, {
-	int32_t depth, sort_extra;
-	kr_comp_pipeline_t pipeline;
+	int32_t depth;
+	int32_t sort_extra;
+	int32_t pipeline;
 });
 
 ECS_STRUCT(KrSingletonClearColor, { uint32_t color; });

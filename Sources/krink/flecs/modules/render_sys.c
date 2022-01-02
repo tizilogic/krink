@@ -3,14 +3,23 @@
 #include "render_comp.h"
 #include <krink/graphics2/graphics.h>
 
-/* Implement a simple move system */
-static void Render(ecs_iter_t *it) {
+static bool scissor_active = false;
+
+static void Clear(ecs_iter_t *it) {
 	ecs_world_t *world = it->world;
 	kr_g2_begin(0);
 	const KrSingletonClearColor *clear_color =
 	    ecs_get(world, ecs_id(KrSingletonClearColor), KrSingletonClearColor);
 	kr_g2_clear(clear_color->color);
+	scissor_active = false;
+}
 
+static void End(ecs_iter_t *it) {
+	kr_g2_disable_scissor();
+	kr_g2_end();
+}
+
+static void Render(ecs_iter_t *it) {
 	KrCompDrawable *drawable = ecs_term(it, KrCompDrawable, 1);
 	KrCompPos2 *pos = ecs_term(it, KrCompPos2, 2);
 	KrCompColor *color = ecs_term(it, KrCompColor, 3);
@@ -27,7 +36,6 @@ static void Render(ecs_iter_t *it) {
 	KrCompBorder *border = ecs_term(it, KrCompBorder, 14);
 	KrCompLine *line = ecs_term(it, KrCompLine, 15);
 
-	bool scissor_active = false;
 
 	for (int i = 0; i < it->count; ++i) {
 		float border_strength = 0.0f;
@@ -102,8 +110,6 @@ static void Render(ecs_iter_t *it) {
 			break;
 		}
 	}
-	kr_g2_disable_scissor();
-	kr_g2_end();
 }
 
 static int compare_render_order(ecs_entity_t e1, KrCompDrawable *d1, ecs_entity_t e2,
@@ -124,6 +130,8 @@ void SystemsRenderImport(ecs_world_t *world) {
 
 	/* Register components */
 	ECS_IMPORT(world, ComponentsRender);
+
+	ECS_SYSTEM(world, Clear, EcsPreStore);
 
 	ecs_system_init(world,
 	                &(ecs_system_desc_t){.entity = {.name = "Render", .add = {EcsOnStore}},
@@ -147,4 +155,6 @@ void SystemsRenderImport(ecs_world_t *world) {
 	                                             {KrCompVisible},
 	                                         },
 	                                     .callback = Render});
+
+	ECS_SYSTEM(world, End, EcsOnStore);
 }

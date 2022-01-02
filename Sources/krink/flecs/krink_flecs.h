@@ -10,16 +10,21 @@ typedef struct kr_rect {
 	float x, y, w, h;
 } kr_rect_t;
 
+typedef struct kr_pos2 {
+	float x, y;
+} kr_pos2_t;
+
 typedef struct kr_init_sprite {
 	kr_image_t *image;
-	kr_rect src, dest;
+	kr_rect_t src, dest;
 	uint32_t color;
 } kr_init_sprite_t;
 
 typedef struct kr_init_text {
+	kr_pos2_t pos;
 	const char *text;
 	kr_ttf_font_t *font;
-	float size;
+	int32_t size;
 	uint32_t color;
 } kr_init_text_t;
 
@@ -63,26 +68,27 @@ typedef struct kr_init_sdf_asymm_rect {
 } kr_init_sdf_asymm_rect_t;
 
 typedef struct kr_init_sdf_rect_wborder {
-	kr_init_sdf_rect_t sdfrect;
+	kr_init_sdf_rect_t sdf_rect;
 	float border;
 	uint32_t border_color;
 } kr_init_sdf_rect_wborder_t;
 
 typedef struct kr_init_sdf_asymm_rect_wborder {
-	kr_init_sdf_asymm_rect_t sdfrect;
+	kr_init_sdf_asymm_rect_t sdf_asymm_rect;
 	float border;
 	uint32_t border_color;
 } kr_init_sdf_asymm_rect_wborder_t;
 
 typedef struct kr_init_sdf_circle {
-	float x, y, radius;
+	kr_pos2_t pos;
+	float radius, smooth;
 	uint32_t color;
 } kr_init_sdf_circle_t;
 
 typedef struct kr_init_sdf_circle_wborder {
-	kr_init_sdf_circle_t sdfcircle;
+	kr_init_sdf_circle_t sdf_circle;
 	float border;
-	uint32_t color;
+	uint32_t border_color;
 } kr_init_sdf_circle_wborder_t;
 
 extern ecs_world_t *kr_world;

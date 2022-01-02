@@ -41,11 +41,10 @@ void ComponentsRenderImport(ecs_world_t *world) {
 	ECS_PREFAB_DEFINE(world, KrPrefabStrokedRect, KrCompDrawable, KrCompPos2, KrCompColor,
 	                  KrCompRect, KrCompStroke);
 	ECS_PREFAB_DEFINE(world, KrPrefabFilledRect, KrCompDrawable, KrCompPos2, KrCompColor,
-	                  KrCompRect, KrCompFill);
+	                  KrCompRect);
 	ECS_PREFAB_DEFINE(world, KrPrefabStrokedTriangle, KrCompDrawable, KrCompColor, KrCompTriangle,
 	                  KrCompStroke);
-	ECS_PREFAB_DEFINE(world, KrPrefabFilledTriangle, KrCompDrawable, KrCompColor, KrCompTriangle,
-	                  KrCompFill);
+	ECS_PREFAB_DEFINE(world, KrPrefabFilledTriangle, KrCompDrawable, KrCompColor, KrCompTriangle);
 	ECS_PREFAB_DEFINE(world, KrPrefabLine, KrCompDrawable, KrCompPos2, KrCompColor, KrCompLine,
 	                  KrCompStroke);
 	ECS_PREFAB_DEFINE(world, KrPrefabSdfRect, KrCompDrawable, KrCompPos2, KrCompColor, KrCompRect,
