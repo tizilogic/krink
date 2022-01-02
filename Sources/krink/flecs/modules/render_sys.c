@@ -7,25 +7,25 @@
 static void Render(ecs_iter_t *it) {
 	ecs_world_t *world = it->world;
 	kr_g2_begin(0);
-	KrSingletonClearColor *clear_color =
+	const KrSingletonClearColor *clear_color =
 	    ecs_get(world, ecs_id(KrSingletonClearColor), KrSingletonClearColor);
 	kr_g2_clear(clear_color->color);
 
 	KrCompDrawable *drawable = ecs_term(it, KrCompDrawable, 1);
-	KrCompPos2 *pos = ecs_term(&it, KrCompPos2, 2);
-	KrCompColor *color = ecs_term(&it, KrCompColor, 3);
-	KrCompImage *image = ecs_term(&it, KrCompImage, 4);
-	KrCompText *text = ecs_term(&it, KrCompText, 5);
-	KrCompStroke *stroke = ecs_term(&it, KrCompStroke, 6);
-	KrCompSmooth *smooth = ecs_term(&it, KrCompSmooth, 7);
-	KrCompTriangle *triangle = ecs_term(&it, KrCompTriangle, 8);
-	KrCompRect *rect = ecs_term(&it, KrCompRect, 9);
-	KrCompScissor *scissor = ecs_term(&it, KrCompScissor, 10);
-	KrCompCorner *corner = ecs_term(&it, KrCompCorner, 11);
-	KrCompCornerAsymm *corner_asymm = ecs_term(&it, KrCompCornerAsymm, 12);
-	KrCompCircle *circle = ecs_term(&it, KrCompCircle, 13);
-	KrCompBorder *border = ecs_term(&it, KrCompBorder, 14);
-	KrCompLine *line = ecs_term(&it, KrCompLine, 15);
+	KrCompPos2 *pos = ecs_term(it, KrCompPos2, 2);
+	KrCompColor *color = ecs_term(it, KrCompColor, 3);
+	KrCompImage *image = ecs_term(it, KrCompImage, 4);
+	KrCompText *text = ecs_term(it, KrCompText, 5);
+	KrCompStroke *stroke = ecs_term(it, KrCompStroke, 6);
+	KrCompSmooth *smooth = ecs_term(it, KrCompSmooth, 7);
+	KrCompTriangle *triangle = ecs_term(it, KrCompTriangle, 8);
+	KrCompRect *rect = ecs_term(it, KrCompRect, 9);
+	KrCompScissor *scissor = ecs_term(it, KrCompScissor, 10);
+	KrCompCorner *corner = ecs_term(it, KrCompCorner, 11);
+	KrCompCornerAsymm *corner_asymm = ecs_term(it, KrCompCornerAsymm, 12);
+	KrCompCircle *circle = ecs_term(it, KrCompCircle, 13);
+	KrCompBorder *border = ecs_term(it, KrCompBorder, 14);
+	KrCompLine *line = ecs_term(it, KrCompLine, 15);
 
 	bool scissor_active = false;
 
