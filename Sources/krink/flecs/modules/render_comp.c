@@ -20,6 +20,7 @@ void ComponentsRenderImport(ecs_world_t *world) {
 	ECS_MODULE(world, ComponentsRender);
 
 	ECS_TAG_DEFINE(world, KrCompVisible);
+	ECS_META_COMPONENT(world, KrCompPipeline);
 	ECS_META_COMPONENT(world, KrCompDrawable);
 	ECS_META_COMPONENT(world, KrSingletonClearColor);
 	ECS_META_COMPONENT(world, KrCompColor);

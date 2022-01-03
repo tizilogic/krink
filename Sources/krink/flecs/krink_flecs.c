@@ -25,11 +25,7 @@ static inline int32_t ptr2sort(void *img) {
 }
 
 ecs_entity_t kr_flecs_create_sprite(kr_init_sprite_t args) {
-	ecs_entity_t e = ecs_new_id(kr_world);
-	ecs_add(kr_world, e, KrCompDrawable);
-	ecs_add(kr_world, e, KrCompPos2);
-	ecs_add(kr_world, e, KrCompColor);
-	ecs_add(kr_world, e, KrCompImage);
+	ecs_entity_t e = ecs_new_w_pair(kr_world, EcsIsA, KrPrefabSprite);
 	ecs_add(kr_world, e, KrCompVisible);
 
 	ecs_set(kr_world, e, KrCompDrawable,
@@ -48,11 +44,7 @@ ecs_entity_t kr_flecs_create_sprite(kr_init_sprite_t args) {
 }
 
 ecs_entity_t kr_flecs_create_text(kr_init_text_t args) {
-	ecs_entity_t e = ecs_new_id(kr_world);
-	ecs_add(kr_world, e, KrCompDrawable);
-	ecs_add(kr_world, e, KrCompPos2);
-	ecs_add(kr_world, e, KrCompColor);
-	ecs_add(kr_world, e, KrCompText);
+	ecs_entity_t e = ecs_new_w_pair(kr_world, EcsIsA, KrPrefabText);
 	ecs_add(kr_world, e, KrCompVisible);
 
 	ecs_set(kr_world, e, KrCompDrawable,
@@ -64,12 +56,7 @@ ecs_entity_t kr_flecs_create_text(kr_init_text_t args) {
 }
 
 ecs_entity_t kr_flecs_create_stroked_rect(kr_init_stroked_rect_t args) {
-	ecs_entity_t e = ecs_new_id(kr_world);
-	ecs_add(kr_world, e, KrCompDrawable);
-	ecs_add(kr_world, e, KrCompPos2);
-	ecs_add(kr_world, e, KrCompColor);
-	ecs_add(kr_world, e, KrCompRect);
-	ecs_add(kr_world, e, KrCompStroke);
+	ecs_entity_t e = ecs_new_w_pair(kr_world, EcsIsA, KrPrefabStrokedRect);
 	ecs_add(kr_world, e, KrCompVisible);
 
 	ecs_set(kr_world, e, KrCompDrawable,
@@ -82,11 +69,7 @@ ecs_entity_t kr_flecs_create_stroked_rect(kr_init_stroked_rect_t args) {
 }
 
 ecs_entity_t kr_flecs_create_filled_rect(kr_init_filled_rect_t args) {
-	ecs_entity_t e = ecs_new_id(kr_world);
-	ecs_add(kr_world, e, KrCompDrawable);
-	ecs_add(kr_world, e, KrCompPos2);
-	ecs_add(kr_world, e, KrCompColor);
-	ecs_add(kr_world, e, KrCompRect);
+	ecs_entity_t e = ecs_new_w_pair(kr_world, EcsIsA, KrPrefabFilledRect);
 	ecs_add(kr_world, e, KrCompVisible);
 
 	ecs_set(kr_world, e, KrCompDrawable,
@@ -98,11 +81,7 @@ ecs_entity_t kr_flecs_create_filled_rect(kr_init_filled_rect_t args) {
 }
 
 ecs_entity_t kr_flecs_create_stroked_triangle(kr_init_stroked_triangle_t args) {
-	ecs_entity_t e = ecs_new_id(kr_world);
-	ecs_add(kr_world, e, KrCompDrawable);
-	ecs_add(kr_world, e, KrCompColor);
-	ecs_add(kr_world, e, KrCompTriangle);
-	ecs_add(kr_world, e, KrCompStroke);
+	ecs_entity_t e = ecs_new_w_pair(kr_world, EcsIsA, KrPrefabStrokedTriangle);
 	ecs_add(kr_world, e, KrCompVisible);
 
 	ecs_set(kr_world, e, KrCompDrawable,
@@ -116,10 +95,7 @@ ecs_entity_t kr_flecs_create_stroked_triangle(kr_init_stroked_triangle_t args) {
 }
 
 ecs_entity_t kr_flecs_create_filled_triangle(kr_init_filled_triangle_t args) {
-	ecs_entity_t e = ecs_new_id(kr_world);
-	ecs_add(kr_world, e, KrCompDrawable);
-	ecs_add(kr_world, e, KrCompColor);
-	ecs_add(kr_world, e, KrCompTriangle);
+	ecs_entity_t e = ecs_new_w_pair(kr_world, EcsIsA, KrPrefabFilledTriangle);
 	ecs_add(kr_world, e, KrCompVisible);
 
 	ecs_set(kr_world, e, KrCompDrawable,
@@ -132,12 +108,7 @@ ecs_entity_t kr_flecs_create_filled_triangle(kr_init_filled_triangle_t args) {
 }
 
 ecs_entity_t kr_flecs_create_line(kr_init_line_t args) {
-	ecs_entity_t e = ecs_new_id(kr_world);
-	ecs_add(kr_world, e, KrCompDrawable);
-	ecs_add(kr_world, e, KrCompPos2);
-	ecs_add(kr_world, e, KrCompColor);
-	ecs_add(kr_world, e, KrCompLine);
-	ecs_add(kr_world, e, KrCompStroke);
+	ecs_entity_t e = ecs_new_w_pair(kr_world, EcsIsA, KrPrefabLine);
 	ecs_add(kr_world, e, KrCompVisible);
 
 	ecs_set(kr_world, e, KrCompDrawable,
@@ -150,13 +121,7 @@ ecs_entity_t kr_flecs_create_line(kr_init_line_t args) {
 }
 
 ecs_entity_t kr_flecs_create_sdf_rect(kr_init_sdf_rect_t args) {
-	ecs_entity_t e = ecs_new_id(kr_world);
-	ecs_add(kr_world, e, KrCompDrawable);
-	ecs_add(kr_world, e, KrCompPos2);
-	ecs_add(kr_world, e, KrCompColor);
-	ecs_add(kr_world, e, KrCompRect);
-	ecs_add(kr_world, e, KrCompCorner);
-	ecs_add(kr_world, e, KrCompSmooth);
+	ecs_entity_t e = ecs_new_w_pair(kr_world, EcsIsA, KrPrefabSdfRect);
 	ecs_add(kr_world, e, KrCompVisible);
 
 	ecs_set(kr_world, e, KrCompDrawable,
@@ -170,13 +135,7 @@ ecs_entity_t kr_flecs_create_sdf_rect(kr_init_sdf_rect_t args) {
 }
 
 ecs_entity_t kr_flecs_create_sdf_asymm_rect(kr_init_sdf_asymm_rect_t args) {
-	ecs_entity_t e = ecs_new_id(kr_world);
-	ecs_add(kr_world, e, KrCompDrawable);
-	ecs_add(kr_world, e, KrCompPos2);
-	ecs_add(kr_world, e, KrCompColor);
-	ecs_add(kr_world, e, KrCompRect);
-	ecs_add(kr_world, e, KrCompCornerAsymm);
-	ecs_add(kr_world, e, KrCompSmooth);
+	ecs_entity_t e = ecs_new_w_pair(kr_world, EcsIsA, KrPrefabSdfRectAsymm);
 	ecs_add(kr_world, e, KrCompVisible);
 
 	ecs_set(kr_world, e, KrCompDrawable,
@@ -214,12 +173,7 @@ ecs_entity_t kr_flecs_create_sdf_asymm_rect_wborder(kr_init_sdf_asymm_rect_wbord
 }
 
 ecs_entity_t kr_flecs_create_sdf_circle(kr_init_sdf_circle_t args) {
-	ecs_entity_t e = ecs_new_id(kr_world);
-	ecs_add(kr_world, e, KrCompDrawable);
-	ecs_add(kr_world, e, KrCompPos2);
-	ecs_add(kr_world, e, KrCompColor);
-	ecs_add(kr_world, e, KrCompCircle);
-	ecs_add(kr_world, e, KrCompSmooth);
+	ecs_entity_t e = ecs_new_w_pair(kr_world, EcsIsA, KrPrefabSdfCircle);
 	ecs_add(kr_world, e, KrCompVisible);
 
 	ecs_set(kr_world, e, KrCompDrawable,

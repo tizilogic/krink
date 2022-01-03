@@ -15,7 +15,7 @@
 extern "C" {
 #endif
 
-typedef enum kr_comp_pipeline {
+ECS_ENUM(KrCompPipeline, {
 	KR_COMP_PP_IMAGE = 0,
 	KR_COMP_PP_TEXT,
 	KR_COMP_PP_LINE,
@@ -30,7 +30,7 @@ typedef enum kr_comp_pipeline {
 	KR_COMP_PP_SDF_CIRCLE,
 	KR_COMP_PP_SDF_CIRCLE_WBORDER,
 	KR_COMP_PP_SDF_LINE,
-} kr_comp_pipeline_t;
+});
 
 /* Tags */
 
@@ -40,7 +40,7 @@ extern ECS_DECLARE(KrCompVisible);
 ECS_STRUCT(KrCompDrawable, {
 	int32_t depth;
 	int32_t sort_extra;
-	int32_t pipeline;
+	KrCompPipeline pipeline;
 });
 
 ECS_STRUCT(KrSingletonClearColor, { uint32_t color; });
