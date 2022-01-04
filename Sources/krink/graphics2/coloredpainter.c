@@ -7,6 +7,7 @@
 #include <kinc/graphics4/vertexstructure.h>
 #include <kinc/io/filereader.h>
 #include <krink/color.h>
+#include <krink/math/matrix.h>
 #include <krink/math/vector.h>
 #include <krink/memory.h>
 #include <stdbool.h>
@@ -224,7 +225,7 @@ void kr_csp_set_projection_matrix(kinc_matrix4x4_t mat) {
 }
 
 void kr_csp_fill_rect(float x, float y, float width, float height, uint32_t color, float opacity,
-                      kinc_matrix3x3_t transformation) {
+                      kr_matrix3x3_t transformation) {
 	if (tris_buffer_index - tris_buffer_start > 0)
 		csp_tris_draw_buffer(true); // Flush other buffer for right render order
 
@@ -232,21 +233,18 @@ void kr_csp_fill_rect(float x, float y, float width, float height, uint32_t colo
 
 	csp_rect_set_colors(opacity, color);
 
-	kinc_vector3_t p0 = kinc_matrix3x3_multiply_vector(
-	    &transformation, (kinc_vector3_t){x, y + height, 0.0f}); // bottom-left
-	kinc_vector3_t p1 =
-	    kinc_matrix3x3_multiply_vector(&transformation, (kinc_vector3_t){x, y, 0.0f}); // top-left
-	kinc_vector3_t p2 = kinc_matrix3x3_multiply_vector(
-	    &transformation, (kinc_vector3_t){x + width, y, 0.0f}); // top-right
-	kinc_vector3_t p3 = kinc_matrix3x3_multiply_vector(
-	    &transformation, (kinc_vector3_t){x + width, y + height, 0.0f}); // bottom-right
+	kr_vec2_t p0 = kr_matrix3x3_multvec(transformation, (kr_vec2_t){x, y + height}); // bottom-left
+	kr_vec2_t p1 = kr_matrix3x3_multvec(transformation, (kr_vec2_t){x, y});          // top-left
+	kr_vec2_t p2 = kr_matrix3x3_multvec(transformation, (kr_vec2_t){x + width, y});  // top-right
+	kr_vec2_t p3 =
+	    kr_matrix3x3_multvec(transformation, (kr_vec2_t){x + width, y + height}); // bottom-right
 	csp_rect_set_verts(p0.x, p0.y, p1.x, p1.y, p2.x, p2.y, p3.x, p3.y);
 
 	++rect_buffer_index;
 }
 
 void kr_csp_fill_triangle(float x0, float y0, float x1, float y1, float x2, float y2,
-                          uint32_t color, float opacity, kinc_matrix3x3_t transformation) {
+                          uint32_t color, float opacity, kr_matrix3x3_t transformation) {
 	if (rect_buffer_index - rect_buffer_start > 0)
 		csp_rect_draw_buffer(true); // Flush other buffer for right render order
 
@@ -254,12 +252,9 @@ void kr_csp_fill_triangle(float x0, float y0, float x1, float y1, float x2, floa
 
 	csp_tris_set_colors(opacity, color);
 
-	kinc_vector3_t p0 = kinc_matrix3x3_multiply_vector(
-	    &transformation, (kinc_vector3_t){x0, y0, 0.0f}); // bottom-left
-	kinc_vector3_t p1 =
-	    kinc_matrix3x3_multiply_vector(&transformation, (kinc_vector3_t){x1, y1, 0.0f}); // top-left
-	kinc_vector3_t p2 = kinc_matrix3x3_multiply_vector(&transformation,
-	                                                   (kinc_vector3_t){x2, y2, 0.0f}); // top-right
+	kr_vec2_t p0 = kr_matrix3x3_multvec(transformation, (kr_vec2_t){x0, y0}); // bottom-left
+	kr_vec2_t p1 = kr_matrix3x3_multvec(transformation, (kr_vec2_t){x1, y1}); // top-left
+	kr_vec2_t p2 = kr_matrix3x3_multvec(transformation, (kr_vec2_t){x2, y2}); // top-right
 	csp_tris_set_verts(p0.x, p0.y, p1.x, p1.y, p2.x, p2.y);
 
 	++tris_buffer_index;

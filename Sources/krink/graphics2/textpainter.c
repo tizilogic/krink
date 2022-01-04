@@ -11,6 +11,8 @@
 #include <kinc/graphics4/vertexstructure.h>
 #include <kinc/io/filereader.h>
 #include <krink/color.h>
+#include <krink/math/matrix.h>
+#include <krink/math/vector.h>
 #include <krink/memory.h>
 
 static kinc_g4_vertex_buffer_t vertex_buffer;
@@ -193,7 +195,7 @@ void kr_tsp_set_font_size(int size) {
 }
 
 void kr_tsp_draw_string(const char *text, float opacity, uint32_t color, float x, float y,
-                        kinc_matrix3x3_t transformation) {
+                        kr_matrix3x3_t transformation) {
 	kinc_g4_texture_t *tex = kr_ttf_get_texture(active_font, font_size);
 
 	if (last_texture != NULL && tex != last_texture) kr_tsp_draw_buffer(false);
@@ -208,15 +210,14 @@ void kr_tsp_draw_string(const char *text, float opacity, uint32_t color, float x
 			if (buffer_index + 1 >= KR_G2_TSP_BUFFER_SIZE) kr_tsp_draw_buffer(false);
 			kr_tsp_set_rect_colors(opacity, color);
 			kr_tsp_set_rect_tex_coords(q.s0, q.t0, q.s1, q.t1);
-			kinc_vector3_t p0 =
-			    kinc_matrix3x3_multiply_vector(&transformation, (kinc_vector3_t){q.x0, q.y1, 0.0f});
+			kr_vec2_t p0 = kr_matrix3x3_multvec(transformation, (kr_vec2_t){q.x0, q.y1});
 			// bottom-left
-			kinc_vector3_t p1 = kinc_matrix3x3_multiply_vector(
-			    &transformation, (kinc_vector3_t){q.x0, q.y0, 0.0f}); // top-left
-			kinc_vector3_t p2 = kinc_matrix3x3_multiply_vector(
-			    &transformation, (kinc_vector3_t){q.x1, q.y0, 0.0f}); // top-right
-			kinc_vector3_t p3 = kinc_matrix3x3_multiply_vector(
-			    &transformation, (kinc_vector3_t){q.x1, q.y1, 0.0f}); // bottom-right
+			kr_vec2_t p1 =
+			    kr_matrix3x3_multvec(transformation, (kr_vec2_t){q.x0, q.y0}); // top-left
+			kr_vec2_t p2 =
+			    kr_matrix3x3_multvec(transformation, (kr_vec2_t){q.x1, q.y0}); // top-right
+			kr_vec2_t p3 =
+			    kr_matrix3x3_multvec(transformation, (kr_vec2_t){q.x1, q.y1}); // bottom-right
 			kr_tsp_set_rect_verts(p0.x, p0.y, p1.x, p1.y, p2.x, p2.y, p3.x, p3.y);
 			xpos += q.xadvance;
 			++buffer_index;
@@ -225,7 +226,7 @@ void kr_tsp_draw_string(const char *text, float opacity, uint32_t color, float x
 }
 
 void kr_tsp_draw_characters(int *text, int start, int length, float opacity, uint32_t color,
-                            float x, float y, kinc_matrix3x3_t transformation) {
+                            float x, float y, kr_matrix3x3_t transformation) {
 	kinc_g4_texture_t *tex = kr_ttf_get_texture(active_font, font_size);
 
 	if (last_texture != NULL && tex != last_texture) kr_tsp_draw_buffer(false);
@@ -239,14 +240,14 @@ void kr_tsp_draw_characters(int *text, int start, int length, float opacity, uin
 			if (buffer_index + 1 >= KR_G2_TSP_BUFFER_SIZE) kr_tsp_draw_buffer(false);
 			kr_tsp_set_rect_colors(opacity, color);
 			kr_tsp_set_rect_tex_coords(q.s0, q.t0, q.s1, q.t1);
-			kinc_vector3_t p0 = kinc_matrix3x3_multiply_vector(
-			    &transformation, (kinc_vector3_t){q.x0, q.y1, 0.0f}); // bottom-left
-			kinc_vector3_t p1 = kinc_matrix3x3_multiply_vector(
-			    &transformation, (kinc_vector3_t){q.x0, q.y0, 0.0f}); // top-left
-			kinc_vector3_t p2 = kinc_matrix3x3_multiply_vector(
-			    &transformation, (kinc_vector3_t){q.x1, q.y0, 0.0f}); // top-right
-			kinc_vector3_t p3 = kinc_matrix3x3_multiply_vector(
-			    &transformation, (kinc_vector3_t){q.x1, q.y1, 0.0f}); // bottom-right
+			kr_vec2_t p0 =
+			    kr_matrix3x3_multvec(transformation, (kr_vec2_t){q.x0, q.y1}); // bottom-left
+			kr_vec2_t p1 =
+			    kr_matrix3x3_multvec(transformation, (kr_vec2_t){q.x0, q.y0}); // top-left
+			kr_vec2_t p2 =
+			    kr_matrix3x3_multvec(transformation, (kr_vec2_t){q.x1, q.y0}); // top-right
+			kr_vec2_t p3 =
+			    kr_matrix3x3_multvec(transformation, (kr_vec2_t){q.x1, q.y1}); // bottom-right
 			kr_tsp_set_rect_verts(p0.x, p0.y, p1.x, p1.y, p2.x, p2.y, p3.x, p3.y);
 			xpos += q.xadvance;
 			++buffer_index;

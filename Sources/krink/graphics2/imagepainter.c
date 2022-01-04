@@ -10,6 +10,8 @@
 #include <kinc/graphics4/vertexstructure.h>
 #include <kinc/io/filereader.h>
 #include <krink/color.h>
+#include <krink/math/matrix.h>
+#include <krink/math/vector.h>
 #include <krink/memory.h>
 
 static kinc_g4_vertex_buffer_t vertex_buffer;
@@ -148,7 +150,8 @@ void kr_isp_draw_buffer(bool end) {
 	kinc_g4_set_texture(texunit, last_texture);
 	kinc_g4_set_texture_addressing(texunit, KINC_G4_TEXTURE_ADDRESSING_CLAMP,
 	                               KINC_G4_TEXTURE_ADDRESSING_CLAMP);
-	kinc_g4_set_texture_mipmap_filter(texunit, bilinear_filter ? KINC_G4_MIPMAP_FILTER_LINEAR : KINC_G4_MIPMAP_FILTER_NONE);
+	kinc_g4_set_texture_mipmap_filter(texunit, bilinear_filter ? KINC_G4_MIPMAP_FILTER_LINEAR
+	                                                           : KINC_G4_MIPMAP_FILTER_NONE);
 	kinc_g4_set_texture_minification_filter(
 	    texunit, bilinear_filter ? KINC_G4_TEXTURE_FILTER_LINEAR : KINC_G4_TEXTURE_FILTER_POINT);
 	kinc_g4_set_texture_magnification_filter(
@@ -180,7 +183,7 @@ void kr_isp_set_projection_matrix(kinc_matrix4x4_t mat) {
 
 void kr_isp_draw_scaled_sub_image(kr_image_t *img, float sx, float sy, float sw, float sh, float dx,
                                   float dy, float dw, float dh, float opacity, uint32_t color,
-                                  kinc_matrix3x3_t transformation) {
+                                  kr_matrix3x3_t transformation) {
 	kinc_g4_texture_t *tex = &(img->tex);
 	if (buffer_start + buffer_index + 1 >= KR_G2_ISP_BUFFER_SIZE ||
 	    (last_texture != NULL && tex != last_texture))
@@ -189,14 +192,11 @@ void kr_isp_draw_scaled_sub_image(kr_image_t *img, float sx, float sy, float sw,
 	kr_isp_set_rect_tex_coords(sx / img->real_width, sy / img->real_height,
 	                           (sx + sw) / img->real_width, (sy + sh) / img->real_height);
 	kr_isp_set_rect_colors(opacity, color);
-	kinc_vector3_t p0 = kinc_matrix3x3_multiply_vector(
-	    &transformation, (kinc_vector3_t){dx, dy + dh, 0.0f}); // bottom-left
-	kinc_vector3_t p1 =
-	    kinc_matrix3x3_multiply_vector(&transformation, (kinc_vector3_t){dx, dy, 0.0f}); // top-left
-	kinc_vector3_t p2 = kinc_matrix3x3_multiply_vector(
-	    &transformation, (kinc_vector3_t){dx + dw, dy, 0.0f}); // top-right
-	kinc_vector3_t p3 = kinc_matrix3x3_multiply_vector(
-	    &transformation, (kinc_vector3_t){dx + dw, dy + dh, 0.0f}); // bottom-right
+	kr_vec2_t p0 = kr_matrix3x3_multvec(transformation, (kr_vec2_t){dx, dy + dh}); // bottom-left
+	kr_vec2_t p1 = kr_matrix3x3_multvec(transformation, (kr_vec2_t){dx, dy});      // top-left
+	kr_vec2_t p2 = kr_matrix3x3_multvec(transformation, (kr_vec2_t){dx + dw, dy}); // top-right
+	kr_vec2_t p3 =
+	    kr_matrix3x3_multvec(transformation, (kr_vec2_t){dx + dw, dy + dh}); // bottom-right
 	kr_isp_set_rect_verts(p0.x, p0.y, p1.x, p1.y, p2.x, p2.y, p3.x, p3.y);
 
 	++buffer_index;

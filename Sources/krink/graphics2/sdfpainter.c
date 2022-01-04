@@ -8,6 +8,7 @@
 #include <kinc/graphics4/vertexstructure.h>
 #include <kinc/io/filereader.h>
 #include <krink/color.h>
+#include <krink/math/matrix.h>
 #include <krink/math/vector.h>
 #include <krink/memory.h>
 
@@ -396,17 +397,14 @@ void kr_sdf_set_projection_matrix(kinc_matrix4x4_t mat) {
 
 void kr_sdf_draw_rect(float x, float y, float width, float height, kr_sdf_corner_radius_t corner,
                       float border, float smooth, uint32_t color, uint32_t border_color,
-                      float opacity, kinc_matrix3x3_t transformation) {
+                      float opacity, kr_matrix3x3_t transformation) {
 	sdf_circle_draw_buffer(false);
 	sdf_line_draw_buffer(false);
-	kinc_vector3_t p0 = kinc_matrix3x3_multiply_vector(
-	    &transformation, (kinc_vector3_t){x, y + height, 0.0f}); // bottom-left
-	kinc_vector3_t p1 =
-	    kinc_matrix3x3_multiply_vector(&transformation, (kinc_vector3_t){x, y, 0.0f}); // top-left
-	kinc_vector3_t p2 = kinc_matrix3x3_multiply_vector(
-	    &transformation, (kinc_vector3_t){x + width, y, 0.0f}); // top-right
-	kinc_vector3_t p3 = kinc_matrix3x3_multiply_vector(
-	    &transformation, (kinc_vector3_t){x + width, y + height, 0.0f}); // bottom-right
+	kr_vec2_t p0 = kr_matrix3x3_multvec(transformation, (kr_vec2_t){x, y + height}); // bottom-left
+	kr_vec2_t p1 = kr_matrix3x3_multvec(transformation, (kr_vec2_t){x, y});          // top-left
+	kr_vec2_t p2 = kr_matrix3x3_multvec(transformation, (kr_vec2_t){x + width, y});  // top-right
+	kr_vec2_t p3 =
+	    kr_matrix3x3_multvec(transformation, (kr_vec2_t){x + width, y + height}); // bottom-right
 	sdf_rect_set_rect_verts(p0.x, p0.y, p1.x, p1.y, p2.x, p2.y, p3.x, p3.y);
 	float w = kr_vec2_length(kr_vec2_subv((kr_vec2_t){p2.x, p2.y}, (kr_vec2_t){p1.x, p1.y}));
 	float h = kr_vec2_length(kr_vec2_subv((kr_vec2_t){p0.x, p0.y}, (kr_vec2_t){p1.x, p1.y}));
@@ -430,7 +428,7 @@ void kr_sdf_draw_rect(float x, float y, float width, float height, kr_sdf_corner
 
 void kr_sdf_draw_rect_symm(float x, float y, float width, float height, float corner, float border,
                            float smooth, uint32_t color, uint32_t border_color, float opacity,
-                           kinc_matrix3x3_t transformation) {
+                           kr_matrix3x3_t transformation) {
 	kr_sdf_draw_rect(x, y, width, height, (kr_sdf_corner_radius_t){corner, corner, corner, corner},
 	                 border, smooth, color, border_color, opacity, transformation);
 }
@@ -548,17 +546,17 @@ static void sdf_circle_draw_buffer(bool end) {
 }
 
 void kr_sdf_draw_circle(float x, float y, float radius, float border, float smooth, uint32_t color,
-                        uint32_t border_color, float opacity, kinc_matrix3x3_t transformation) {
+                        uint32_t border_color, float opacity, kr_matrix3x3_t transformation) {
 	sdf_rect_draw_buffer(false);
 	sdf_line_draw_buffer(false);
-	kinc_vector3_t p0 = kinc_matrix3x3_multiply_vector(
-	    &transformation, (kinc_vector3_t){x - radius, y + radius, 0.0f}); // bottom-left
-	kinc_vector3_t p1 = kinc_matrix3x3_multiply_vector(
-	    &transformation, (kinc_vector3_t){x - radius, y - radius, 0.0f}); // top-left
-	kinc_vector3_t p2 = kinc_matrix3x3_multiply_vector(
-	    &transformation, (kinc_vector3_t){x + radius, y - radius, 0.0f}); // top-right
-	kinc_vector3_t p3 = kinc_matrix3x3_multiply_vector(
-	    &transformation, (kinc_vector3_t){x + radius, y + radius, 0.0f}); // bottom-right
+	kr_vec2_t p0 =
+	    kr_matrix3x3_multvec(transformation, (kr_vec2_t){x - radius, y + radius}); // bottom-left
+	kr_vec2_t p1 =
+	    kr_matrix3x3_multvec(transformation, (kr_vec2_t){x - radius, y - radius}); // top-left
+	kr_vec2_t p2 =
+	    kr_matrix3x3_multvec(transformation, (kr_vec2_t){x + radius, y - radius}); // top-right
+	kr_vec2_t p3 =
+	    kr_matrix3x3_multvec(transformation, (kr_vec2_t){x + radius, y + radius}); // bottom-right
 	sdf_circle_set_rect_verts(p0.x, p0.y, p1.x, p1.y, p2.x, p2.y, p3.x, p3.y);
 	float w = kr_vec2_length(kr_vec2_subv((kr_vec2_t){p2.x, p2.y}, (kr_vec2_t){p1.x, p1.y}));
 	float h = kr_vec2_length(kr_vec2_subv((kr_vec2_t){p0.x, p0.y}, (kr_vec2_t){p1.x, p1.y}));
@@ -681,13 +679,13 @@ static void sdf_line_draw_buffer(bool end) {
 	}
 }
 
-static kinc_vector3_t get_corner_vec(kr_vec2_t a, kr_vec2_t d0, kr_vec2_t d1) {
+static kr_vec2_t get_corner_vec(kr_vec2_t a, kr_vec2_t d0, kr_vec2_t d1) {
 	a = kr_vec2_addv(kr_vec2_addv(a, d0), d1);
-	return (kinc_vector3_t){a.x, a.y, 0.0f};
+	return (kr_vec2_t){a.x, a.y};
 }
 
 void kr_sdf_draw_line(float x0, float y0, float x1, float y1, float strength, float smooth,
-                      uint32_t color, float opacity, kinc_matrix3x3_t transformation) {
+                      uint32_t color, float opacity, kr_matrix3x3_t transformation) {
 	sdf_circle_draw_buffer(false);
 	sdf_rect_draw_buffer(false);
 	kr_vec2_t a = x0 <= x1 ? ((kr_vec2_t){x0, y0}) : ((kr_vec2_t){x1, y1});
@@ -702,14 +700,11 @@ void kr_sdf_draw_line(float x0, float y0, float x1, float y1, float strength, fl
 	up = kr_vec2_mult(up, hs);
 	down = kr_vec2_mult(down, hs);
 
-	kinc_vector3_t p0 =
-	    kinc_matrix3x3_multiply_vector(&transformation, get_corner_vec(a, down, bw)); // bottom-left
-	kinc_vector3_t p1 =
-	    kinc_matrix3x3_multiply_vector(&transformation, get_corner_vec(a, up, bw)); // top-left
-	kinc_vector3_t p2 =
-	    kinc_matrix3x3_multiply_vector(&transformation, get_corner_vec(b, up, fw)); // top-right
-	kinc_vector3_t p3 = kinc_matrix3x3_multiply_vector(&transformation,
-	                                                   get_corner_vec(b, down, fw)); // bottom-right
+	kr_vec2_t p0 = kr_matrix3x3_multvec(transformation, get_corner_vec(a, down, bw)); // bottom-left
+	kr_vec2_t p1 = kr_matrix3x3_multvec(transformation, get_corner_vec(a, up, bw));   // top-left
+	kr_vec2_t p2 = kr_matrix3x3_multvec(transformation, get_corner_vec(b, up, fw));   // top-right
+	kr_vec2_t p3 =
+	    kr_matrix3x3_multvec(transformation, get_corner_vec(b, down, fw)); // bottom-right
 
 	float w = kr_vec2_length(kr_vec2_subv((kr_vec2_t){p2.x, p2.y}, (kr_vec2_t){p1.x, p1.y}));
 	float h = kr_vec2_length(kr_vec2_subv((kr_vec2_t){p0.x, p0.y}, (kr_vec2_t){p1.x, p1.y}));

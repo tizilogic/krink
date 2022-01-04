@@ -2,8 +2,8 @@
 #include "sdfpainter.h"
 #include "ttf.h"
 #include <kinc/global.h>
-#include <kinc/math/matrix.h>
-#include <kinc/math/vector.h>
+#include <krink/math/matrix.h>
+#include <krink/math/vector.h>
 #include <krink/image.h>
 
 #ifndef KR_G2_MAX_WIN
@@ -166,12 +166,12 @@ void kr_g2_draw_scaled_sub_image(kr_image_t *img, float sx, float sy, float sw, 
 /// Set transformation matrix for the next drawing operations.
 /// </summary>
 /// <param name="m"></param>
-void kr_g2_set_transform(kinc_matrix3x3_t m);
+void kr_g2_set_transform(kr_matrix3x3_t m);
 
 /// <summary>
 /// Get current transformation matrix.
 /// </summary>
-kinc_matrix3x3_t kr_g2_get_transform(void);
+kr_matrix3x3_t kr_g2_get_transform(void);
 
 /// <summary>
 /// Get the font ptr of the current font.

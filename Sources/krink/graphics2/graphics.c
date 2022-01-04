@@ -14,7 +14,7 @@
 static bool begin = false;
 static uint32_t g2_color = 0;
 static float g2_opacity = 1.0f;
-static kinc_matrix3x3_t g2_transformation;
+static kr_matrix3x3_t g2_transformation;
 static kr_ttf_font_t *g2_font = NULL;
 static kinc_matrix4x4_t g2_projection_matrix;
 static int g2_font_size;
@@ -28,7 +28,7 @@ void kr_g2_init(int window, int window_width, int window_height) {
 		kr_csp_init();
 		kr_tsp_init();
 		kr_sdf_init();
-		g2_transformation = kinc_matrix3x3_identity();
+		g2_transformation = kr_matrix3x3_identity();
 	}
 	kr_g2_set_window_size(window, window_width, window_height);
 }
@@ -237,11 +237,11 @@ void kr_g2_draw_scaled_sub_image(kr_image_t *img, float sx, float sy, float sw, 
 	                             g2_transformation);
 }
 
-void kr_g2_set_transform(kinc_matrix3x3_t m) {
+void kr_g2_set_transform(kr_matrix3x3_t m) {
 	g2_transformation = m;
 }
 
-kinc_matrix3x3_t kr_g2_get_transform(void) {
+kr_matrix3x3_t kr_g2_get_transform(void) {
 	return g2_transformation;
 }
 
