@@ -1,6 +1,7 @@
 #include "krink_flecs.h"
 #include "modules/render_comp.h"
 #include "modules/render_sys.h"
+#include <stdbool.h>
 
 ecs_world_t *kr_world;
 
@@ -193,4 +194,12 @@ ecs_entity_t kr_flecs_create_sdf_circle_wborder(kr_init_sdf_circle_wborder_t arg
 	        {.depth = 0, .sort_extra = 0, .pipeline = KR_COMP_PP_SDF_CIRCLE_WBORDER});
 	ecs_set(kr_world, e, KrCompBorder, {.strength = args.border, .color = args.border_color});
 	return e;
+}
+
+void kr_flecs_set_depth(ecs_entity_t e, int32_t depth) {
+	bool is_added;
+	KrCompDrawable *d = ecs_get_mut(kr_world, e, KrCompDrawable, &is_added);
+	assert(!is_added);
+	d->depth = depth;
+	ecs_modified(kr_world, e, KrCompDrawable);
 }

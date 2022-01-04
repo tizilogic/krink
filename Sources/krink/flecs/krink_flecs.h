@@ -96,6 +96,7 @@ extern ecs_world_t *kr_world;
 void kr_flecs_init(void);
 void kr_flecs_destroy(void);
 void kr_flecs_tick(void);
+void kr_flecs_set_depth(ecs_entity_t e, int32_t depth);
 ecs_entity_t kr_flecs_create_sprite(kr_init_sprite_t args);
 ecs_entity_t kr_flecs_create_text(kr_init_text_t args);
 ecs_entity_t kr_flecs_create_stroked_rect(kr_init_stroked_rect_t args);
