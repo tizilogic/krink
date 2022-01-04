@@ -22,6 +22,7 @@ kr_vec2_t kr_matrix3x3_multvec(kr_matrix3x3_t m, kr_vec2_t v);
 float kr_matrix3x3_cofactor(float m0, float m1, float m2, float m3);
 float kr_matrix3x3_determinant(kr_matrix3x3_t m);
 kr_matrix3x3_t kr_matrix3x3_inverse(kr_matrix3x3_t m);
+kinc_matrix3x3_t kr_matrix3x3_to_kinc(kr_matrix3x3_t m);
 
 typedef struct kr_matrix4x4 {
 	float m00, m10, m20, m30, m01, m11, m21, m31, m02, m12, m22, m32, m03, m13, m23, m33;

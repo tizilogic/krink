@@ -102,6 +102,20 @@ kr_matrix3x3_t kr_matrix3x3_inverse(kr_matrix3x3_t m) {
 	                        c20 * invdet,  -c21 * invdet, c22 * invdet};
 }
 
+kinc_matrix3x3_t kr_matrix3x3_to_kinc(kr_matrix3x3_t m) {
+	kinc_matrix3x3_t value;
+	kinc_matrix3x3_set(&value, 0, 0, m.m00);
+	kinc_matrix3x3_set(&value, 1, 0, m.m10);
+	kinc_matrix3x3_set(&value, 2, 0, m.m20);
+	kinc_matrix3x3_set(&value, 0, 1, m.m01);
+	kinc_matrix3x3_set(&value, 1, 1, m.m11);
+	kinc_matrix3x3_set(&value, 2, 1, m.m21);
+	kinc_matrix3x3_set(&value, 0, 2, m.m02);
+	kinc_matrix3x3_set(&value, 1, 2, m.m12);
+	kinc_matrix3x3_set(&value, 2, 2, m.m22);
+	return value;
+}
+
 // kr_matrix4x4 impl
 
 kr_matrix4x4_t kr_matrix4x4_translation(float x, float y, float z) {
