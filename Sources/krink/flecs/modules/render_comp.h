@@ -86,6 +86,15 @@ ECS_STRUCT(KrCompBorder, {
 
 ECS_STRUCT(KrCompLine, { float x_to; float y_to; });
 
+/// Optional Components
+ECS_STRUCT(KrCompAngle, { float radians; });
+ECS_STRUCT(KrCompRotationCenter, { float x; float y; });
+ECS_STRUCT(KrCompOpacity, { float alpha; });
+ECS_STRUCT(KrCompScale, { float value; });
+ECS_STRUCT(KrCompScaleX, { float value; });
+ECS_STRUCT(KrCompScaleY, { float value; });
+ECS_STRUCT(KrCompTranslation, { float x; float y; });
+
 /* Prefabs */
 
 extern ECS_DECLARE(KrPrefabSprite);

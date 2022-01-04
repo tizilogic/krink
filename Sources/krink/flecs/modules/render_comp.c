@@ -37,6 +37,15 @@ void ComponentsRenderImport(ecs_world_t *world) {
 	ECS_META_COMPONENT(world, KrCompCircle);
 	ECS_META_COMPONENT(world, KrCompBorder);
 	ECS_META_COMPONENT(world, KrCompLine);
+
+	ECS_META_COMPONENT(world, KrCompAngle);
+	ECS_META_COMPONENT(world, KrCompRotationCenter);
+	ECS_META_COMPONENT(world, KrCompOpacity);
+	ECS_META_COMPONENT(world, KrCompScale);
+	ECS_META_COMPONENT(world, KrCompScaleX);
+	ECS_META_COMPONENT(world, KrCompScaleY);
+	ECS_META_COMPONENT(world, KrCompTranslation);
+
 	ECS_PREFAB_DEFINE(world, KrPrefabSprite, KrCompDrawable, KrCompPos2, KrCompColor, KrCompImage);
 	ECS_PREFAB_DEFINE(world, KrPrefabText, KrCompDrawable, KrCompPos2, KrCompColor, KrCompText);
 	ECS_PREFAB_DEFINE(world, KrPrefabStrokedRect, KrCompDrawable, KrCompPos2, KrCompColor,
