@@ -148,8 +148,6 @@ static void Render(ecs_iter_t *it) {
 		else if (scissor_active)
 			kr_g2_disable_scissor();
 
-		// TODO: add and handle transform component
-
 		switch (drawable[i].pipeline) {
 		case KR_COMP_PP_IMAGE: {
 			kr_g2_draw_scaled_sub_image(image[i].image, image[i].sx, image[i].sy, image[i].sw,
