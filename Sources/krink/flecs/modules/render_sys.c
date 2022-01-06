@@ -56,18 +56,18 @@ static void Render(ecs_iter_t *it) {
 
 		float sx = 1.0f, sy = 1.0f;
 		if (ecs_term_is_set(it, 22)) { // Translate
-			transform = kr_matrix3x3_multmat(
-			    transform, kr_matrix3x3_translation(translation[i].x, translation[i].y));
+			kr_matrix3x3_t tmat = kr_matrix3x3_translation(translation[i].x, translation[i].y);
+			transform = kr_matrix3x3_multmat(&transform, &tmat);
 		}
 		if (ecs_term_is_set(it, 19)) { // Scale
-			transform =
-			    kr_matrix3x3_multmat(transform, kr_matrix3x3_scale(scale[i].value, scale[i].value));
+			kr_matrix3x3_t smat = kr_matrix3x3_scale(scale[i].value, scale[i].value);
+			transform = kr_matrix3x3_multmat(&transform, &smat);
 			sx = scale[i].value;
 			sy = scale[i].value;
 		}
 		else if (ecs_term_is_set(it, 20) && ecs_term_is_set(it, 21)) { // Scale asymmetric
-			transform = kr_matrix3x3_multmat(
-			    transform, kr_matrix3x3_scale(scale_x[i].value, scale_y[i].value));
+			kr_matrix3x3_t smat = kr_matrix3x3_scale(scale_x[i].value, scale_y[i].value);
+			transform = kr_matrix3x3_multmat(&transform, &smat);
 			sx = scale_x[i].value;
 			sy = scale_y[i].value;
 		}
@@ -124,10 +124,13 @@ static void Render(ecs_iter_t *it) {
 				cy = h / 2.0f;
 			}
 			kr_matrix3x3_t rot = kr_matrix3x3_identity();
-			rot = kr_matrix3x3_multmat(rot, kr_matrix3x3_translation(cx, cy));
-			rot = kr_matrix3x3_multmat(rot, kr_matrix3x3_rotation(angle[i].radians));
-			rot = kr_matrix3x3_multmat(rot, kr_matrix3x3_translation(-cx, -cy));
-			transform = kr_matrix3x3_multmat(transform, rot);
+			kr_matrix3x3_t tmp = kr_matrix3x3_translation(cx, cy);
+			rot = kr_matrix3x3_multmat(&rot, &tmp);
+			tmp = kr_matrix3x3_rotation(angle[i].radians);
+			rot = kr_matrix3x3_multmat(&rot, &tmp);
+			tmp = kr_matrix3x3_translation(-cx, -cy);
+			rot = kr_matrix3x3_multmat(&rot, &tmp);
+			transform = kr_matrix3x3_multmat(&transform, &rot);
 		}
 		kr_g2_set_transform(transform);
 

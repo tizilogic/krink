@@ -233,11 +233,11 @@ void kr_csp_fill_rect(float x, float y, float width, float height, uint32_t colo
 
 	csp_rect_set_colors(opacity, color);
 
-	kr_vec2_t p0 = kr_matrix3x3_multvec(transformation, (kr_vec2_t){x, y + height}); // bottom-left
-	kr_vec2_t p1 = kr_matrix3x3_multvec(transformation, (kr_vec2_t){x, y});          // top-left
-	kr_vec2_t p2 = kr_matrix3x3_multvec(transformation, (kr_vec2_t){x + width, y});  // top-right
+	kr_vec2_t p0 = kr_matrix3x3_multvec(&transformation, (kr_vec2_t){x, y + height}); // bottom-left
+	kr_vec2_t p1 = kr_matrix3x3_multvec(&transformation, (kr_vec2_t){x, y});          // top-left
+	kr_vec2_t p2 = kr_matrix3x3_multvec(&transformation, (kr_vec2_t){x + width, y});  // top-right
 	kr_vec2_t p3 =
-	    kr_matrix3x3_multvec(transformation, (kr_vec2_t){x + width, y + height}); // bottom-right
+	    kr_matrix3x3_multvec(&transformation, (kr_vec2_t){x + width, y + height}); // bottom-right
 	csp_rect_set_verts(p0.x, p0.y, p1.x, p1.y, p2.x, p2.y, p3.x, p3.y);
 
 	++rect_buffer_index;
@@ -252,9 +252,9 @@ void kr_csp_fill_triangle(float x0, float y0, float x1, float y1, float x2, floa
 
 	csp_tris_set_colors(opacity, color);
 
-	kr_vec2_t p0 = kr_matrix3x3_multvec(transformation, (kr_vec2_t){x0, y0}); // bottom-left
-	kr_vec2_t p1 = kr_matrix3x3_multvec(transformation, (kr_vec2_t){x1, y1}); // top-left
-	kr_vec2_t p2 = kr_matrix3x3_multvec(transformation, (kr_vec2_t){x2, y2}); // top-right
+	kr_vec2_t p0 = kr_matrix3x3_multvec(&transformation, (kr_vec2_t){x0, y0}); // bottom-left
+	kr_vec2_t p1 = kr_matrix3x3_multvec(&transformation, (kr_vec2_t){x1, y1}); // top-left
+	kr_vec2_t p2 = kr_matrix3x3_multvec(&transformation, (kr_vec2_t){x2, y2}); // top-right
 	csp_tris_set_verts(p0.x, p0.y, p1.x, p1.y, p2.x, p2.y);
 
 	++tris_buffer_index;

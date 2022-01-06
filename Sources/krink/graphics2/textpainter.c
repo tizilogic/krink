@@ -210,14 +210,14 @@ void kr_tsp_draw_string(const char *text, float opacity, uint32_t color, float x
 			if (buffer_index + 1 >= KR_G2_TSP_BUFFER_SIZE) kr_tsp_draw_buffer(false);
 			kr_tsp_set_rect_colors(opacity, color);
 			kr_tsp_set_rect_tex_coords(q.s0, q.t0, q.s1, q.t1);
-			kr_vec2_t p0 = kr_matrix3x3_multvec(transformation, (kr_vec2_t){q.x0, q.y1});
+			kr_vec2_t p0 = kr_matrix3x3_multvec(&transformation, (kr_vec2_t){q.x0, q.y1});
 			// bottom-left
 			kr_vec2_t p1 =
-			    kr_matrix3x3_multvec(transformation, (kr_vec2_t){q.x0, q.y0}); // top-left
+			    kr_matrix3x3_multvec(&transformation, (kr_vec2_t){q.x0, q.y0}); // top-left
 			kr_vec2_t p2 =
-			    kr_matrix3x3_multvec(transformation, (kr_vec2_t){q.x1, q.y0}); // top-right
+			    kr_matrix3x3_multvec(&transformation, (kr_vec2_t){q.x1, q.y0}); // top-right
 			kr_vec2_t p3 =
-			    kr_matrix3x3_multvec(transformation, (kr_vec2_t){q.x1, q.y1}); // bottom-right
+			    kr_matrix3x3_multvec(&transformation, (kr_vec2_t){q.x1, q.y1}); // bottom-right
 			kr_tsp_set_rect_verts(p0.x, p0.y, p1.x, p1.y, p2.x, p2.y, p3.x, p3.y);
 			xpos += q.xadvance;
 			++buffer_index;
@@ -241,13 +241,13 @@ void kr_tsp_draw_characters(int *text, int start, int length, float opacity, uin
 			kr_tsp_set_rect_colors(opacity, color);
 			kr_tsp_set_rect_tex_coords(q.s0, q.t0, q.s1, q.t1);
 			kr_vec2_t p0 =
-			    kr_matrix3x3_multvec(transformation, (kr_vec2_t){q.x0, q.y1}); // bottom-left
+			    kr_matrix3x3_multvec(&transformation, (kr_vec2_t){q.x0, q.y1}); // bottom-left
 			kr_vec2_t p1 =
-			    kr_matrix3x3_multvec(transformation, (kr_vec2_t){q.x0, q.y0}); // top-left
+			    kr_matrix3x3_multvec(&transformation, (kr_vec2_t){q.x0, q.y0}); // top-left
 			kr_vec2_t p2 =
-			    kr_matrix3x3_multvec(transformation, (kr_vec2_t){q.x1, q.y0}); // top-right
+			    kr_matrix3x3_multvec(&transformation, (kr_vec2_t){q.x1, q.y0}); // top-right
 			kr_vec2_t p3 =
-			    kr_matrix3x3_multvec(transformation, (kr_vec2_t){q.x1, q.y1}); // bottom-right
+			    kr_matrix3x3_multvec(&transformation, (kr_vec2_t){q.x1, q.y1}); // bottom-right
 			kr_tsp_set_rect_verts(p0.x, p0.y, p1.x, p1.y, p2.x, p2.y, p3.x, p3.y);
 			xpos += q.xadvance;
 			++buffer_index;

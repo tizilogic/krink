@@ -38,14 +38,16 @@ void kr_g2_set_window_size(int window, int window_width, int window_height) {
 	g2_width[window] = (float)window_width;
 	g2_height[window] = (float)window_height;
 
+	kr_matrix4x4_t proj;
 	if (!kinc_g4_render_targets_inverted_y()) {
-		g2_projection_matrix = kr_matrix4x4_to_kinc(kr_matrix4x4_orthogonal_projection(
-		    0.0f, g2_width[window], 0.0f, g2_height[window], 0.1f, 1000.0f));
+		proj = kr_matrix4x4_orthogonal_projection(0.0f, g2_width[window], 0.0f, g2_height[window],
+		                                          0.1f, 1000.0f);
 	}
 	else {
-		g2_projection_matrix = kr_matrix4x4_to_kinc(kr_matrix4x4_orthogonal_projection(
-		    0.0f, g2_width[window], g2_height[window], 0.0f, 0.1f, 1000.0f));
+		proj = kr_matrix4x4_orthogonal_projection(0.0f, g2_width[window], g2_height[window], 0.0f,
+		                                          0.1f, 1000.0f);
 	}
+	g2_projection_matrix = kr_matrix4x4_to_kinc(&proj);
 	kr_isp_set_projection_matrix(g2_projection_matrix);
 	kr_tsp_set_projection_matrix(g2_projection_matrix);
 	kr_csp_set_projection_matrix(g2_projection_matrix);

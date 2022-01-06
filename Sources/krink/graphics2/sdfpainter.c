@@ -400,11 +400,11 @@ void kr_sdf_draw_rect(float x, float y, float width, float height, kr_sdf_corner
                       float opacity, kr_matrix3x3_t transformation) {
 	sdf_circle_draw_buffer(false);
 	sdf_line_draw_buffer(false);
-	kr_vec2_t p0 = kr_matrix3x3_multvec(transformation, (kr_vec2_t){x, y + height}); // bottom-left
-	kr_vec2_t p1 = kr_matrix3x3_multvec(transformation, (kr_vec2_t){x, y});          // top-left
-	kr_vec2_t p2 = kr_matrix3x3_multvec(transformation, (kr_vec2_t){x + width, y});  // top-right
+	kr_vec2_t p0 = kr_matrix3x3_multvec(&transformation, (kr_vec2_t){x, y + height}); // bottom-left
+	kr_vec2_t p1 = kr_matrix3x3_multvec(&transformation, (kr_vec2_t){x, y});          // top-left
+	kr_vec2_t p2 = kr_matrix3x3_multvec(&transformation, (kr_vec2_t){x + width, y});  // top-right
 	kr_vec2_t p3 =
-	    kr_matrix3x3_multvec(transformation, (kr_vec2_t){x + width, y + height}); // bottom-right
+	    kr_matrix3x3_multvec(&transformation, (kr_vec2_t){x + width, y + height}); // bottom-right
 	sdf_rect_set_rect_verts(p0.x, p0.y, p1.x, p1.y, p2.x, p2.y, p3.x, p3.y);
 	float w = kr_vec2_length(kr_vec2_subv((kr_vec2_t){p2.x, p2.y}, (kr_vec2_t){p1.x, p1.y}));
 	float h = kr_vec2_length(kr_vec2_subv((kr_vec2_t){p0.x, p0.y}, (kr_vec2_t){p1.x, p1.y}));
@@ -550,13 +550,13 @@ void kr_sdf_draw_circle(float x, float y, float radius, float border, float smoo
 	sdf_rect_draw_buffer(false);
 	sdf_line_draw_buffer(false);
 	kr_vec2_t p0 =
-	    kr_matrix3x3_multvec(transformation, (kr_vec2_t){x - radius, y + radius}); // bottom-left
+	    kr_matrix3x3_multvec(&transformation, (kr_vec2_t){x - radius, y + radius}); // bottom-left
 	kr_vec2_t p1 =
-	    kr_matrix3x3_multvec(transformation, (kr_vec2_t){x - radius, y - radius}); // top-left
+	    kr_matrix3x3_multvec(&transformation, (kr_vec2_t){x - radius, y - radius}); // top-left
 	kr_vec2_t p2 =
-	    kr_matrix3x3_multvec(transformation, (kr_vec2_t){x + radius, y - radius}); // top-right
+	    kr_matrix3x3_multvec(&transformation, (kr_vec2_t){x + radius, y - radius}); // top-right
 	kr_vec2_t p3 =
-	    kr_matrix3x3_multvec(transformation, (kr_vec2_t){x + radius, y + radius}); // bottom-right
+	    kr_matrix3x3_multvec(&transformation, (kr_vec2_t){x + radius, y + radius}); // bottom-right
 	sdf_circle_set_rect_verts(p0.x, p0.y, p1.x, p1.y, p2.x, p2.y, p3.x, p3.y);
 	float w = kr_vec2_length(kr_vec2_subv((kr_vec2_t){p2.x, p2.y}, (kr_vec2_t){p1.x, p1.y}));
 	float h = kr_vec2_length(kr_vec2_subv((kr_vec2_t){p0.x, p0.y}, (kr_vec2_t){p1.x, p1.y}));
@@ -700,11 +700,12 @@ void kr_sdf_draw_line(float x0, float y0, float x1, float y1, float strength, fl
 	up = kr_vec2_mult(up, hs);
 	down = kr_vec2_mult(down, hs);
 
-	kr_vec2_t p0 = kr_matrix3x3_multvec(transformation, get_corner_vec(a, down, bw)); // bottom-left
-	kr_vec2_t p1 = kr_matrix3x3_multvec(transformation, get_corner_vec(a, up, bw));   // top-left
-	kr_vec2_t p2 = kr_matrix3x3_multvec(transformation, get_corner_vec(b, up, fw));   // top-right
+	kr_vec2_t p0 =
+	    kr_matrix3x3_multvec(&transformation, get_corner_vec(a, down, bw));          // bottom-left
+	kr_vec2_t p1 = kr_matrix3x3_multvec(&transformation, get_corner_vec(a, up, bw)); // top-left
+	kr_vec2_t p2 = kr_matrix3x3_multvec(&transformation, get_corner_vec(b, up, fw)); // top-right
 	kr_vec2_t p3 =
-	    kr_matrix3x3_multvec(transformation, get_corner_vec(b, down, fw)); // bottom-right
+	    kr_matrix3x3_multvec(&transformation, get_corner_vec(b, down, fw)); // bottom-right
 
 	float w = kr_vec2_length(kr_vec2_subv((kr_vec2_t){p2.x, p2.y}, (kr_vec2_t){p1.x, p1.y}));
 	float h = kr_vec2_length(kr_vec2_subv((kr_vec2_t){p0.x, p0.y}, (kr_vec2_t){p1.x, p1.y}));

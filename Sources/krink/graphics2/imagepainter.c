@@ -192,11 +192,11 @@ void kr_isp_draw_scaled_sub_image(kr_image_t *img, float sx, float sy, float sw,
 	kr_isp_set_rect_tex_coords(sx / img->real_width, sy / img->real_height,
 	                           (sx + sw) / img->real_width, (sy + sh) / img->real_height);
 	kr_isp_set_rect_colors(opacity, color);
-	kr_vec2_t p0 = kr_matrix3x3_multvec(transformation, (kr_vec2_t){dx, dy + dh}); // bottom-left
-	kr_vec2_t p1 = kr_matrix3x3_multvec(transformation, (kr_vec2_t){dx, dy});      // top-left
-	kr_vec2_t p2 = kr_matrix3x3_multvec(transformation, (kr_vec2_t){dx + dw, dy}); // top-right
+	kr_vec2_t p0 = kr_matrix3x3_multvec(&transformation, (kr_vec2_t){dx, dy + dh}); // bottom-left
+	kr_vec2_t p1 = kr_matrix3x3_multvec(&transformation, (kr_vec2_t){dx, dy});      // top-left
+	kr_vec2_t p2 = kr_matrix3x3_multvec(&transformation, (kr_vec2_t){dx + dw, dy}); // top-right
 	kr_vec2_t p3 =
-	    kr_matrix3x3_multvec(transformation, (kr_vec2_t){dx + dw, dy + dh}); // bottom-right
+	    kr_matrix3x3_multvec(&transformation, (kr_vec2_t){dx + dw, dy + dh}); // bottom-right
 	kr_isp_set_rect_verts(p0.x, p0.y, p1.x, p1.y, p2.x, p2.y, p3.x, p3.y);
 
 	++buffer_index;
