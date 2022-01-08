@@ -223,7 +223,7 @@ static int compare_render_order(ecs_entity_t e1, const void *ptr1, ecs_entity_t 
 	KrCompDrawable *d2 = (KrCompDrawable *)ptr2;
 	return (d1->depth << DSHIFT) + (d1->pipeline << PSHIFT) +
 	       ((d1->sort_extra >> PSHIFT) ^ (d1->sort_extra & EMOD)) - (d2->depth << DSHIFT) +
-	       (d2->pipeline << PSHIFT) + ((d2->sort_extra >> PSHIFT) ^ (d2->sort_extra & EMOD));
+	       (d2->pipeline << PSHIFT) + (((d2->sort_extra >> PSHIFT) & EMOD) ^ (d2->sort_extra & EMOD));
 }
 
 void SystemsRenderImport(ecs_world_t *world) {
