@@ -213,17 +213,30 @@ static void Render(ecs_iter_t *it) {
 	}
 }
 
-#define DSHIFT 22
+/**
+ * MSB -> LSB
+ * 10 bits signed depth -1024..1023
+ * 6 bits unsigned pipeline 0..63
+ * 16 bits extra sort upper 16 bits XOR lower 16 bits, masked sign removed
+ */
+
+#define DSHIFT 21
 #define PSHIFT 16
-#define EMOD 0x0000ffff
+#define DSIGN 0x80000000
+#define DMASK 0x000001ff
+#define PMASK 0x003f0000
+#define EMASK 0x0000ffff
 
 static int compare_render_order(ecs_entity_t e1, const void *ptr1, ecs_entity_t e2,
                                 const void *ptr2) {
 	KrCompDrawable *d1 = (KrCompDrawable *)ptr1;
 	KrCompDrawable *d2 = (KrCompDrawable *)ptr2;
-	return (d1->depth << DSHIFT) + (d1->pipeline << PSHIFT) +
-	       ((d1->sort_extra >> PSHIFT) ^ (d1->sort_extra & EMOD)) - (d2->depth << DSHIFT) +
-	       (d2->pipeline << PSHIFT) + (((d2->sort_extra >> PSHIFT) & EMOD) ^ (d2->sort_extra & EMOD));
+	return ((d1->depth & DSIGN) | ((d1->depth & DMASK) << DSHIFT) |
+	        ((d1->pipeline << PSHIFT) & PMASK) |
+	        (((d1->sort_extra >> (32 - PSHIFT)) & EMASK) ^ (d1->sort_extra & EMASK))) -
+	       ((d2->depth & DSIGN) | ((d2->depth & DMASK) << DSHIFT) |
+	        ((d2->pipeline << PSHIFT) & PMASK) |
+	        (((d2->sort_extra >> (32 - PSHIFT)) & EMASK) ^ (d2->sort_extra & EMASK)));
 }
 
 void SystemsRenderImport(ecs_world_t *world) {
