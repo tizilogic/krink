@@ -3,8 +3,8 @@
 static ecs_world_t *world;
 
 struct Position {
-  float start; // start time of animation, t=0 is now
-  float duration;
+  float x;
+  float y;
 };
 
 struct Animation {
@@ -27,7 +27,6 @@ ECS_TAG(world, EaseIn);
 ECS_TAG(world, EaseOut);
 /*
 [9:55 PM] Swan (Silent Tower Games): Oh yeah... C++ can have empty structs
-[9:57 PM] tizilogic: do I understand correctly that you are adding the same tag multiple times to a single entity? nvm...
 [9:57 PM] Sander: */
 ecs_entity_t anim_1 = ecs_new_id(world);
 ecs_set(world, anim_1, Animation, {0, 0.1});
