@@ -64,6 +64,18 @@ static void Render(ecs_iter_t *it) {
 			sx = scale_x[i].value;
 			sy = scale_y[i].value;
 		}
+		else if (ecs_term_is_set(it, 19)) { // ScaleX
+			kr_matrix3x3_t smat = kr_matrix3x3_scale(scale_x[i].value, 1.0f);
+			transform = kr_matrix3x3_multmat(&transform, &smat);
+			sx = scale_x[i].value;
+			sy = 1.0f;
+		}
+		else if (ecs_term_is_set(it, 20)) { // ScaleY
+			kr_matrix3x3_t smat = kr_matrix3x3_scale(1.0f, scale_y[i].value);
+			transform = kr_matrix3x3_multmat(&transform, &smat);
+			sx = 1.0f;
+			sy = scale_y[i].value;
+		}
 		if (ecs_term_is_set(it, 16)) { // Rotate
 			float cx, cy;
 			if (ecs_term_is_set(it, 17)) {
