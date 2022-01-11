@@ -26,28 +26,27 @@ static void End(ecs_iter_t *it) {
 }
 
 static void Render(ecs_iter_t *it) {
-	KrCompDrawable *drawable = ecs_term(it, KrCompDrawable, 1);
-	KrCompPos2 *pos = ecs_term(it, KrCompPos2, 2);
-	KrCompColor *color = ecs_term(it, KrCompColor, 3);
-	KrCompImage *image = ecs_term(it, KrCompImage, 4);
-	KrCompText *text = ecs_term(it, KrCompText, 5);
-	KrCompStroke *stroke = ecs_term(it, KrCompStroke, 6);
-	KrCompSmooth *smooth = ecs_term(it, KrCompSmooth, 7);
-	KrCompTriangle *triangle = ecs_term(it, KrCompTriangle, 8);
-	KrCompRect *rect = ecs_term(it, KrCompRect, 9);
-	KrCompScissor *scissor = ecs_term(it, KrCompScissor, 10);
-	KrCompCorner *corner = ecs_term(it, KrCompCorner, 11);
-	KrCompCornerAsymm *corner_asymm = ecs_term(it, KrCompCornerAsymm, 12);
-	KrCompCircle *circle = ecs_term(it, KrCompCircle, 13);
-	KrCompBorder *border = ecs_term(it, KrCompBorder, 14);
-	KrCompLine *line = ecs_term(it, KrCompLine, 15);
-	KrCompAngle *angle = ecs_term(it, KrCompAngle, 16);
-	KrCompRotationCenter *rotation_center = ecs_term(it, KrCompRotationCenter, 17);
-	KrCompOpacity *opacity = ecs_term(it, KrCompOpacity, 18);
-	KrCompScale *scale = ecs_term(it, KrCompScale, 19);
-	KrCompScaleX *scale_x = ecs_term(it, KrCompScaleX, 20);
-	KrCompScaleY *scale_y = ecs_term(it, KrCompScaleY, 21);
-	KrCompTranslation *translation = ecs_term(it, KrCompTranslation, 22);
+	KrDrawable *drawable = ecs_term(it, KrDrawable, 1);
+	KrPos2 *pos = ecs_term(it, KrPos2, 2);
+	KrColor *color = ecs_term(it, KrColor, 3);
+	KrImage *image = ecs_term(it, KrImage, 4);
+	KrText *text = ecs_term(it, KrText, 5);
+	KrStroke *stroke = ecs_term(it, KrStroke, 6);
+	KrSmooth *smooth = ecs_term(it, KrSmooth, 7);
+	KrTriangle *triangle = ecs_term(it, KrTriangle, 8);
+	KrRect *rect = ecs_term(it, KrRect, 9);
+	KrScissor *scissor = ecs_term(it, KrScissor, 10);
+	KrCorner *corner = ecs_term(it, KrCorner, 11);
+	KrCornerAsymm *corner_asymm = ecs_term(it, KrCornerAsymm, 12);
+	KrCircle *circle = ecs_term(it, KrCircle, 13);
+	KrBorder *border = ecs_term(it, KrBorder, 14);
+	KrLine *line = ecs_term(it, KrLine, 15);
+	KrAngle *angle = ecs_term(it, KrAngle, 16);
+	KrRotationCenter *rotation_center = ecs_term(it, KrRotationCenter, 17);
+	KrOpacity *opacity = ecs_term(it, KrOpacity, 18);
+	KrScaleX *scale_x = ecs_term(it, KrScaleX, 19);
+	KrScaleY *scale_y = ecs_term(it, KrScaleY, 20);
+	KrTranslation *translation = ecs_term(it, KrTranslation, 21);
 
 	for (int i = 0; i < it->count; ++i) {
 		float border_strength = 0.0f;
@@ -55,17 +54,11 @@ static void Render(ecs_iter_t *it) {
 		kr_matrix3x3_t transform = kr_matrix3x3_identity();
 
 		float sx = 1.0f, sy = 1.0f;
-		if (ecs_term_is_set(it, 22)) { // Translate
+		if (ecs_term_is_set(it, 21)) { // Translate
 			kr_matrix3x3_t tmat = kr_matrix3x3_translation(translation[i].x, translation[i].y);
 			transform = kr_matrix3x3_multmat(&transform, &tmat);
 		}
-		if (ecs_term_is_set(it, 19)) { // Scale
-			kr_matrix3x3_t smat = kr_matrix3x3_scale(scale[i].value, scale[i].value);
-			transform = kr_matrix3x3_multmat(&transform, &smat);
-			sx = scale[i].value;
-			sy = scale[i].value;
-		}
-		else if (ecs_term_is_set(it, 20) && ecs_term_is_set(it, 21)) { // Scale asymmetric
+		if (ecs_term_is_set(it, 19) && ecs_term_is_set(it, 20)) { // Scale asymmetric
 			kr_matrix3x3_t smat = kr_matrix3x3_scale(scale_x[i].value, scale_y[i].value);
 			transform = kr_matrix3x3_multmat(&transform, &smat);
 			sx = scale_x[i].value;
@@ -229,8 +222,8 @@ static void Render(ecs_iter_t *it) {
 
 static int compare_render_order(ecs_entity_t e1, const void *ptr1, ecs_entity_t e2,
                                 const void *ptr2) {
-	KrCompDrawable *d1 = (KrCompDrawable *)ptr1;
-	KrCompDrawable *d2 = (KrCompDrawable *)ptr2;
+	KrDrawable *d1 = (KrDrawable *)ptr1;
+	KrDrawable *d2 = (KrDrawable *)ptr2;
 	return ((d1->depth & DSIGN) | ((d1->depth & DMASK) << DSHIFT) |
 	        ((d1->pipeline << PSHIFT) & PMASK) |
 	        ((((d1->sort_extra >> (32 - PSHIFT)) & EMASK) + (d1->sort_extra & EMASK)) & EMASK)) -
@@ -248,36 +241,35 @@ void SystemsRenderImport(ecs_world_t *world) {
 
 	ECS_SYSTEM(world, Clear, EcsPreStore);
 
-	ecs_term_t termbuff[23] = {
-	    {ecs_id(KrCompDrawable)},
-	    {ecs_id(KrCompPos2), .oper = EcsOptional},
-	    {ecs_id(KrCompColor)},
-	    {ecs_id(KrCompImage), .oper = EcsOptional},
-	    {ecs_id(KrCompText), .oper = EcsOptional},
-	    {ecs_id(KrCompStroke), .oper = EcsOptional},
-	    {ecs_id(KrCompSmooth), .oper = EcsOptional},
-	    {ecs_id(KrCompTriangle), .oper = EcsOptional},
-	    {ecs_id(KrCompRect), .oper = EcsOptional},
-	    {ecs_id(KrCompScissor), .oper = EcsOptional},
-	    {ecs_id(KrCompCorner), .oper = EcsOptional},
-	    {ecs_id(KrCompCornerAsymm), .oper = EcsOptional},
-	    {ecs_id(KrCompCircle), .oper = EcsOptional},
-	    {ecs_id(KrCompBorder), .oper = EcsOptional},
-	    {ecs_id(KrCompLine), .oper = EcsOptional},
-	    {ecs_id(KrCompAngle), .oper = EcsOptional},
-	    {ecs_id(KrCompRotationCenter), .oper = EcsOptional},
-	    {ecs_id(KrCompOpacity), .oper = EcsOptional},
-	    {ecs_id(KrCompScale), .oper = EcsOptional},
-	    {ecs_id(KrCompScaleX), .oper = EcsOptional},
-	    {ecs_id(KrCompScaleY), .oper = EcsOptional},
-	    {ecs_id(KrCompTranslation), .oper = EcsOptional},
-	    {KrCompVisible},
+	ecs_term_t termbuff[22] = {
+	    {ecs_id(KrDrawable)},
+	    {ecs_id(KrPos2), .oper = EcsOptional},
+	    {ecs_id(KrColor)},
+	    {ecs_id(KrImage), .oper = EcsOptional},
+	    {ecs_id(KrText), .oper = EcsOptional},
+	    {ecs_id(KrStroke), .oper = EcsOptional},
+	    {ecs_id(KrSmooth), .oper = EcsOptional},
+	    {ecs_id(KrTriangle), .oper = EcsOptional},
+	    {ecs_id(KrRect), .oper = EcsOptional},
+	    {ecs_id(KrScissor), .oper = EcsOptional},
+	    {ecs_id(KrCorner), .oper = EcsOptional},
+	    {ecs_id(KrCornerAsymm), .oper = EcsOptional},
+	    {ecs_id(KrCircle), .oper = EcsOptional},
+	    {ecs_id(KrBorder), .oper = EcsOptional},
+	    {ecs_id(KrLine), .oper = EcsOptional},
+	    {ecs_id(KrAngle), .oper = EcsOptional},
+	    {ecs_id(KrRotationCenter), .oper = EcsOptional},
+	    {ecs_id(KrOpacity), .oper = EcsOptional},
+	    {ecs_id(KrScaleX), .oper = EcsOptional},
+	    {ecs_id(KrScaleY), .oper = EcsOptional},
+	    {ecs_id(KrTranslation), .oper = EcsOptional},
+	    {KrVisible},
 	};
 
 	ecs_system_init(world, &(ecs_system_desc_t){.entity = {.name = "Render", .add = {EcsOnStore}},
-	                                            .query.filter.terms_buffer_count = 23,
+	                                            .query.filter.terms_buffer_count = 22,
 	                                            .query.filter.terms_buffer = termbuff,
-	                                            .query.order_by_component = ecs_id(KrCompDrawable),
+	                                            .query.order_by_component = ecs_id(KrDrawable),
 	                                            .query.order_by = compare_render_order,
 	                                            .callback = Render});
 

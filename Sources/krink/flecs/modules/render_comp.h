@@ -15,85 +15,118 @@
 extern "C" {
 #endif
 
-ECS_ENUM(KrCompPipeline, {
-	KR_COMP_PP_IMAGE = 0,
-	KR_COMP_PP_TEXT,
-	KR_COMP_PP_LINE,
-	KR_COMP_PP_COLOR_TRIS_STROKE,
-	KR_COMP_PP_COLOR_TRIS_FILL,
-	KR_COMP_PP_COLOR_QUAD_STROKE,
-	KR_COMP_PP_COLOR_QUAD_FILL,
-	KR_COMP_PP_SDF_RECT,
-	KR_COMP_PP_SDF_RECT_ASYMM,
-	KR_COMP_PP_SDF_RECT_WBORDER,
-	KR_COMP_PP_SDF_RECT_ASYMM_WBORDER,
-	KR_COMP_PP_SDF_CIRCLE,
-	KR_COMP_PP_SDF_CIRCLE_WBORDER,
-	KR_COMP_PP_SDF_LINE,
-});
+ECS_ENUM(KrPipeline, {
+                         KR_COMP_PP_IMAGE = 0,
+                         KR_COMP_PP_TEXT,
+                         KR_COMP_PP_LINE,
+                         KR_COMP_PP_COLOR_TRIS_STROKE,
+                         KR_COMP_PP_COLOR_TRIS_FILL,
+                         KR_COMP_PP_COLOR_QUAD_STROKE,
+                         KR_COMP_PP_COLOR_QUAD_FILL,
+                         KR_COMP_PP_SDF_RECT,
+                         KR_COMP_PP_SDF_RECT_ASYMM,
+                         KR_COMP_PP_SDF_RECT_WBORDER,
+                         KR_COMP_PP_SDF_RECT_ASYMM_WBORDER,
+                         KR_COMP_PP_SDF_CIRCLE,
+                         KR_COMP_PP_SDF_CIRCLE_WBORDER,
+                         KR_COMP_PP_SDF_LINE,
+                     });
 
 /* Tags */
 
-extern ECS_DECLARE(KrCompVisible);
+extern ECS_DECLARE(KrVisible);
 
 /* Component types */
-ECS_STRUCT(KrCompDrawable, {
+ECS_STRUCT(KrDrawable, {
 	int32_t depth;
 	int32_t sort_extra;
-	KrCompPipeline pipeline;
+	KrPipeline pipeline;
 });
 
 ECS_STRUCT(KrSingletonClearColor, { uint32_t color; });
 
-ECS_STRUCT(KrCompColor, { uint32_t color; });
+ECS_STRUCT(KrColor, { uint32_t color; });
 
-ECS_STRUCT(KrCompPos2, {
+ECS_STRUCT(KrPos2, {
 	float x;
 	float y;
 });
 
-ECS_STRUCT(KrCompImage, {
+ECS_STRUCT(KrImage, {
 	kr_image_t *image;
-	float sx; float sy; float sw; float sh; float dw; float dh;
+	float sx;
+	float sy;
+	float sw;
+	float sh;
+	float dw;
+	float dh;
 });
 
-ECS_STRUCT(KrCompText, {
+ECS_STRUCT(KrText, {
 	const char *text;
 	kr_ttf_font_t *font;
 	int32_t size;
 });
 
-ECS_STRUCT(KrCompStroke, { float strength; });
+ECS_STRUCT(KrStroke, { float strength; });
 
-ECS_STRUCT(KrCompSmooth, { float px; });
+ECS_STRUCT(KrSmooth, { float px; });
 
-ECS_STRUCT(KrCompTriangle, { float x1; float y1; float x2; float y2; float x3; float y3; });
+ECS_STRUCT(KrTriangle, {
+	float x1;
+	float y1;
+	float x2;
+	float y2;
+	float x3;
+	float y3;
+});
 
-ECS_STRUCT(KrCompRect, { float w; float h; });
+ECS_STRUCT(KrRect, {
+	float w;
+	float h;
+});
 
-ECS_STRUCT(KrCompScissor, { float x; float y; float w; float h; });
+ECS_STRUCT(KrScissor, {
+	float x;
+	float y;
+	float w;
+	float h;
+});
 
-ECS_STRUCT(KrCompCorner, { float radius; });
+ECS_STRUCT(KrCorner, { float radius; });
 
-ECS_STRUCT(KrCompCornerAsymm, { float tl; float bl; float tr; float br; });
+ECS_STRUCT(KrCornerAsymm, {
+	float tl;
+	float bl;
+	float tr;
+	float br;
+});
 
-ECS_STRUCT(KrCompCircle, { float radius; });
+ECS_STRUCT(KrCircle, { float radius; });
 
-ECS_STRUCT(KrCompBorder, {
+ECS_STRUCT(KrBorder, {
 	float strength;
 	uint32_t color;
 });
 
-ECS_STRUCT(KrCompLine, { float x_to; float y_to; });
+ECS_STRUCT(KrLine, {
+	float x_to;
+	float y_to;
+});
 
 /// Optional Components
-ECS_STRUCT(KrCompAngle, { float radians; });
-ECS_STRUCT(KrCompRotationCenter, { float x; float y; });
-ECS_STRUCT(KrCompOpacity, { float alpha; });
-ECS_STRUCT(KrCompScale, { float value; });
-ECS_STRUCT(KrCompScaleX, { float value; });
-ECS_STRUCT(KrCompScaleY, { float value; });
-ECS_STRUCT(KrCompTranslation, { float x; float y; });
+ECS_STRUCT(KrAngle, { float radians; });
+ECS_STRUCT(KrRotationCenter, {
+	float x;
+	float y;
+});
+ECS_STRUCT(KrOpacity, { float alpha; });
+ECS_STRUCT(KrScaleX, { float value; });
+ECS_STRUCT(KrScaleY, { float value; });
+ECS_STRUCT(KrTranslation, {
+	float x;
+	float y;
+});
 
 /* Prefabs */
 
@@ -110,7 +143,6 @@ extern ECS_DECLARE(KrPrefabSdfRectWborder);
 extern ECS_DECLARE(KrPrefabSdfRectAsymmWborder);
 extern ECS_DECLARE(KrPrefabSdfCircle);
 extern ECS_DECLARE(KrPrefabSdfCircleWborder);
-
 
 void ComponentsRenderImport(ecs_world_t *world);
 

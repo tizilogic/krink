@@ -1,7 +1,7 @@
 #define COMPONENTS_RENDER_IMPL
 #include "render_comp.h"
 
-ECS_DECLARE(KrCompVisible);
+ECS_DECLARE(KrVisible);
 ECS_DECLARE(KrPrefabSprite);
 ECS_DECLARE(KrPrefabText);
 ECS_DECLARE(KrPrefabStrokedRect);
@@ -19,54 +19,48 @@ ECS_DECLARE(KrPrefabSdfCircleWborder);
 void ComponentsRenderImport(ecs_world_t *world) {
 	ECS_MODULE(world, ComponentsRender);
 
-	ECS_TAG_DEFINE(world, KrCompVisible);
-	ECS_META_COMPONENT(world, KrCompPipeline);
-	ECS_META_COMPONENT(world, KrCompDrawable);
+	ECS_TAG_DEFINE(world, KrVisible);
+	ECS_META_COMPONENT(world, KrPipeline);
+	ECS_META_COMPONENT(world, KrDrawable);
 	ECS_META_COMPONENT(world, KrSingletonClearColor);
-	ECS_META_COMPONENT(world, KrCompColor);
-	ECS_META_COMPONENT(world, KrCompPos2);
-	ECS_META_COMPONENT(world, KrCompImage);
-	ECS_META_COMPONENT(world, KrCompText);
-	ECS_META_COMPONENT(world, KrCompStroke);
-	ECS_META_COMPONENT(world, KrCompSmooth);
-	ECS_META_COMPONENT(world, KrCompTriangle);
-	ECS_META_COMPONENT(world, KrCompRect);
-	ECS_META_COMPONENT(world, KrCompScissor);
-	ECS_META_COMPONENT(world, KrCompCorner);
-	ECS_META_COMPONENT(world, KrCompCornerAsymm);
-	ECS_META_COMPONENT(world, KrCompCircle);
-	ECS_META_COMPONENT(world, KrCompBorder);
-	ECS_META_COMPONENT(world, KrCompLine);
+	ECS_META_COMPONENT(world, KrColor);
+	ECS_META_COMPONENT(world, KrPos2);
+	ECS_META_COMPONENT(world, KrImage);
+	ECS_META_COMPONENT(world, KrText);
+	ECS_META_COMPONENT(world, KrStroke);
+	ECS_META_COMPONENT(world, KrSmooth);
+	ECS_META_COMPONENT(world, KrTriangle);
+	ECS_META_COMPONENT(world, KrRect);
+	ECS_META_COMPONENT(world, KrScissor);
+	ECS_META_COMPONENT(world, KrCorner);
+	ECS_META_COMPONENT(world, KrCornerAsymm);
+	ECS_META_COMPONENT(world, KrCircle);
+	ECS_META_COMPONENT(world, KrBorder);
+	ECS_META_COMPONENT(world, KrLine);
 
-	ECS_META_COMPONENT(world, KrCompAngle);
-	ECS_META_COMPONENT(world, KrCompRotationCenter);
-	ECS_META_COMPONENT(world, KrCompOpacity);
-	ECS_META_COMPONENT(world, KrCompScale);
-	ECS_META_COMPONENT(world, KrCompScaleX);
-	ECS_META_COMPONENT(world, KrCompScaleY);
-	ECS_META_COMPONENT(world, KrCompTranslation);
+	ECS_META_COMPONENT(world, KrAngle);
+	ECS_META_COMPONENT(world, KrRotationCenter);
+	ECS_META_COMPONENT(world, KrOpacity);
+	ECS_META_COMPONENT(world, KrScaleX);
+	ECS_META_COMPONENT(world, KrScaleY);
+	ECS_META_COMPONENT(world, KrTranslation);
 
-	ECS_PREFAB_DEFINE(world, KrPrefabSprite, KrCompDrawable, KrCompPos2, KrCompColor, KrCompImage);
-	ECS_PREFAB_DEFINE(world, KrPrefabText, KrCompDrawable, KrCompPos2, KrCompColor, KrCompText);
-	ECS_PREFAB_DEFINE(world, KrPrefabStrokedRect, KrCompDrawable, KrCompPos2, KrCompColor,
-	                  KrCompRect, KrCompStroke);
-	ECS_PREFAB_DEFINE(world, KrPrefabFilledRect, KrCompDrawable, KrCompPos2, KrCompColor,
-	                  KrCompRect);
-	ECS_PREFAB_DEFINE(world, KrPrefabStrokedTriangle, KrCompDrawable, KrCompColor, KrCompTriangle,
-	                  KrCompStroke);
-	ECS_PREFAB_DEFINE(world, KrPrefabFilledTriangle, KrCompDrawable, KrCompColor, KrCompTriangle);
-	ECS_PREFAB_DEFINE(world, KrPrefabLine, KrCompDrawable, KrCompPos2, KrCompColor, KrCompLine,
-	                  KrCompStroke);
-	ECS_PREFAB_DEFINE(world, KrPrefabSdfRect, KrCompDrawable, KrCompPos2, KrCompColor, KrCompRect,
-	                  KrCompCorner, KrCompSmooth);
-	ECS_PREFAB_DEFINE(world, KrPrefabSdfRectAsymm, KrCompDrawable, KrCompPos2, KrCompColor,
-	                  KrCompRect, KrCompCornerAsymm, KrCompSmooth);
-	ECS_PREFAB_DEFINE(world, KrPrefabSdfRectWborder, KrCompDrawable, KrCompPos2, KrCompColor,
-	                  KrCompRect, KrCompCorner, KrCompBorder, KrCompSmooth);
-	ECS_PREFAB_DEFINE(world, KrPrefabSdfRectAsymmWborder, KrCompDrawable, KrCompPos2, KrCompColor,
-	                  KrCompRect, KrCompCornerAsymm, KrCompBorder, KrCompSmooth);
-	ECS_PREFAB_DEFINE(world, KrPrefabSdfCircle, KrCompDrawable, KrCompPos2, KrCompColor,
-	                  KrCompCircle, KrCompSmooth);
-	ECS_PREFAB_DEFINE(world, KrPrefabSdfCircleWborder, KrCompDrawable, KrCompPos2, KrCompColor,
-	                  KrCompCircle, KrCompBorder, KrCompSmooth);
+	ECS_PREFAB_DEFINE(world, KrPrefabSprite, KrDrawable, KrPos2, KrColor, KrImage);
+	ECS_PREFAB_DEFINE(world, KrPrefabText, KrDrawable, KrPos2, KrColor, KrText);
+	ECS_PREFAB_DEFINE(world, KrPrefabStrokedRect, KrDrawable, KrPos2, KrColor, KrRect, KrStroke);
+	ECS_PREFAB_DEFINE(world, KrPrefabFilledRect, KrDrawable, KrPos2, KrColor, KrRect);
+	ECS_PREFAB_DEFINE(world, KrPrefabStrokedTriangle, KrDrawable, KrColor, KrTriangle, KrStroke);
+	ECS_PREFAB_DEFINE(world, KrPrefabFilledTriangle, KrDrawable, KrColor, KrTriangle);
+	ECS_PREFAB_DEFINE(world, KrPrefabLine, KrDrawable, KrPos2, KrColor, KrLine, KrStroke);
+	ECS_PREFAB_DEFINE(world, KrPrefabSdfRect, KrDrawable, KrPos2, KrColor, KrRect, KrCorner,
+	                  KrSmooth);
+	ECS_PREFAB_DEFINE(world, KrPrefabSdfRectAsymm, KrDrawable, KrPos2, KrColor, KrRect,
+	                  KrCornerAsymm, KrSmooth);
+	ECS_PREFAB_DEFINE(world, KrPrefabSdfRectWborder, KrDrawable, KrPos2, KrColor, KrRect, KrCorner,
+	                  KrBorder, KrSmooth);
+	ECS_PREFAB_DEFINE(world, KrPrefabSdfRectAsymmWborder, KrDrawable, KrPos2, KrColor, KrRect,
+	                  KrCornerAsymm, KrBorder, KrSmooth);
+	ECS_PREFAB_DEFINE(world, KrPrefabSdfCircle, KrDrawable, KrPos2, KrColor, KrCircle, KrSmooth);
+	ECS_PREFAB_DEFINE(world, KrPrefabSdfCircleWborder, KrDrawable, KrPos2, KrColor, KrCircle,
+	                  KrBorder, KrSmooth);
 }
