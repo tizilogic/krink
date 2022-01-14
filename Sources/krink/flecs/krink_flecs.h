@@ -4,6 +4,7 @@
 #include <krink/graphics2/sdfpainter.h>
 #include <krink/graphics2/ttf.h>
 #include <krink/image.h>
+#include <krink/util/tween.h>
 #include <stdint.h>
 
 typedef struct kr_rect {
@@ -110,3 +111,31 @@ ecs_entity_t kr_flecs_create_sdf_rect_wborder(kr_init_sdf_rect_wborder_t args);
 ecs_entity_t kr_flecs_create_sdf_asymm_rect_wborder(kr_init_sdf_asymm_rect_wborder_t args);
 ecs_entity_t kr_flecs_create_sdf_circle(kr_init_sdf_circle_t args);
 ecs_entity_t kr_flecs_create_sdf_circle_wborder(kr_init_sdf_circle_wborder_t args);
+
+/* Animation */
+
+typedef enum kr_modifier_flag {
+	KR_MODIFIER_ANGLE = 1,
+	KR_MODIFIER_ROTATION_CENTER_X = 2,
+	KR_MODIFIER_ROTATION_CENTER_Y = 4,
+	KR_MODIFIER_X = 8,
+	KR_MODIFIER_Y = 16,
+	KR_MODIFIER_SCALE_X = 32,
+	KR_MODIFIER_SCALE_Y = 64,
+	KR_MODIFIER_OPACITY = 128,
+} kr_modifier_flag_t;
+
+typedef struct kr_init_animation {
+	double start, duration;
+	kr_tween_ease_t ease;
+	uint32_t active_modifiers;
+	float modifiers[8];
+} kr_init_animation_t;
+
+typedef struct kr_init_sequence {
+	int count;
+	kr_init_animation_t animations[16];
+} kr_init_sequence_t;
+
+void kr_flecs_create_animation(ecs_entity_t e, const kr_init_animation_t *anim);
+void kr_flecs_create_sequence(ecs_entity_t e, const kr_init_sequence_t *sequence);

@@ -1,15 +1,22 @@
 #include "krink_flecs.h"
+#include "modules/animation_comp.h"
+#include "modules/animation_sys.h"
 #include "modules/render_comp.h"
 #include "modules/render_sys.h"
 #include <stdbool.h>
+#include <kinc/log.h>
 
 ecs_world_t *kr_world;
 
 void kr_flecs_init(void) {
 	kr_world = ecs_init();
+	ecs_singleton_set(kr_world, EcsRest, {0});
 	ECS_IMPORT(kr_world, ComponentsRender);
 	ECS_IMPORT(kr_world, SystemsRender);
+	ECS_IMPORT(kr_world, ComponentsAnimation);
+	ECS_IMPORT(kr_world, SystemsAnimation);
 	ecs_singleton_set(kr_world, KrSingletonClearColor, {.color = 0});
+	kinc_log(KINC_LOG_LEVEL_INFO, "flecs initialized");
 }
 
 void kr_flecs_destroy(void) {
@@ -201,4 +208,69 @@ void kr_flecs_set_depth(ecs_entity_t e, int32_t depth) {
 	assert(!is_added);
 	d->depth = depth;
 	ecs_modified(kr_world, e, KrDrawable);
+}
+
+/* Animation */
+
+static ecs_entity_t entity_buffer[16];
+static int entity_buffer_top = 0;
+
+static void fill_entity_buffer(void) {
+	if (entity_buffer_top == 16) return;
+	while (entity_buffer_top < 16) {
+		entity_buffer[entity_buffer_top++] = ecs_new_id(kr_world);
+	}
+
+	// TODO: replace bubble with other sort algo if necessary
+	for (int i = 0; i < 16; ++i)
+		for (int j = 0; j < 15 - i; ++j)
+			if (entity_buffer[j] < entity_buffer[j + 1]) {
+				ecs_entity_t tmp = entity_buffer[j];
+				entity_buffer[j] = entity_buffer[j + 1];
+				entity_buffer[j + 1] = tmp;
+			}
+}
+
+static void add_animation(ecs_entity_t e, ecs_entity_t anim_e, const kr_init_animation_t *anim) {
+	int i = 0;
+	ecs_set(kr_world, anim_e, KrAnimation, {anim->start, anim->duration, anim->ease});
+	if ((anim->active_modifiers & KR_MODIFIER_ANGLE) > 0) {
+		ecs_set_pair(kr_world, anim_e, KrAngle, KrAnimateToAngle, {anim->modifiers[i++]});
+	}
+	if ((anim->active_modifiers & KR_MODIFIER_ROTATION_CENTER_X) > 0 &&
+	    (anim->active_modifiers & KR_MODIFIER_ROTATION_CENTER_Y) > 0) {
+		ecs_set_pair(kr_world, anim_e, KrRotationCenter, KrAnimateRotationCenter,
+		             {anim->modifiers[i++], anim->modifiers[i++]});
+	}
+	if ((anim->active_modifiers & KR_MODIFIER_X) > 0) {
+		ecs_set_pair(kr_world, anim_e, KrModifier, KrAnimateToX, {anim->modifiers[i++]});
+	}
+	if ((anim->active_modifiers & KR_MODIFIER_Y) > 0) {
+		ecs_set_pair(kr_world, anim_e, KrModifier, KrAnimateToY, {anim->modifiers[i++]});
+	}
+	if ((anim->active_modifiers & KR_MODIFIER_SCALE_X) > 0) {
+		ecs_set_pair(kr_world, anim_e, KrScaleX, KrAnimateToScaleX, {anim->modifiers[i++]});
+	}
+	if ((anim->active_modifiers & KR_MODIFIER_SCALE_Y) > 0) {
+		ecs_set_pair(kr_world, anim_e, KrScaleY, KrAnimateToScaleY, {anim->modifiers[i++]});
+	}
+	if ((anim->active_modifiers & KR_MODIFIER_OPACITY) > 0) {
+		ecs_set_pair(kr_world, anim_e, KrOpacity, KrAnimateToOpacity, {anim->modifiers[i++]});
+	}
+	ecs_add_pair(kr_world, e, KrAnimate, anim_e);
+}
+
+void kr_flecs_create_animation(ecs_entity_t e, const kr_init_animation_t *anim) {
+	fill_entity_buffer();
+	ecs_entity_t anim_e = entity_buffer[--entity_buffer_top];
+	add_animation(e, anim_e, anim);
+}
+
+void kr_flecs_create_sequence(ecs_entity_t e, const kr_init_sequence_t *sequence) {
+	assert(sequence->count > 0 && sequence->count <= 16);
+	fill_entity_buffer();
+	for (int i = 0; i < sequence->count; ++i) {
+		ecs_entity_t anim_e = entity_buffer[--entity_buffer_top];
+		add_animation(e, anim_e, &sequence->animations[i]);
+	}
 }

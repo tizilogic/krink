@@ -15,30 +15,24 @@ extern "C" {
 
 /* Tags */
 
-extern ECS_DECLARE(KrCompAnimate);
-extern ECS_DECLARE(KrCompAnimateToX);
-extern ECS_DECLARE(KrCompAnimateToY);
-extern ECS_DECLARE(KrCompAnimateToAngle);
-extern ECS_DECLARE(KrCompAnimateRotationCenter);
-extern ECS_DECLARE(KrCompAnimateToScaleX);
-extern ECS_DECLARE(KrCompAnimateToScaleY);
-extern ECS_DECLARE(KrCompAnimateToOpacity);
-extern ECS_DECLARE(KrCompAnimateFromX);
-extern ECS_DECLARE(KrCompAnimateFromY);
-extern ECS_DECLARE(KrCompAnimateFromAngle);
-extern ECS_DECLARE(KrCompAnimateFromScaleX);
-extern ECS_DECLARE(KrCompAnimateFromScaleY);
-extern ECS_DECLARE(KrCompAnimateFromOpacity);
+extern ECS_DECLARE(KrAnimate);
+extern ECS_DECLARE(KrAnimateToX);
+extern ECS_DECLARE(KrAnimateToY);
+extern ECS_DECLARE(KrAnimateToAngle);
+extern ECS_DECLARE(KrAnimateRotationCenter);
+extern ECS_DECLARE(KrAnimateToScaleX);
+extern ECS_DECLARE(KrAnimateToScaleY);
+extern ECS_DECLARE(KrAnimateToOpacity);
 
 /* Component types */
 
-ECS_STRUCT(KrCompAnimation, {
-	float start;
-	float duration;
+ECS_STRUCT(KrAnimation, {
+	double start;
+	double duration;
 	int32_t ease;
 });
 
-ECS_STRUCT(KrCompModifier, { float v; });
+ECS_STRUCT(KrModifier, { float v; });
 
 /* Prefabs */
 
