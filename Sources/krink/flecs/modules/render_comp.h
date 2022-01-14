@@ -128,6 +128,8 @@ ECS_STRUCT(KrTranslation, {
 	float y;
 });
 
+ECS_STRUCT(KrFrameTime, { double time; });
+
 /* Prefabs */
 
 extern ECS_DECLARE(KrPrefabSprite);

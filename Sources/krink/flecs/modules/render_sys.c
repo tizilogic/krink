@@ -3,11 +3,17 @@
 #include "render_comp.h"
 #include <kinc/math/core.h>
 #include <kinc/math/matrix.h>
+#include <kinc/system.h>
 #include <krink/graphics2/graphics.h>
 #include <krink/math/matrix.h>
 #include <krink/math/vector.h>
 
 static bool scissor_active = false;
+
+static void FrameTime(ecs_iter_t *it) {
+	KrFrameTime *t = ecs_term(it, KrFrameTime, 1);
+	t[0].time = kinc_time();
+}
 
 static void Clear(ecs_iter_t *it) {
 	ecs_world_t *world = it->world;
@@ -250,6 +256,10 @@ void SystemsRenderImport(ecs_world_t *world) {
 
 	/* Register components */
 	ECS_IMPORT(world, ComponentsRender);
+
+	ECS_SYSTEM(world, FrameTime, EcsPreUpdate, $KrFrameTime);
+
+	ecs_singleton_set(world, KrFrameTime, { kinc_time() });
 
 	ECS_SYSTEM(world, Clear, EcsPreStore);
 
