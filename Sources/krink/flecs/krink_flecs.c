@@ -3,8 +3,8 @@
 #include "modules/animation_sys.h"
 #include "modules/render_comp.h"
 #include "modules/render_sys.h"
-#include <stdbool.h>
 #include <kinc/log.h>
+#include <stdbool.h>
 
 ecs_world_t *kr_world;
 
@@ -234,28 +234,36 @@ static void fill_entity_buffer(void) {
 static void add_animation(ecs_entity_t e, ecs_entity_t anim_e, const kr_init_animation_t *anim) {
 	int i = 0;
 	ecs_set(kr_world, anim_e, KrAnimation, {anim->start, anim->duration, anim->ease});
-	if ((anim->active_modifiers & KR_MODIFIER_ANGLE) > 0) {
-		ecs_set_pair(kr_world, anim_e, KrAngle, KrAnimateToAngle, {anim->modifiers[i++]});
-	}
-	if ((anim->active_modifiers & KR_MODIFIER_ROTATION_CENTER_X) > 0 &&
-	    (anim->active_modifiers & KR_MODIFIER_ROTATION_CENTER_Y) > 0) {
-		ecs_set_pair(kr_world, anim_e, KrRotationCenter, KrAnimateRotationCenter,
-		             {anim->modifiers[i++], anim->modifiers[i++]});
-	}
-	if ((anim->active_modifiers & KR_MODIFIER_X) > 0) {
-		ecs_set_pair(kr_world, anim_e, KrModifier, KrAnimateToX, {anim->modifiers[i++]});
-	}
-	if ((anim->active_modifiers & KR_MODIFIER_Y) > 0) {
-		ecs_set_pair(kr_world, anim_e, KrModifier, KrAnimateToY, {anim->modifiers[i++]});
-	}
-	if ((anim->active_modifiers & KR_MODIFIER_SCALE_X) > 0) {
-		ecs_set_pair(kr_world, anim_e, KrScaleX, KrAnimateToScaleX, {anim->modifiers[i++]});
-	}
-	if ((anim->active_modifiers & KR_MODIFIER_SCALE_Y) > 0) {
-		ecs_set_pair(kr_world, anim_e, KrScaleY, KrAnimateToScaleY, {anim->modifiers[i++]});
-	}
-	if ((anim->active_modifiers & KR_MODIFIER_OPACITY) > 0) {
-		ecs_set_pair(kr_world, anim_e, KrOpacity, KrAnimateToOpacity, {anim->modifiers[i++]});
+
+	for (int i = 0; i < 8; ++i) {
+		switch (anim->modifiers[i].modifier) {
+		case KR_MODIFIER_ANGLE: {
+			ecs_set_pair(kr_world, anim_e, KrAngle, KrAnimateToAngle, {anim->modifiers[i].value});
+		} break;
+		case KR_MODIFIER_ROTATION_CENTER: {
+			ecs_set_pair(kr_world, anim_e, KrRotationCenter, KrAnimateRotationCenter,
+			             {anim->modifiers[i].value, anim->modifiers[i].opt});
+		} break;
+		case KR_MODIFIER_X: {
+			ecs_set_pair(kr_world, anim_e, KrModifier, KrAnimateToX, {anim->modifiers[i].value});
+		} break;
+		case KR_MODIFIER_Y: {
+			ecs_set_pair(kr_world, anim_e, KrModifier, KrAnimateToY, {anim->modifiers[i].value});
+		} break;
+		case KR_MODIFIER_SCALE_X: {
+			ecs_set_pair(kr_world, anim_e, KrScaleX, KrAnimateToScaleX, {anim->modifiers[i].value});
+		} break;
+		case KR_MODIFIER_SCALE_Y: {
+			ecs_set_pair(kr_world, anim_e, KrScaleY, KrAnimateToScaleY, {anim->modifiers[i].value});
+		} break;
+		case KR_MODIFIER_OPACITY: {
+			ecs_set_pair(kr_world, anim_e, KrOpacity, KrAnimateToOpacity,
+			             {anim->modifiers[i].value});
+		} break;
+
+		default:
+			break;
+		}
 	}
 	ecs_add_pair(kr_world, e, KrAnimate, anim_e);
 }

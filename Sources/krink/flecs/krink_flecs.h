@@ -115,21 +115,25 @@ ecs_entity_t kr_flecs_create_sdf_circle_wborder(kr_init_sdf_circle_wborder_t arg
 /* Animation */
 
 typedef enum kr_modifier_flag {
-	KR_MODIFIER_ANGLE = 1,
-	KR_MODIFIER_ROTATION_CENTER_X = 2,
-	KR_MODIFIER_ROTATION_CENTER_Y = 4,
-	KR_MODIFIER_X = 8,
-	KR_MODIFIER_Y = 16,
-	KR_MODIFIER_SCALE_X = 32,
-	KR_MODIFIER_SCALE_Y = 64,
-	KR_MODIFIER_OPACITY = 128,
+	KR_MODIFIER_NONE = 0,
+	KR_MODIFIER_ANGLE,
+	KR_MODIFIER_ROTATION_CENTER,
+	KR_MODIFIER_X,
+	KR_MODIFIER_Y,
+	KR_MODIFIER_SCALE_X,
+	KR_MODIFIER_SCALE_Y,
+	KR_MODIFIER_OPACITY,
 } kr_modifier_flag_t;
+
+typedef struct kr_modifier {
+	kr_modifier_flag_t modifier;
+	float value, opt;
+} kr_modifier_t;
 
 typedef struct kr_init_animation {
 	double start, duration;
 	kr_tween_ease_t ease;
-	uint32_t active_modifiers;
-	float modifiers[8];
+	kr_modifier_t modifiers[8];
 } kr_init_animation_t;
 
 typedef struct kr_init_sequence {
