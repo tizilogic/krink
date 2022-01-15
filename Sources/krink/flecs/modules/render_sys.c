@@ -85,19 +85,19 @@ static void Render(ecs_iter_t *it) {
 		if (ecs_term_is_set(it, 16)) { // Rotate
 			float cx, cy;
 			if (ecs_term_is_set(it, 17)) {
-				cx = rotation_center[i].x * sx;
-				cy = rotation_center[i].y * sy;
+				cx = rotation_center[i].x;
+				cy = rotation_center[i].y;
 			}
 			else {
 				float w, h;
 				switch (drawable[i].pipeline) {
 				case KR_COMP_PP_IMAGE: {
-					w = image[i].dw * sx;
-					h = image[i].dh * sy;
+					w = image[i].dw;
+					h = image[i].dh;
 				} break;
 				case KR_COMP_PP_TEXT: {
-					w = kr_ttf_width(text[i].font, (int)(text[i].size + 0.5f), text[i].text) * sx;
-					h = kr_ttf_height(text[i].font, (int)(text[i].size + 0.5f)) * sy;
+					w = kr_ttf_width(text[i].font, (int)(text[i].size + 0.5f), text[i].text);
+					h = kr_ttf_height(text[i].font, (int)(text[i].size + 0.5f));
 				} break;
 				case KR_COMP_PP_COLOR_TRIS_STROKE:
 				case KR_COMP_PP_COLOR_TRIS_FILL: {
@@ -105,8 +105,8 @@ static void Render(ecs_iter_t *it) {
 					    kinc_min(triangle[i].x1, kinc_min(triangle[i].x2, triangle[i].x3));
 					h = kinc_max(triangle[i].y1, kinc_max(triangle[i].y2, triangle[i].y3)) -
 					    kinc_min(triangle[i].y1, kinc_min(triangle[i].y2, triangle[i].y3));
-					w *= sx;
-					h *= sy;
+					//w *= sx;
+					//h *= sy;
 				} break;
 				case KR_COMP_PP_COLOR_QUAD_STROKE:
 				case KR_COMP_PP_COLOR_QUAD_FILL:
@@ -114,18 +114,18 @@ static void Render(ecs_iter_t *it) {
 				case KR_COMP_PP_SDF_RECT:
 				case KR_COMP_PP_SDF_RECT_ASYMM_WBORDER:
 				case KR_COMP_PP_SDF_RECT_ASYMM: {
-					w = rect[i].w * sx;
-					h = rect[i].h * sy;
+					w = rect[i].w;
+					h = rect[i].h;
 				} break;
 				case KR_COMP_PP_SDF_CIRCLE_WBORDER:
 				case KR_COMP_PP_SDF_CIRCLE: {
-					w = circle[i].radius * 2.0f * sx;
-					h = circle[i].radius * 2.0f * sy;
+					w = circle[i].radius * 2.0f;
+					h = circle[i].radius * 2.0f;
 				} break;
 				case KR_COMP_PP_LINE:
 				case KR_COMP_PP_SDF_LINE: {
-					w = kinc_max(pos[i].x, line[i].x_to) - kinc_min(pos[i].x, line[i].x_to) * sx;
-					h = kinc_max(pos[i].y, line[i].y_to) - kinc_min(pos[i].y, line[i].y_to) * sy;
+					w = kinc_max(pos[i].x, line[i].x_to) - kinc_min(pos[i].x, line[i].x_to);
+					h = kinc_max(pos[i].y, line[i].y_to) - kinc_min(pos[i].y, line[i].y_to);
 				} break;
 				default: {
 					w = h = 0.0f;
