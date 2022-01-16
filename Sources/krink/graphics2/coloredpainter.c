@@ -232,13 +232,9 @@ void kr_csp_fill_rect(float x, float y, float width, float height, uint32_t colo
 	if (rect_buffer_index + 1 >= KR_G2_CSP_BUFFER_SIZE) csp_rect_draw_buffer(false);
 
 	csp_rect_set_colors(opacity, color);
-
-	kr_vec2_t p0 = kr_matrix3x3_multvec(&transformation, (kr_vec2_t){x, y + height}); // bottom-left
-	kr_vec2_t p1 = kr_matrix3x3_multvec(&transformation, (kr_vec2_t){x, y});          // top-left
-	kr_vec2_t p2 = kr_matrix3x3_multvec(&transformation, (kr_vec2_t){x + width, y});  // top-right
-	kr_vec2_t p3 =
-	    kr_matrix3x3_multvec(&transformation, (kr_vec2_t){x + width, y + height}); // bottom-right
-	csp_rect_set_verts(p0.x, p0.y, p1.x, p1.y, p2.x, p2.y, p3.x, p3.y);
+	kr_vec2_t p[4];
+	kr_matrix3x3_multquad(&transformation, (kr_quad_t){x, y, width, height}, p);
+	csp_rect_set_verts(p[0].x, p[0].y, p[1].x, p[1].y, p[2].x, p[2].y, p[3].x, p[3].y);
 
 	++rect_buffer_index;
 }

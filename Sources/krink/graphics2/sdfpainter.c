@@ -400,14 +400,13 @@ void kr_sdf_draw_rect(float x, float y, float width, float height, kr_sdf_corner
                       float opacity, kr_matrix3x3_t transformation) {
 	sdf_circle_draw_buffer(false);
 	sdf_line_draw_buffer(false);
-	kr_vec2_t p0 = kr_matrix3x3_multvec(&transformation, (kr_vec2_t){x, y + height}); // bottom-left
-	kr_vec2_t p1 = kr_matrix3x3_multvec(&transformation, (kr_vec2_t){x, y});          // top-left
-	kr_vec2_t p2 = kr_matrix3x3_multvec(&transformation, (kr_vec2_t){x + width, y});  // top-right
-	kr_vec2_t p3 =
-	    kr_matrix3x3_multvec(&transformation, (kr_vec2_t){x + width, y + height}); // bottom-right
-	sdf_rect_set_rect_verts(p0.x, p0.y, p1.x, p1.y, p2.x, p2.y, p3.x, p3.y);
-	float w = kr_vec2_length(kr_vec2_subv((kr_vec2_t){p2.x, p2.y}, (kr_vec2_t){p1.x, p1.y}));
-	float h = kr_vec2_length(kr_vec2_subv((kr_vec2_t){p0.x, p0.y}, (kr_vec2_t){p1.x, p1.y}));
+	kr_vec2_t p[4];
+	kr_matrix3x3_multquad(&transformation, (kr_quad_t){x, y, width, height}, p);
+	sdf_rect_set_rect_verts(p[0].x, p[0].y, p[1].x, p[1].y, p[2].x, p[2].y, p[3].x, p[3].y);
+	float w =
+	    kr_vec2_length(kr_vec2_subv((kr_vec2_t){p[2].x, p[2].y}, (kr_vec2_t){p[1].x, p[1].y}));
+	float h =
+	    kr_vec2_length(kr_vec2_subv((kr_vec2_t){p[0].x, p[0].y}, (kr_vec2_t){p[1].x, p[1].y}));
 	float u = w / (w > h ? w : h);
 	float v = h / (w > h ? w : h);
 	float f = (u >= v ? u / w : v / h) * max(w / width, h / height);
@@ -549,17 +548,15 @@ void kr_sdf_draw_circle(float x, float y, float radius, float border, float smoo
                         uint32_t border_color, float opacity, kr_matrix3x3_t transformation) {
 	sdf_rect_draw_buffer(false);
 	sdf_line_draw_buffer(false);
-	kr_vec2_t p0 =
-	    kr_matrix3x3_multvec(&transformation, (kr_vec2_t){x - radius, y + radius}); // bottom-left
-	kr_vec2_t p1 =
-	    kr_matrix3x3_multvec(&transformation, (kr_vec2_t){x - radius, y - radius}); // top-left
-	kr_vec2_t p2 =
-	    kr_matrix3x3_multvec(&transformation, (kr_vec2_t){x + radius, y - radius}); // top-right
-	kr_vec2_t p3 =
-	    kr_matrix3x3_multvec(&transformation, (kr_vec2_t){x + radius, y + radius}); // bottom-right
-	sdf_circle_set_rect_verts(p0.x, p0.y, p1.x, p1.y, p2.x, p2.y, p3.x, p3.y);
-	float w = kr_vec2_length(kr_vec2_subv((kr_vec2_t){p2.x, p2.y}, (kr_vec2_t){p1.x, p1.y}));
-	float h = kr_vec2_length(kr_vec2_subv((kr_vec2_t){p0.x, p0.y}, (kr_vec2_t){p1.x, p1.y}));
+
+	kr_vec2_t p[4];
+	kr_matrix3x3_multquad(&transformation,
+	                      (kr_quad_t){x - radius, y - radius, radius * 2.0f, radius * 2.0f}, p);
+	sdf_circle_set_rect_verts(p[0].x, p[0].y, p[1].x, p[1].y, p[2].x, p[2].y, p[3].x, p[3].y);
+	float w =
+	    kr_vec2_length(kr_vec2_subv((kr_vec2_t){p[2].x, p[2].y}, (kr_vec2_t){p[1].x, p[1].y}));
+	float h =
+	    kr_vec2_length(kr_vec2_subv((kr_vec2_t){p[0].x, p[0].y}, (kr_vec2_t){p[1].x, p[1].y}));
 	float u = w / (w > h ? w : h);
 	float v = h / (w > h ? w : h);
 	float f = (u >= v ? u / w : v / h) * max(w / (2 * radius), h / (2 * radius));
@@ -688,6 +685,8 @@ void kr_sdf_draw_line(float x0, float y0, float x1, float y1, float strength, fl
                       uint32_t color, float opacity, kr_matrix3x3_t transformation) {
 	sdf_circle_draw_buffer(false);
 	sdf_rect_draw_buffer(false);
+
+	// TODO: use SIMD transform mult
 	kr_vec2_t a = x0 <= x1 ? ((kr_vec2_t){x0, y0}) : ((kr_vec2_t){x1, y1});
 	kr_vec2_t b = x0 <= x1 ? ((kr_vec2_t){x1, y1}) : ((kr_vec2_t){x0, y0});
 	kr_vec2_t fw = kr_vec2_normalized(kr_vec2_subv(b, a));

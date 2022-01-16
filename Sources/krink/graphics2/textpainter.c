@@ -210,15 +210,11 @@ void kr_tsp_draw_string(const char *text, float opacity, uint32_t color, float x
 			if (buffer_index + 1 >= KR_G2_TSP_BUFFER_SIZE) kr_tsp_draw_buffer(false);
 			kr_tsp_set_rect_colors(opacity, color);
 			kr_tsp_set_rect_tex_coords(q.s0, q.t0, q.s1, q.t1);
-			kr_vec2_t p0 = kr_matrix3x3_multvec(&transformation, (kr_vec2_t){q.x0, q.y1});
-			// bottom-left
-			kr_vec2_t p1 =
-			    kr_matrix3x3_multvec(&transformation, (kr_vec2_t){q.x0, q.y0}); // top-left
-			kr_vec2_t p2 =
-			    kr_matrix3x3_multvec(&transformation, (kr_vec2_t){q.x1, q.y0}); // top-right
-			kr_vec2_t p3 =
-			    kr_matrix3x3_multvec(&transformation, (kr_vec2_t){q.x1, q.y1}); // bottom-right
-			kr_tsp_set_rect_verts(p0.x, p0.y, p1.x, p1.y, p2.x, p2.y, p3.x, p3.y);
+
+			kr_vec2_t p[4];
+			kr_matrix3x3_multquad(&transformation,
+			                      (kr_quad_t){q.x0, q.y0, q.x1 - q.x0, q.y1 - q.y0}, p);
+			kr_tsp_set_rect_verts(p[0].x, p[0].y, p[1].x, p[1].y, p[2].x, p[2].y, p[3].x, p[3].y);
 			xpos += q.xadvance;
 			++buffer_index;
 		}

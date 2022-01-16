@@ -1,5 +1,6 @@
 #include "matrix.h"
-#include <math.h>
+#include <kinc/math/core.h>
+#include <kinc/simd/float32x4.h>
 
 // kr_matrix3x3 impl
 
@@ -20,8 +21,15 @@ kr_matrix3x3_t kr_matrix3x3_scale(float x, float y) {
 }
 
 kr_matrix3x3_t kr_matrix3x3_rotation(float alpha) {
-	return (kr_matrix3x3_t){cosf(alpha), -sinf(alpha), 0.0f, sinf(alpha), cosf(alpha),
-	                        0.0f,        0.0f,         0.0f, 1.0f};
+	return (kr_matrix3x3_t){kinc_cos(alpha),
+	                        -kinc_sin(alpha),
+	                        0.0f,
+	                        kinc_sin(alpha),
+	                        kinc_cos(alpha),
+	                        0.0f,
+	                        0.0f,
+	                        0.0f,
+	                        1.0f};
 }
 
 kr_matrix3x3_t kr_matrix3x3_add(kr_matrix3x3_t *mlh, kr_matrix3x3_t *mrh) {
@@ -69,6 +77,37 @@ kr_vec2_t kr_matrix3x3_multvec(kr_matrix3x3_t *m, kr_vec2_t v) {
 	return (kr_vec2_t){x, y};
 }
 
+void kr_matrix3x3_multquad(kr_matrix3x3_t *m, kr_quad_t q, kr_vec2_t *out) {
+	kinc_float32x4_t xx = kinc_float32x4_load(q.x, q.x, q.x + q.w, q.x + q.w);
+	kinc_float32x4_t yy = kinc_float32x4_load(q.y + q.h, q.y, q.y, q.y + q.h);
+
+	kinc_float32x4_t m00 = kinc_float32x4_load_all(m->m00);
+	kinc_float32x4_t m01 = kinc_float32x4_load_all(m->m01);
+	kinc_float32x4_t m02 = kinc_float32x4_load_all(m->m02);
+	kinc_float32x4_t m10 = kinc_float32x4_load_all(m->m10);
+	kinc_float32x4_t m11 = kinc_float32x4_load_all(m->m11);
+	kinc_float32x4_t m12 = kinc_float32x4_load_all(m->m12);
+	kinc_float32x4_t m20 = kinc_float32x4_load_all(m->m20);
+	kinc_float32x4_t m21 = kinc_float32x4_load_all(m->m21);
+	kinc_float32x4_t m22 = kinc_float32x4_load_all(m->m22);
+
+	kinc_float32x4_t w = kinc_float32x4_add(
+	    kinc_float32x4_add(kinc_float32x4_mul(m02, xx), kinc_float32x4_mul(m12, yy)), m22);
+	kinc_float32x4_t px = kinc_float32x4_div(
+	    kinc_float32x4_add(
+	        kinc_float32x4_add(kinc_float32x4_mul(m00, xx), kinc_float32x4_mul(m10, yy)), m20),
+	    w);
+	kinc_float32x4_t py = kinc_float32x4_div(
+	    kinc_float32x4_add(
+	        kinc_float32x4_add(kinc_float32x4_mul(m01, xx), kinc_float32x4_mul(m11, yy)), m21),
+	    w);
+
+	out[0] = (kr_vec2_t){kinc_float32x4_get(px, 0), kinc_float32x4_get(py, 0)};
+	out[1] = (kr_vec2_t){kinc_float32x4_get(px, 1), kinc_float32x4_get(py, 1)};
+	out[2] = (kr_vec2_t){kinc_float32x4_get(px, 2), kinc_float32x4_get(py, 2)};
+	out[3] = (kr_vec2_t){kinc_float32x4_get(px, 3), kinc_float32x4_get(py, 3)};
+}
+
 float kr_matrix3x3_cofactor(float m0, float m1, float m2, float m3) {
 	return m0 * m3 - m1 * m2;
 }
@@ -86,7 +125,7 @@ kr_matrix3x3_t kr_matrix3x3_inverse(kr_matrix3x3_t *m) {
 	float c02 = kr_matrix3x3_cofactor(m->m10, m->m20, m->m11, m->m21);
 
 	float det = m->m00 * c00 - m->m01 * c01 + m->m02 * c02;
-	if (fabsf(det) < 0.000001f) return kr_matrix3x3_empty();
+	if (kinc_abs(det) < 0.000001f) return kr_matrix3x3_empty();
 
 	float c10 = kr_matrix3x3_cofactor(m->m01, m->m21, m->m02, m->m22);
 	float c11 = kr_matrix3x3_cofactor(m->m00, m->m20, m->m02, m->m22);
@@ -138,33 +177,33 @@ kr_matrix4x4_t kr_matrix4x4_scale(float x, float y, float z) {
 }
 
 kr_matrix4x4_t kr_matrix4x4_rotation_x(float alpha) {
-	float ca = cosf(alpha);
-	float sa = sinf(alpha);
+	float ca = kinc_cos(alpha);
+	float sa = kinc_sin(alpha);
 	return (kr_matrix4x4_t){1.0f, 0.0f, 0.0f, 0.0f, 0.0f, ca,   -sa,  0.0f,
 	                        0.0f, sa,   ca,   0.0f, 0.0f, 0.0f, 0.0f, 1.0f};
 }
 
 kr_matrix4x4_t kr_matrix4x4_rotation_y(float alpha) {
-	float ca = cosf(alpha);
-	float sa = sinf(alpha);
+	float ca = kinc_cos(alpha);
+	float sa = kinc_sin(alpha);
 	return (kr_matrix4x4_t){ca,  0.0f, sa, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,
 	                        -sa, 0.0f, ca, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f};
 }
 
 kr_matrix4x4_t kr_matrix4x4_rotation_z(float alpha) {
-	float ca = cosf(alpha);
-	float sa = sinf(alpha);
+	float ca = kinc_cos(alpha);
+	float sa = kinc_sin(alpha);
 	return (kr_matrix4x4_t){ca,   -sa,  0.0f, 0.0f, sa,   ca,   0.0f, 0.0f,
 	                        0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f};
 }
 
 kr_matrix4x4_t kr_matrix4x4_rotation(float yaw, float pitch, float roll) {
-	float sy = sinf(yaw);
-	float cy = cosf(yaw);
-	float sx = sinf(pitch);
-	float cx = cosf(pitch);
-	float sz = sinf(roll);
-	float cz = cosf(roll);
+	float sy = kinc_sin(yaw);
+	float cy = kinc_cos(yaw);
+	float sx = kinc_sin(pitch);
+	float cx = kinc_cos(pitch);
+	float sz = kinc_sin(roll);
+	float cz = kinc_cos(roll);
 	return (kr_matrix4x4_t){cx * cy,
 	                        cx * sy * sz - sx * cz,
 	                        cx * sy * cz + sx * sz,
@@ -207,7 +246,7 @@ kr_matrix4x4_t kr_matrix4x4_orthogonal_projection(float left, float right, float
 }
 
 kr_matrix4x4_t kr_matrix4x4_perspective_projection(float fov_y, float aspect, float zn, float zf) {
-	float uh = 1.0 / tanf(fov_y / 2.0f);
+	float uh = 1.0 / kinc_tan(fov_y / 2.0f);
 	float uw = uh / aspect;
 	return (kr_matrix4x4_t){uw,
 	                        0.0f,
@@ -310,58 +349,58 @@ float kr_matrix4x4_cofactor(float m0, float m1, float m2, float m3, float m4, fl
 }
 
 float kr_matrix4x4_determinant(kr_matrix4x4_t *m) {
-	float c00 =
-	    kr_matrix4x4_cofactor(m->m11, m->m21, m->m31, m->m12, m->m22, m->m32, m->m13, m->m23, m->m33);
-	float c01 =
-	    kr_matrix4x4_cofactor(m->m10, m->m20, m->m30, m->m12, m->m22, m->m32, m->m13, m->m23, m->m33);
-	float c02 =
-	    kr_matrix4x4_cofactor(m->m10, m->m20, m->m30, m->m11, m->m21, m->m31, m->m13, m->m23, m->m33);
-	float c03 =
-	    kr_matrix4x4_cofactor(m->m10, m->m20, m->m30, m->m11, m->m21, m->m31, m->m12, m->m22, m->m32);
+	float c00 = kr_matrix4x4_cofactor(m->m11, m->m21, m->m31, m->m12, m->m22, m->m32, m->m13,
+	                                  m->m23, m->m33);
+	float c01 = kr_matrix4x4_cofactor(m->m10, m->m20, m->m30, m->m12, m->m22, m->m32, m->m13,
+	                                  m->m23, m->m33);
+	float c02 = kr_matrix4x4_cofactor(m->m10, m->m20, m->m30, m->m11, m->m21, m->m31, m->m13,
+	                                  m->m23, m->m33);
+	float c03 = kr_matrix4x4_cofactor(m->m10, m->m20, m->m30, m->m11, m->m21, m->m31, m->m12,
+	                                  m->m22, m->m32);
 	return m->m00 * c00 - m->m01 * c01 + m->m02 * c02 - m->m03 * c03;
 }
 
 kr_matrix4x4_t kr_matrix4x4_inverse(kr_matrix4x4_t *m) {
-	float c00 =
-	    kr_matrix4x4_cofactor(m->m11, m->m21, m->m31, m->m12, m->m22, m->m32, m->m13, m->m23, m->m33);
-	float c01 =
-	    kr_matrix4x4_cofactor(m->m10, m->m20, m->m30, m->m12, m->m22, m->m32, m->m13, m->m23, m->m33);
-	float c02 =
-	    kr_matrix4x4_cofactor(m->m10, m->m20, m->m30, m->m11, m->m21, m->m31, m->m13, m->m23, m->m33);
-	float c03 =
-	    kr_matrix4x4_cofactor(m->m10, m->m20, m->m30, m->m11, m->m21, m->m31, m->m12, m->m22, m->m32);
+	float c00 = kr_matrix4x4_cofactor(m->m11, m->m21, m->m31, m->m12, m->m22, m->m32, m->m13,
+	                                  m->m23, m->m33);
+	float c01 = kr_matrix4x4_cofactor(m->m10, m->m20, m->m30, m->m12, m->m22, m->m32, m->m13,
+	                                  m->m23, m->m33);
+	float c02 = kr_matrix4x4_cofactor(m->m10, m->m20, m->m30, m->m11, m->m21, m->m31, m->m13,
+	                                  m->m23, m->m33);
+	float c03 = kr_matrix4x4_cofactor(m->m10, m->m20, m->m30, m->m11, m->m21, m->m31, m->m12,
+	                                  m->m22, m->m32);
 
 	float det = m->m00 * c00 - m->m01 * c01 + m->m02 * c02 - m->m03 * c03;
-	if (fabsf(det) < 0.000001f) {
+	if (kinc_abs(det) < 0.000001f) {
 		return kr_matrix4x4_empty();
 	}
 
-	float c10 =
-	    kr_matrix4x4_cofactor(m->m01, m->m21, m->m31, m->m02, m->m22, m->m32, m->m03, m->m23, m->m33);
-	float c11 =
-	    kr_matrix4x4_cofactor(m->m00, m->m20, m->m30, m->m02, m->m22, m->m32, m->m03, m->m23, m->m33);
-	float c12 =
-	    kr_matrix4x4_cofactor(m->m00, m->m20, m->m30, m->m01, m->m21, m->m31, m->m03, m->m23, m->m33);
-	float c13 =
-	    kr_matrix4x4_cofactor(m->m00, m->m20, m->m30, m->m01, m->m21, m->m31, m->m02, m->m22, m->m32);
+	float c10 = kr_matrix4x4_cofactor(m->m01, m->m21, m->m31, m->m02, m->m22, m->m32, m->m03,
+	                                  m->m23, m->m33);
+	float c11 = kr_matrix4x4_cofactor(m->m00, m->m20, m->m30, m->m02, m->m22, m->m32, m->m03,
+	                                  m->m23, m->m33);
+	float c12 = kr_matrix4x4_cofactor(m->m00, m->m20, m->m30, m->m01, m->m21, m->m31, m->m03,
+	                                  m->m23, m->m33);
+	float c13 = kr_matrix4x4_cofactor(m->m00, m->m20, m->m30, m->m01, m->m21, m->m31, m->m02,
+	                                  m->m22, m->m32);
 
-	float c20 =
-	    kr_matrix4x4_cofactor(m->m01, m->m11, m->m31, m->m02, m->m12, m->m32, m->m03, m->m13, m->m33);
-	float c21 =
-	    kr_matrix4x4_cofactor(m->m00, m->m10, m->m30, m->m02, m->m12, m->m32, m->m03, m->m13, m->m33);
-	float c22 =
-	    kr_matrix4x4_cofactor(m->m00, m->m10, m->m30, m->m01, m->m11, m->m31, m->m03, m->m13, m->m33);
-	float c23 =
-	    kr_matrix4x4_cofactor(m->m00, m->m10, m->m30, m->m01, m->m11, m->m31, m->m02, m->m12, m->m32);
+	float c20 = kr_matrix4x4_cofactor(m->m01, m->m11, m->m31, m->m02, m->m12, m->m32, m->m03,
+	                                  m->m13, m->m33);
+	float c21 = kr_matrix4x4_cofactor(m->m00, m->m10, m->m30, m->m02, m->m12, m->m32, m->m03,
+	                                  m->m13, m->m33);
+	float c22 = kr_matrix4x4_cofactor(m->m00, m->m10, m->m30, m->m01, m->m11, m->m31, m->m03,
+	                                  m->m13, m->m33);
+	float c23 = kr_matrix4x4_cofactor(m->m00, m->m10, m->m30, m->m01, m->m11, m->m31, m->m02,
+	                                  m->m12, m->m32);
 
-	float c30 =
-	    kr_matrix4x4_cofactor(m->m01, m->m11, m->m21, m->m02, m->m12, m->m22, m->m03, m->m13, m->m23);
-	float c31 =
-	    kr_matrix4x4_cofactor(m->m00, m->m10, m->m20, m->m02, m->m12, m->m22, m->m03, m->m13, m->m23);
-	float c32 =
-	    kr_matrix4x4_cofactor(m->m00, m->m10, m->m20, m->m01, m->m11, m->m21, m->m03, m->m13, m->m23);
-	float c33 =
-	    kr_matrix4x4_cofactor(m->m00, m->m10, m->m20, m->m01, m->m11, m->m21, m->m02, m->m12, m->m22);
+	float c30 = kr_matrix4x4_cofactor(m->m01, m->m11, m->m21, m->m02, m->m12, m->m22, m->m03,
+	                                  m->m13, m->m23);
+	float c31 = kr_matrix4x4_cofactor(m->m00, m->m10, m->m20, m->m02, m->m12, m->m22, m->m03,
+	                                  m->m13, m->m23);
+	float c32 = kr_matrix4x4_cofactor(m->m00, m->m10, m->m20, m->m01, m->m11, m->m21, m->m03,
+	                                  m->m13, m->m23);
+	float c33 = kr_matrix4x4_cofactor(m->m00, m->m10, m->m20, m->m01, m->m11, m->m21, m->m02,
+	                                  m->m12, m->m22);
 
 	float invdet = 1.0f / det;
 	return (kr_matrix4x4_t){c00 * invdet,  -c01 * invdet, c02 * invdet,  -c03 * invdet,
