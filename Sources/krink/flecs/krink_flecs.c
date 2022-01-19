@@ -1,4 +1,5 @@
 #include "krink_flecs.h"
+#include "internal/os_api.h"
 #include "modules/animation_comp.h"
 #include "modules/animation_sys.h"
 #include "modules/render_comp.h"
@@ -9,6 +10,7 @@
 ecs_world_t *kr_world;
 
 void kr_flecs_init(void) {
+	kr_set_flecs_os_api();
 	kr_world = ecs_init();
 	ecs_singleton_set(kr_world, EcsRest, {0});
 	ECS_IMPORT(kr_world, ComponentsRender);
