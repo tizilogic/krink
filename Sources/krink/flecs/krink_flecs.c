@@ -12,7 +12,9 @@ ecs_world_t *kr_world;
 void kr_flecs_init(void) {
 	kr_set_flecs_os_api();
 	kr_world = ecs_init();
+#ifndef NDEBUG
 	ecs_singleton_set(kr_world, EcsRest, {0});
+#endif
 	ECS_IMPORT(kr_world, ComponentsRender);
 	ECS_IMPORT(kr_world, SystemsRender);
 	ECS_IMPORT(kr_world, ComponentsAnimation);
