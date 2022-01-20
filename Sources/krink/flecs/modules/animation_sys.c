@@ -33,13 +33,10 @@ static void SystemAnimateAngle(ecs_iter_t *it) {
 
 		KrAnimation *animation = ecs_term(&rit, KrAnimation, 5);
 		KrAngle *angle = ecs_term(&rit, KrAngle, 2);
-		KrRotationCenter *rotation_center;
-		if (has_rotation_center) rotation_center = ecs_term(&rit, KrRotationCenter, 3);
+		KrRotationCenter *rotation_center = ecs_term(&rit, KrRotationCenter, 3);
 		KrAngle *angle_to = ecs_term(&rit, KrAngle, 7);
-		KrAngle *angle_from;
-		if (anim_has_angle_from) angle_from = ecs_term(&rit, KrAngle, 8);
-		KrRotationCenter *anim_rotation_center;
-		if (anim_has_rotation_center) anim_rotation_center = ecs_term(&rit, KrRotationCenter, 9);
+		KrAngle *angle_from = ecs_term(&rit, KrAngle, 8);
+		KrRotationCenter *anim_rotation_center = ecs_term(&rit, KrRotationCenter, 9);
 
 		ecs_entity_t anim_e = ecs_pair_object(it->world, ecs_term_id(&rit, 4));
 		bool active = ecs_has(it->world, anim_e, KrInternalAnimationActive);
