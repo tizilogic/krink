@@ -287,7 +287,7 @@ void kr_flecs_create_sequence(ecs_entity_t e, const kr_init_sequence_t *sequence
 	double offset = 0.0;
 	if (sequence->loop) {
 		kr_init_animation_t a = sequence->animations[sequence->count - 1];
-		offset = a.start = a.duration;
+		offset = a.start + a.duration;
 	}
 	for (int i = 0; i < sequence->count; ++i) {
 		ecs_entity_t anim_e = entity_buffer[--entity_buffer_top];
