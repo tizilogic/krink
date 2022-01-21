@@ -23,6 +23,7 @@ extern ECS_DECLARE(KrAnimateRotationCenter);
 extern ECS_DECLARE(KrAnimateToScaleX);
 extern ECS_DECLARE(KrAnimateToScaleY);
 extern ECS_DECLARE(KrAnimateToOpacity);
+extern ECS_DECLARE(KrAnimateLoop);
 
 /* Component types */
 
@@ -33,6 +34,8 @@ ECS_STRUCT(KrAnimation, {
 });
 
 ECS_STRUCT(KrModifier, { float v; });
+
+ECS_STRUCT(KrOffset, { double t; });
 
 /* Prefabs */
 

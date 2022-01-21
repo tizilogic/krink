@@ -133,12 +133,14 @@ typedef struct kr_modifier {
 typedef struct kr_init_animation {
 	double start, duration;
 	kr_tween_ease_t ease;
+	bool loop;
 	kr_modifier_t modifiers[8];
 } kr_init_animation_t;
 
 typedef struct kr_init_sequence {
 	int count;
 	kr_init_animation_t animations[16];
+	bool loop;
 } kr_init_sequence_t;
 
 void kr_flecs_create_animation(ecs_entity_t e, const kr_init_animation_t *anim);

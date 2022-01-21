@@ -275,14 +275,27 @@ static void add_animation(ecs_entity_t e, ecs_entity_t anim_e, const kr_init_ani
 void kr_flecs_create_animation(ecs_entity_t e, const kr_init_animation_t *anim) {
 	fill_entity_buffer();
 	ecs_entity_t anim_e = entity_buffer[--entity_buffer_top];
+	if (anim->loop) {
+		ecs_set_pair(kr_world, anim_e, KrOffset, KrAnimateLoop, {anim->duration});
+	}
 	add_animation(e, anim_e, anim);
 }
 
 void kr_flecs_create_sequence(ecs_entity_t e, const kr_init_sequence_t *sequence) {
 	assert(sequence->count > 0 && sequence->count <= 16);
 	fill_entity_buffer();
+	double offset = 0.0;
+	if (sequence->loop) {
+		kr_init_animation_t a = sequence->animations[sequence->count - 1];
+		offset = a.start = a.duration;
+	}
 	for (int i = 0; i < sequence->count; ++i) {
 		ecs_entity_t anim_e = entity_buffer[--entity_buffer_top];
-		add_animation(e, anim_e, &sequence->animations[i]);
+		kr_init_animation_t a = sequence->animations[i];
+		a.loop = sequence->loop;
+		if (a.loop) {
+			ecs_set_pair(kr_world, anim_e, KrOffset, KrAnimateLoop, {offset});
+		}
+		add_animation(e, anim_e, &a);
 	}
 }

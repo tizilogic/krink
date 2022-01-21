@@ -8,6 +8,7 @@
 
 ECS_DECLARE(KrInternalAnimationActive);
 ECS_DECLARE(KrInternalAnimationDelete);
+ECS_DECLARE(KrInternalAnimationReset);
 ECS_DECLARE(KrInternalAnimateFromX);
 ECS_DECLARE(KrInternalAnimateFromY);
 ECS_DECLARE(KrInternalAnimateFromAngle);
@@ -37,6 +38,7 @@ static void SystemAnimateAngle(ecs_iter_t *it) {
 		KrAngle *angle_to = ecs_term(&rit, KrAngle, 7);
 		KrAngle *angle_from = ecs_term(&rit, KrAngle, 8);
 		KrRotationCenter *anim_rotation_center = ecs_term(&rit, KrRotationCenter, 9);
+		KrOffset *anim_loop_offset = ecs_term(&rit, KrOffset, 10);
 
 		ecs_entity_t anim_e = ecs_pair_object(it->world, ecs_term_id(&rit, 4));
 		bool active = ecs_has(it->world, anim_e, KrInternalAnimationActive);
@@ -48,8 +50,11 @@ static void SystemAnimateAngle(ecs_iter_t *it) {
 			if (k < 1.0 && k >= 0.0) {
 				if (!active) {
 					ecs_add(it->world, anim_e, KrInternalAnimationActive);
-					ecs_set_pair(it->world, anim_e, KrAngle, KrInternalAnimateFromAngle,
-					             {start_angle});
+					if (!ecs_has_pair(it->world, anim_e, ecs_id(KrAngle),
+					                  KrInternalAnimateFromAngle))
+						ecs_set_pair(it->world, anim_e, KrAngle, KrInternalAnimateFromAngle,
+						             {start_angle});
+
 					if (anim_has_rotation_center)
 						ecs_set(it->world, rit.entities[i], KrRotationCenter,
 						        {anim_rotation_center[i].x, anim_rotation_center[i].y});
@@ -57,7 +62,13 @@ static void SystemAnimateAngle(ecs_iter_t *it) {
 			}
 			else if (active && k >= 1.0) {
 				ecs_remove(it->world, anim_e, KrInternalAnimationActive);
-				ecs_add(it->world, anim_e, KrInternalAnimationDelete);
+
+				if (ecs_term_is_set(&rit, 10)) {
+					ecs_add(it->world, anim_e, KrInternalAnimationReset);
+				}
+				else {
+					ecs_add(it->world, anim_e, KrInternalAnimationDelete);
+				}
 				angle[i].radians = angle_to[i].radians;
 				continue;
 			}
@@ -89,11 +100,12 @@ static void SystemAnimatePos(ecs_iter_t *it) {
 		bool anim_has_from_y = ecs_term_is_set(&rit, 9);
 
 		KrAnimation *animation = ecs_term(&rit, KrAnimation, 4);
-		KrTranslation *translation = has_translation ? ecs_term(&rit, KrTranslation, 2) : NULL;
-		KrModifier *to_x = anim_has_to_x ? ecs_term(&rit, KrModifier, 6) : NULL;
-		KrModifier *to_y = anim_has_to_y ? ecs_term(&rit, KrModifier, 7) : NULL;
-		KrModifier *from_x = anim_has_from_x ? ecs_term(&rit, KrModifier, 8) : NULL;
-		KrModifier *from_y = anim_has_from_y ? ecs_term(&rit, KrModifier, 9) : NULL;
+		KrTranslation *translation = ecs_term(&rit, KrTranslation, 2);
+		KrModifier *to_x = ecs_term(&rit, KrModifier, 6);
+		KrModifier *to_y = ecs_term(&rit, KrModifier, 7);
+		KrModifier *from_x = ecs_term(&rit, KrModifier, 8);
+		KrModifier *from_y = ecs_term(&rit, KrModifier, 9);
+		KrOffset *anim_loop_offset = ecs_term(&rit, KrOffset, 10);
 
 		ecs_entity_t anim_e = ecs_pair_object(it->world, ecs_term_id(&rit, 3));
 		bool active = ecs_has(it->world, anim_e, KrInternalAnimationActive);
@@ -110,14 +122,28 @@ static void SystemAnimatePos(ecs_iter_t *it) {
 			if (k < 1.0 && k >= 0.0) {
 				if (!active) {
 					ecs_add(it->world, anim_e, KrInternalAnimationActive);
-					ecs_set_pair(it->world, anim_e, KrModifier, KrInternalAnimateFromX, {start_x});
-					ecs_set_pair(it->world, anim_e, KrModifier, KrInternalAnimateFromY, {start_y});
+
+					if (!ecs_has_pair(it->world, anim_e, ecs_id(KrModifier),
+					                  KrInternalAnimateFromX))
+						ecs_set_pair(it->world, anim_e, KrModifier, KrInternalAnimateFromX,
+						             {start_x});
+					if (!ecs_has_pair(it->world, anim_e, ecs_id(KrModifier),
+					                  KrInternalAnimateFromY))
+						ecs_set_pair(it->world, anim_e, KrModifier, KrInternalAnimateFromY,
+						             {start_y});
+
 					ecs_set(it->world, rit.entities[i], KrTranslation, {start_x, start_y});
 				}
 			}
 			else if (active && k >= 1.0) {
 				ecs_remove(it->world, anim_e, KrInternalAnimationActive);
-				ecs_add(it->world, anim_e, KrInternalAnimationDelete);
+
+				if (ecs_term_is_set(&rit, 10)) {
+					ecs_add(it->world, anim_e, KrInternalAnimationReset);
+				}
+				else {
+					ecs_add(it->world, anim_e, KrInternalAnimationDelete);
+				}
 				translation[i].x = end_x;
 				translation[i].y = end_y;
 				continue;
@@ -150,6 +176,7 @@ static void SystemAnimateScaleX(ecs_iter_t *it) {
 		KrScaleX *scale_x = has_scale_x ? ecs_term(&rit, KrScaleX, 2) : NULL;
 		KrScaleX *to_scale_x = ecs_term(&rit, KrScaleX, 6);
 		KrScaleX *from_scale_x = anim_has_from_x ? ecs_term(&rit, KrScaleX, 7) : NULL;
+		KrOffset *anim_loop_offset = ecs_term(&rit, KrOffset, 8);
 
 		ecs_entity_t anim_e = ecs_pair_object(it->world, ecs_term_id(&rit, 3));
 		bool active = ecs_has(it->world, anim_e, KrInternalAnimationActive);
@@ -163,14 +190,23 @@ static void SystemAnimateScaleX(ecs_iter_t *it) {
 			if (k < 1.0 && k >= 0.0) {
 				if (!active) {
 					ecs_add(it->world, anim_e, KrInternalAnimationActive);
-					ecs_set_pair(it->world, anim_e, KrScaleX, KrInternalAnimateFromScaleX,
-					             {start_x});
+					if (!ecs_has_pair(it->world, anim_e, ecs_id(KrScaleX),
+					                  KrInternalAnimateFromScaleX))
+						ecs_set_pair(it->world, anim_e, KrScaleX, KrInternalAnimateFromScaleX,
+						             {start_x});
+
 					ecs_set(it->world, rit.entities[i], KrScaleX, {start_x});
 				}
 			}
 			else if (active && k >= 1.0) {
 				ecs_remove(it->world, anim_e, KrInternalAnimationActive);
-				ecs_add(it->world, anim_e, KrInternalAnimationDelete);
+
+				if (ecs_term_is_set(&rit, 8)) {
+					ecs_add(it->world, anim_e, KrInternalAnimationReset);
+				}
+				else {
+					ecs_add(it->world, anim_e, KrInternalAnimationDelete);
+				}
 				scale_x[i].value = end_x;
 				continue;
 			}
@@ -200,6 +236,7 @@ static void SystemAnimateScaleY(ecs_iter_t *it) {
 		KrScaleY *scale_y = has_scale_y ? ecs_term(&rit, KrScaleY, 2) : NULL;
 		KrScaleY *to_scale_y = ecs_term(&rit, KrScaleY, 6);
 		KrScaleY *from_scale_x = anim_has_from_y ? ecs_term(&rit, KrScaleY, 7) : NULL;
+		KrOffset *anim_loop_offset = ecs_term(&rit, KrOffset, 8);
 
 		ecs_entity_t anim_e = ecs_pair_object(it->world, ecs_term_id(&rit, 3));
 		bool active = ecs_has(it->world, anim_e, KrInternalAnimationActive);
@@ -213,14 +250,22 @@ static void SystemAnimateScaleY(ecs_iter_t *it) {
 			if (k < 1.0 && k >= 0.0) {
 				if (!active) {
 					ecs_add(it->world, anim_e, KrInternalAnimationActive);
-					ecs_set_pair(it->world, anim_e, KrScaleY, KrInternalAnimateFromScaleY,
-					             {start_y});
+					if (!ecs_has_pair(it->world, anim_e, ecs_id(KrScaleY),
+					                  KrInternalAnimateFromScaleY))
+						ecs_set_pair(it->world, anim_e, KrScaleY, KrInternalAnimateFromScaleY,
+						             {start_y});
 					ecs_set(it->world, rit.entities[i], KrScaleY, {start_y});
 				}
 			}
 			else if (active && k >= 1.0) {
 				ecs_remove(it->world, anim_e, KrInternalAnimationActive);
-				ecs_add(it->world, anim_e, KrInternalAnimationDelete);
+
+				if (ecs_term_is_set(&rit, 8)) {
+					ecs_add(it->world, anim_e, KrInternalAnimationReset);
+				}
+				else {
+					ecs_add(it->world, anim_e, KrInternalAnimationDelete);
+				}
 				scale_y[i].value = end_y;
 				continue;
 			}
@@ -252,6 +297,7 @@ static void SystemAnimateOpacity(ecs_iter_t *it) {
 		KrOpacity *opacity = has_opacity ? ecs_term(&rit, KrOpacity, 2) : NULL;
 		KrOpacity *to_opacity = ecs_term(&rit, KrOpacity, 6);
 		KrOpacity *from_opacity = anim_has_from_opacity ? ecs_term(&rit, KrOpacity, 7) : NULL;
+		KrOffset *anim_loop_offset = ecs_term(&rit, KrOffset, 8);
 
 		ecs_entity_t anim_e = ecs_pair_object(it->world, ecs_term_id(&rit, 3));
 		bool active = ecs_has(it->world, anim_e, KrInternalAnimationActive);
@@ -265,14 +311,22 @@ static void SystemAnimateOpacity(ecs_iter_t *it) {
 			if (k < 1.0 && k >= 0.0) {
 				if (!active) {
 					ecs_add(it->world, anim_e, KrInternalAnimationActive);
-					ecs_set_pair(it->world, anim_e, KrOpacity, KrInternalAnimateFromOpacity,
-					             {start});
+					if (ecs_has_pair(it->world, anim_e, ecs_id(KrOpacity),
+					                 KrInternalAnimateFromOpacity))
+						ecs_set_pair(it->world, anim_e, KrOpacity, KrInternalAnimateFromOpacity,
+						             {start});
 					ecs_set(it->world, rit.entities[i], KrOpacity, {start});
 				}
 			}
 			else if (active && k >= 1.0) {
 				ecs_remove(it->world, anim_e, KrInternalAnimationActive);
-				ecs_add(it->world, anim_e, KrInternalAnimationDelete);
+
+				if (ecs_term_is_set(&rit, 8)) {
+					ecs_add(it->world, anim_e, KrInternalAnimationReset);
+				}
+				else {
+					ecs_add(it->world, anim_e, KrInternalAnimationDelete);
+				}
 				opacity[i].alpha = end;
 				continue;
 			}
@@ -304,6 +358,15 @@ static void DeleteAnimation(ecs_iter_t *it) {
 	for (int i = 0; i < it->count; ++i) ecs_delete(it->world, it->entities[i]);
 }
 
+static void ResetAnimation(ecs_iter_t *it) {
+	KrAnimation *anim = ecs_term(it, KrAnimation, 1);
+	for (int i = 0; i < it->count; ++i) {
+		ecs_remove(it->world, it->entities[i], KrInternalAnimationReset);
+		const KrOffset *offset = ecs_get_pair(it->world, it->entities[i], KrOffset, KrAnimateLoop);
+		anim[i].start += offset->t;
+	}
+}
+
 void SystemsAnimationImport(ecs_world_t *world) {
 	/* Define module */
 	ECS_MODULE(world, SystemsAnimation);
@@ -313,6 +376,7 @@ void SystemsAnimationImport(ecs_world_t *world) {
 	/* Register internal components */
 	ECS_TAG_DEFINE(world, KrInternalAnimationActive);
 	ECS_TAG_DEFINE(world, KrInternalAnimationDelete);
+	ECS_TAG_DEFINE(world, KrInternalAnimationReset);
 	ECS_TAG_DEFINE(world, KrInternalAnimateFromX);
 	ECS_TAG_DEFINE(world, KrInternalAnimateFromY);
 	ECS_TAG_DEFINE(world, KrInternalAnimateFromAngle);
@@ -324,6 +388,8 @@ void SystemsAnimationImport(ecs_world_t *world) {
 	ECS_TRIGGER(world, AddAnimation, EcsOnSet, components.animation.KrAnimation);
 	ECS_SYSTEM(world, DeleteAnimation, EcsPostUpdate, components.animation.KrAnimation,
 	           KrInternalAnimationDelete);
+	ECS_SYSTEM(world, ResetAnimation, EcsPostUpdate, components.animation.KrAnimation,
+	           KrInternalAnimationReset);
 
 	const char *expr =
 	    "components.render.KrDrawable"
@@ -334,7 +400,8 @@ void SystemsAnimationImport(ecs_world_t *world) {
 	    ",?(_A, systems.animation.KrInternalAnimationActive)"
 	    ",components.render.KrAngle(_A, components.animation.KrAnimateToAngle)"
 	    ",?components.render.KrAngle(_A, systems.animation.KrInternalAnimateFromAngle)"
-	    ",?components.render.KrRotationCenter(_A, components.animation.KrAnimateRotationCenter)";
+	    ",?components.render.KrRotationCenter(_A, components.animation.KrAnimateRotationCenter)"
+	    ",?components.animation.KrOffset(_A, components.animation.KrAnimateLoop)";
 	anim_angle_rule = ecs_rule_init(world, &(ecs_filter_desc_t){.expr = expr});
 	ecs_system_init(
 	    world, &(ecs_system_desc_t){.entity = {.name = "SystemAnimationAngle", .add = EcsOnUpdate},
@@ -349,7 +416,8 @@ void SystemsAnimationImport(ecs_world_t *world) {
 	       ",?components.animation.KrModifier(_A, components.animation.KrAnimateToX)"
 	       ",?components.animation.KrModifier(_A, components.animation.KrAnimateToY)"
 	       ",?components.animation.KrModifier(_A, systems.animation.KrInternalAnimateFromX)"
-	       ",?components.animation.KrModifier(_A, systems.animation.KrInternalAnimateFromY)";
+	       ",?components.animation.KrModifier(_A, systems.animation.KrInternalAnimateFromY)"
+	       ",?components.animation.KrOffset(_A, components.animation.KrAnimateLoop)";
 	anim_pos_rule = ecs_rule_init(world, &(ecs_filter_desc_t){.expr = expr});
 	ecs_system_init(
 	    world, &(ecs_system_desc_t){.entity = {.name = "SystemAnimationPos", .add = EcsOnUpdate},
@@ -362,7 +430,8 @@ void SystemsAnimationImport(ecs_world_t *world) {
 	       ",components.animation.KrAnimation(_A)"
 	       ",?(_A, systems.animation.KrInternalAnimationActive)"
 	       ",components.render.KrScaleX(_A, components.animation.KrAnimateToScaleX)"
-	       ",?components.render.KrScaleX(_A, systems.animation.KrInternalAnimateFromScaleX)";
+	       ",?components.render.KrScaleX(_A, systems.animation.KrInternalAnimateFromScaleX)"
+	       ",?components.animation.KrOffset(_A, components.animation.KrAnimateLoop)";
 	anim_scale_x_rule = ecs_rule_init(world, &(ecs_filter_desc_t){.expr = expr});
 	ecs_system_init(
 	    world, &(ecs_system_desc_t){.entity = {.name = "SystemAnimationScaleX", .add = EcsOnUpdate},
@@ -375,7 +444,8 @@ void SystemsAnimationImport(ecs_world_t *world) {
 	       ",components.animation.KrAnimation(_A)"
 	       ",?(_A, systems.animation.KrInternalAnimationActive)"
 	       ",components.render.KrScaleY(_A, components.animation.KrAnimateToScaleY)"
-	       ",?components.render.KrScaleY(_A, systems.animation.KrInternalAnimateFromScaleY)";
+	       ",?components.render.KrScaleY(_A, systems.animation.KrInternalAnimateFromScaleY)"
+	       ",?components.animation.KrOffset(_A, components.animation.KrAnimateLoop)";
 	anim_scale_y_rule = ecs_rule_init(world, &(ecs_filter_desc_t){.expr = expr});
 	ecs_system_init(
 	    world, &(ecs_system_desc_t){.entity = {.name = "SystemAnimationScaleY", .add = EcsOnUpdate},
@@ -388,7 +458,8 @@ void SystemsAnimationImport(ecs_world_t *world) {
 	       ",components.animation.KrAnimation(_A)"
 	       ",?(_A, systems.animation.KrInternalAnimationActive)"
 	       ",components.render.KrOpacity(_A, components.animation.KrAnimateToOpacity)"
-	       ",?components.render.KrOpacity(_A, systems.animation.KrInternalAnimateFromOpacity)";
+	       ",?components.render.KrOpacity(_A, systems.animation.KrInternalAnimateFromOpacity)"
+	       ",?components.animation.KrOffset(_A, components.animation.KrAnimateLoop)";
 	anim_opacity_rule = ecs_rule_init(world, &(ecs_filter_desc_t){.expr = expr});
 	ecs_system_init(world, &(ecs_system_desc_t){
 	                           .entity = {.name = "SystemAnimationOpacity", .add = EcsOnUpdate},
