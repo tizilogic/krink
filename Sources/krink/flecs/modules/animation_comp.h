@@ -3,6 +3,10 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+/*! \file animation_comp.h
+    \brief Provides flecs components for animation.
+*/
+
 // Reflection system boilerplate
 #undef ECS_META_IMPL
 #ifndef COMPONENTS_ANIMATION_IMPL

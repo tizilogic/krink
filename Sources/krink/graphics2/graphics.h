@@ -2,13 +2,17 @@
 #include "sdfpainter.h"
 #include "ttf.h"
 #include <kinc/global.h>
+#include <krink/image.h>
 #include <krink/math/matrix.h>
 #include <krink/math/vector.h>
-#include <krink/image.h>
 
 #ifndef KR_G2_MAX_WIN
 #define KR_G2_MAX_WIN 8
 #endif
+
+/*! \file graphics.h
+    \brief Provides a 2D drawing API.
+*/
 
 #ifdef __cplusplus
 extern "C" {
@@ -171,16 +175,19 @@ void kr_g2_set_transform(kr_matrix3x3_t m);
 /// <summary>
 /// Get current transformation matrix.
 /// </summary>
+/// <returns>The current transformation matrix</returns>
 kr_matrix3x3_t kr_g2_get_transform(void);
 
 /// <summary>
 /// Get the font ptr of the current font.
 /// </summary>
+/// <returns>The current font</returns>
 kr_ttf_font_t *kr_g2_get_font(void);
 
 /// <summary>
 /// Get the current font size.
 /// </summary>
+/// <returns>The current font size</returns>
 int kr_g2_get_font_size(void);
 
 /// <summary>
@@ -255,6 +262,10 @@ void kr_g2_scissor(float x, float y, float w, float h);
 /// </summary>
 void kr_g2_disable_scissor(void);
 
+/// <summary>
+/// Toggle the bilinear filter on/off.
+/// </summary>
+/// <param name="bilinear"></param>
 void kr_g2_set_bilinear_filter(bool bilinear);
 
 #ifdef __cplusplus

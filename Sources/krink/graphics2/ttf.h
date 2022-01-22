@@ -2,6 +2,10 @@
 #include <kinc/graphics4/texture.h>
 #include <stdbool.h>
 
+/*! \file ttf.h
+    \brief Provides a basic TrueType Font handling.
+*/
+
 typedef struct kr_ttf_image kr_ttf_image_t;
 
 typedef struct kr_ttf_aligned_quad {

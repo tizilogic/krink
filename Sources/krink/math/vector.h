@@ -1,5 +1,9 @@
 #pragma once
 
+/*! \file vector.h
+    \brief Provides basic vector operations.
+*/
+
 typedef struct kr_vec2 {
 	float x;
 	float y;

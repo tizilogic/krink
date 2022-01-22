@@ -3,12 +3,16 @@
 #include "vector.h"
 #include <kinc/math/matrix.h>
 
+/*! \file matrix.h
+    \brief Provides basic matrix operations.
+*/
+
 typedef struct kr_matrix3x3 {
 	float m00, m10, m20, m01, m11, m21, m02, m12, m22;
 } kr_matrix3x3_t;
 
 typedef struct kr_quad {
-    float x, y, w, h;
+	float x, y, w, h;
 } kr_quad_t;
 
 kr_matrix3x3_t kr_matrix3x3_translation(float x, float y);

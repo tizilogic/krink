@@ -5,6 +5,10 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+/*! \file render_comp.h
+    \brief Provides flecs components for rendering.
+*/
+
 // Reflection system boilerplate
 #undef ECS_META_IMPL
 #ifndef COMPONENTS_RENDER_IMPL
@@ -114,7 +118,7 @@ ECS_STRUCT(KrLine, {
 	float y_to;
 });
 
-/// Optional Components
+// Optional Components
 ECS_STRUCT(KrAngle, { float radians; });
 ECS_STRUCT(KrRotationCenter, {
 	float x;

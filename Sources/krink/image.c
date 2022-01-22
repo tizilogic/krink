@@ -12,7 +12,7 @@ void kr_image_init(kr_image_t *img) {
 	img->loaded = false;
 }
 
-void kr_image_load(kr_image_t *img, char *path, bool keep_in_memory) {
+void kr_image_load(kr_image_t *img, const char *path, bool keep_in_memory) {
 	kr_image_init(img);
 	img->path = path;
 	img->image = (kinc_image_t *)kr_malloc(sizeof(kinc_image_t));

@@ -1,5 +1,9 @@
 #pragma once
 
+/*! \file about.h
+    \brief Provides license text from 3rd party code used in krink.
+*/
+
 /**
  * @brief Contains all licenses of 3rd party dependencies of krink.
  *
