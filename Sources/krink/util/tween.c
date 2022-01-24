@@ -63,7 +63,8 @@ static inline float kr_tween_cubic_out(float k) {
 }
 
 static inline float kr_tween_cubic_in_out(float k) {
-	return ((k *= 2.0f) < 1.0f) ? 0.5f * k * k * k : 0.5f * ((k -= 2.0f) * k * k + 2.0f);
+	k *= 2.0f;
+	return (k < 1.0f) ? 0.5f * k * k * k : 0.5f * ((k - 2.0f) * (k - 2.0f) * (k - 2.0f) + 2.0f);
 }
 
 static inline float kr_tween_quart_in(float k) {
@@ -155,7 +156,8 @@ static inline float kr_tween_back_out(float k) {
 		return 1.0f;
 	}
 	else {
-		return ((k = k - 1.0f) * k *
+		k = k - 1.0f;
+		return (k * k *
 		            ((KR_TWEEN_DEFAULT_OVERSHOOT + 1.0f) * k + KR_TWEEN_DEFAULT_OVERSHOOT) +
 		        1.0f);
 	}
@@ -174,7 +176,8 @@ static inline float kr_tween_back_in_out(float k) {
 		                 KR_TWEEN_DEFAULT_OVERSHOOT * 1.525f)));
 	}
 	else {
-		return (0.5f * ((k -= 2.0f) * k *
+		k -= 2.0f;
+		return (0.5f * (k * k *
 		                    (((KR_TWEEN_DEFAULT_OVERSHOOT * 1.525f) + 1.0f) * k +
 		                     KR_TWEEN_DEFAULT_OVERSHOOT * 1.525f) +
 		                2.0f));
