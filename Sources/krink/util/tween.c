@@ -50,7 +50,7 @@ static inline float kr_tween_quad_out(float k) {
 }
 
 static inline float kr_tween_quad_in_out(float k) {
-	return (k < 0.5f) ? 2.0f * k * k : -2.0f * ((k -= 1.0f) * k) + 1.0f;
+	return (k < 0.5f) ? 2.0f * k * k : -2.0f * ((k - 1.0f) * (k - 1.0f)) + 1.0f;
 }
 
 static inline float kr_tween_cubic_in(float k) {
@@ -58,7 +58,8 @@ static inline float kr_tween_cubic_in(float k) {
 }
 
 static inline float kr_tween_cubic_out(float k) {
-	return (k = k - 1.0f) * k * k + 1.0f;
+	k = k - 1.0f;
+	return k * k * k + 1.0f;
 }
 
 static inline float kr_tween_cubic_in_out(float k) {
@@ -66,28 +67,38 @@ static inline float kr_tween_cubic_in_out(float k) {
 }
 
 static inline float kr_tween_quart_in(float k) {
-	return (k *= k) * k;
+	k *= k;
+	return k * k;
 }
 
 static inline float kr_tween_quart_out(float k) {
-	return 1 - (k = (k = k - 1.0f) * k) * k;
+	k = k - 1.0f;
+	k = k * k;
+	return 1.0f - k * k;
 }
 
 static inline float kr_tween_quart_in_out(float k) {
-	return ((k *= 2.0f) < 1.0f) ? 0.5f * (k *= k) * k : -0.5f * ((k = (k -= 2.0f) * k) * k - 2.0f);
+	k *= 2.0f;
+	if (k < 1.0f) return 0.5f * (k * k) * (k * k);
+	k -= 2.0f;
+	k = (k)*k;
+	return -0.5f * (k * k - 2.0f);
 }
 
 static inline float kr_tween_quint_in(float k) {
-	return k * (k *= k) * k;
+	return k * (k * k) * (k * k);
 }
 
 static inline float kr_tween_quint_out(float k) {
-	return (k = k - 1.0f) * (k *= k) * k + 1.0f;
+	k = k - 1.0f;
+	return k * (k * k) * (k * k) + 1.0f;
 }
 
 static inline float kr_tween_quint_in_out(float k) {
-	return ((k *= 2.0f) < 1.0f) ? 0.5f * k * (k *= k) * k
-	                            : 0.5f * (k -= 2.0f) * (k *= k) * k + 1.0f;
+	k *= 2.0f;
+	if (k < 1.0f) return 0.5f * k * (k * k) * (k * k);
+	k -= 2.0f;
+	return 0.5f * (k) * (k * k) * (k * k) + 1.0f;
 }
 
 static inline float kr_tween_expo_in(float k) {
@@ -175,12 +186,15 @@ static inline float kr_tween_bounce_out(float k) {
 		return 7.5625f * k * k;
 	}
 	else if (k < (2 / 2.75)) {
-		return 7.5625f * (k -= (1.5f / 2.75f)) * k + 0.75f;
+		k -= 1.5f / 2.75f;
+		return 7.5625f * k * k + 0.75f;
 	}
 	else if (k < (2.5f / 2.75f)) {
-		return 7.5625f * (k -= (2.25f / 2.75f)) * k + 0.9375f;
+		k -= 2.25f / 2.75f;
+		return 7.5625f * k * k + 0.9375f;
 	}
-	return 7.5625f * (k -= (2.625f / 2.75f)) * k + 0.984375f;
+	k -= (2.625f / 2.75f);
+	return 7.5625f * k * k + 0.984375f;
 }
 
 static inline float kr_tween_bounce_in(float k) {
@@ -208,7 +222,8 @@ static inline float kr_tween_elastic_in(float k) {
 	else {
 		s = p * kinc_asin(1.0f / a) / (2.0f * KINC_PI);
 	}
-	return -(a * kinc_pow(2.0f, 10.0f * (k -= 1.0f)) * kinc_sin((k - s) * (2.0f * KINC_PI) / p));
+	k -= 1.0f;
+	return -(a * kinc_pow(2.0f, 10.0f * k) * kinc_sin((k - s) * (2.0f * KINC_PI) / p));
 }
 
 static inline float kr_tween_elastic_out(float k) {
@@ -246,12 +261,13 @@ static inline float kr_tween_elastic_in_out(float k) {
 	else {
 		s = p * kinc_asin(1 / a) / (2.0f * KINC_PI);
 	}
-	if ((k *= 2.0f) < 1.0f)
-		return -0.5f *
-		       (a * kinc_pow(2.0f, 10.0f * (k -= 1.0f)) * kinc_sin((k - s) * (2.0f * KINC_PI) / p));
-	return a * kinc_pow(2.0f, -10.0f * (k -= 1.0f)) * kinc_sin((k - s) * (2.0f * KINC_PI) / p) *
-	           0.5f +
-	       1.0f;
+	k *= 2.0f;
+	if (k < 1.0f) {
+		k -= 1.0f;
+		return -0.5f * (a * kinc_pow(2.0f, 10.0f * k) * kinc_sin((k - s) * (2.0f * KINC_PI) / p));
+	}
+	k -= 1.0f;
+	return a * kinc_pow(2.0f, -10.0f * k) * kinc_sin((k - s) * (2.0f * KINC_PI) / p) * 0.5f + 1.0f;
 }
 
 typedef float (*ease_func_t)(float);
