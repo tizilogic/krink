@@ -4,6 +4,9 @@
 #include <krink/eventhandler.h>
 #include <krink/memory.h>
 
+#define NK_IMPLEMENTATION
+#include <krink/nk/nuklear.h>
+
 static struct nk_context nkctx;
 static struct nk_user_font fnt;
 static bool ctx_input_started = false;
