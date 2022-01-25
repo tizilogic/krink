@@ -7,3 +7,6 @@
 [submodule "Libraries/flecs"]
 	path = Libraries/flecs
 	url = https://github.com/SanderMertens/flecs.git
+[submodule "Kinc"]
+	path = Kinc
+	url = https://github.com/Kode/Kinc.git

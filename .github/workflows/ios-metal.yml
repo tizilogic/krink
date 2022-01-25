@@ -1,0 +1,21 @@
+name: iOS (Metal)
+
+on:
+  push:
+    branches:
+    - master
+  pull_request:
+    branches:
+    - master
+
+jobs:
+  build:
+
+    runs-on: macOS-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Get Submodules
+      run: git submodule update --init --recursive
+    - name: Compile
+      run: Kinc/Tools/kmake/kmake-osx ios -g metal --kinc Kinc --from Tests/Empty --noshaders --nosigning --compile
