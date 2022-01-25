@@ -17,5 +17,7 @@ jobs:
     - uses: actions/checkout@v2
     - name: Get Submodules
       run: git submodule update --init --recursive
+    - name: Patch Kinc
+      run: cp ios.patch Kinc && git -C Kinc apply ios.patch
     - name: Compile
       run: Kinc/Tools/kmake/kmake-osx ios -g metal --kinc Kinc --from Tests/Empty --noshaders --nosigning --compile
