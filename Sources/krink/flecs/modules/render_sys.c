@@ -257,7 +257,7 @@ void SystemsRenderImport(ecs_world_t *world) {
 	/* Register components */
 	ECS_IMPORT(world, ComponentsRender);
 
-	ECS_SYSTEM(world, FrameTime, EcsPreUpdate, $KrFrameTime);
+	ECS_SYSTEM(world, FrameTime, EcsOnLoad, $KrFrameTime);
 
 	ecs_singleton_set(world, KrFrameTime, { kinc_time() });
 
