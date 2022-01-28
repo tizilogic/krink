@@ -17,8 +17,6 @@ jobs:
     - uses: actions/checkout@v2
     - name: Get Submodules
       run: git submodule update --init --recursive
-    - name: Patch flecs
-      run: cp flecs.patch Libraries/flecs && git -C Libraries/flecs apply flecs.patch
     - name: Get Node.js
       run: git clone https://github.com/Kode/nodejs_bin.git --depth 1
     - name: Setup Node.js
