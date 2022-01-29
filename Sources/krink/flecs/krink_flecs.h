@@ -5,11 +5,19 @@
 #include <krink/graphics2/ttf.h>
 #include <krink/image.h>
 #include <krink/util/tween.h>
+#include <stdbool.h>
 #include <stdint.h>
 
 /*! \file krink_flecs.h
     \brief Provides the flecs integration into krink.
 */
+
+/*! \def KR_FLECS_EVT_BUFFER_SIZE
+    \brief Size of the internal eventbuffer that stores events between frames.
+*/
+#ifndef KR_FLECS_EVT_BUFFER_SIZE
+#define KR_FLECS_EVT_BUFFER_SIZE 60
+#endif
 
 typedef struct kr_rect {
 	float x, y, w, h;
@@ -103,8 +111,10 @@ extern ecs_world_t *kr_world;
 
 /// <summary>
 /// Call before using flecs.
+/// \note The REST API will only activate in DEBUG mode
 /// </summary>
-void kr_flecs_init(void);
+/// <param name="with_flecs_rest">Whether to activate the flecs REST API</param>
+void kr_flecs_init(bool with_flecs_rest);
 
 /// <summary>
 /// Call at end to cleanly shutdown flecs.

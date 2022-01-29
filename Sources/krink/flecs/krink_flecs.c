@@ -2,35 +2,98 @@
 #include "internal/os_api.h"
 #include "modules/animation_comp.h"
 #include "modules/animation_sys.h"
+#include "modules/input_comp.h"
 #include "modules/render_comp.h"
 #include "modules/render_sys.h"
+#include <assert.h>
 #include <kinc/log.h>
+#include <krink/eventhandler.h>
 #include <stdbool.h>
 
 ecs_world_t *kr_world;
 
-void kr_flecs_init(void) {
-	kr_set_flecs_os_api();
-	kr_world = ecs_init();
-#ifndef NDEBUG
-	ecs_singleton_set(kr_world, EcsRest, {0});
-#endif
-	ECS_IMPORT(kr_world, ComponentsRender);
-	ECS_IMPORT(kr_world, SystemsRender);
-	ECS_IMPORT(kr_world, ComponentsAnimation);
-	ECS_IMPORT(kr_world, SystemsAnimation);
-	ecs_singleton_set(kr_world, KrSingletonClearColor, {.color = 0});
-	kinc_log(KINC_LOG_LEVEL_INFO, "flecs initialized");
+/* Input */
+
+static kr_evt_event_t evt_buffer[KR_FLECS_EVT_BUFFER_SIZE];
+static int evt_count = 0;
+static bool first_move = true;
+
+static void evt_on_notify(kr_evt_event_t evt) {
+	assert(evt_count < KR_FLECS_EVT_BUFFER_SIZE);
+	evt_buffer[evt_count++] = evt;
 }
 
-void kr_flecs_destroy(void) {
-	ecs_fini(kr_world);
-	kr_world = NULL;
+static void InputSystem(ecs_iter_t *it) {
+	KrSingletonInput *inp = ecs_term(it, KrSingletonInput, 1);
+
+	for (int i = 0; i < 256; ++i) inp[0].keys[i].triggered = false;
+	inp[0].mouse.primary.triggered = false;
+	inp[0].mouse.right.triggered = false;
+
+	for (int i = 0; i < evt_count; ++i) {
+		switch (evt_buffer[i].event) {
+		case KR_EVT_KEY_DOWN: {
+			inp[0].keys[evt_buffer[i].data.key.keycode].down = true;
+			inp[0].keys[evt_buffer[i].data.key.keycode].triggered = true;
+		} break;
+		case KR_EVT_KEY_UP: {
+			inp[0].keys[evt_buffer[i].data.key.keycode].down = false;
+			inp[0].keys[evt_buffer[i].data.key.keycode].triggered = true;
+		} break;
+		case KR_EVT_MOUSE_SCROLL: {
+			inp[0].mouse.scroll.y = (float)evt_buffer[i].data.mouse_scroll.delta;
+		} break;
+		case KR_EVT_PRIMARY_MOVE: {
+			if (!first_move) {
+				inp[0].mouse.delta.x = (float)evt_buffer[i].data.primary.x - inp[0].mouse.pos.x;
+				inp[0].mouse.delta.y = (float)evt_buffer[i].data.primary.y - inp[0].mouse.pos.y;
+			}
+			first_move = false;
+			inp[0].mouse.pos.x = (float)evt_buffer[i].data.primary.x;
+			inp[0].mouse.pos.y = (float)evt_buffer[i].data.primary.y;
+		} break;
+		case KR_EVT_PRIMARY_START: {
+			inp[0].mouse.primary.down = true;
+			inp[0].mouse.primary.triggered = true;
+			inp[0].mouse.pos.x = (float)evt_buffer[i].data.primary.x;
+			inp[0].mouse.pos.y = (float)evt_buffer[i].data.primary.y;
+		} break;
+		case KR_EVT_PRIMARY_END: {
+			inp[0].mouse.primary.down = false;
+			inp[0].mouse.primary.triggered = true;
+			inp[0].mouse.pos.x = (float)evt_buffer[i].data.primary.x;
+			inp[0].mouse.pos.y = (float)evt_buffer[i].data.primary.y;
+		} break;
+		case KR_EVT_MOUSE_PRESS: {
+			if (evt_buffer[i].data.mouse_button.button != 1) break;
+			inp[0].mouse.right.down = true;
+			inp[0].mouse.right.triggered = true;
+		} break;
+		case KR_EVT_MOUSE_RELEASE: {
+			if (evt_buffer[i].data.mouse_button.button != 1) break;
+			inp[0].mouse.right.down = false;
+			inp[0].mouse.right.triggered = true;
+		} break;
+		case KR_EVT_FOREGROUND:
+		case KR_EVT_BACKGROUND:
+		case KR_EVT_PAUSE:
+		case KR_EVT_RESUME:
+		case KR_EVT_SHUTDOWN:
+		case KR_EVT_MOUSE_MOVE:
+		case KR_EVT_FINGER_MOVE:
+		case KR_EVT_FINGER_START:
+		case KR_EVT_FINGER_END:
+		case KR_EVT_KEY_PRESS:
+
+		default:
+			break;
+		}
+	}
+
+	evt_count = 0;
 }
 
-void kr_flecs_tick(void) {
-	ecs_progress(kr_world, 0);
-}
+/* Render */
 
 static inline int32_t ptr2sort(void *img) {
 	return (int32_t)((uint64_t)img % 214783648);
@@ -298,4 +361,34 @@ void kr_flecs_create_sequence(ecs_entity_t e, const kr_init_sequence_t *sequence
 		}
 		add_animation(e, anim_e, &a);
 	}
+}
+
+/* Init/Destroy/Tick */
+
+void kr_flecs_init(bool with_flecs_rest) {
+	kr_set_flecs_os_api();
+	kr_world = ecs_init();
+#ifndef NDEBUG
+	if (with_flecs_rest) ecs_singleton_set(kr_world, EcsRest, {0});
+#endif
+	ECS_IMPORT(kr_world, ComponentsInput);
+	ECS_IMPORT(kr_world, ComponentsRender);
+	ECS_IMPORT(kr_world, SystemsRender);
+	ECS_IMPORT(kr_world, ComponentsAnimation);
+	ECS_IMPORT(kr_world, SystemsAnimation);
+	ecs_singleton_set(kr_world, KrSingletonClearColor, {.color = 0});
+
+	kr_evt_add_observer(evt_on_notify);
+	ecs_singleton_set(kr_world, KrSingletonInput, {});
+	ECS_SYSTEM(kr_world, InputSystem, EcsOnLoad, KrSingletonInput);
+	kinc_log(KINC_LOG_LEVEL_INFO, "flecs initialized");
+}
+
+void kr_flecs_destroy(void) {
+	ecs_fini(kr_world);
+	kr_world = NULL;
+}
+
+void kr_flecs_tick(void) {
+	ecs_progress(kr_world, 0);
 }
