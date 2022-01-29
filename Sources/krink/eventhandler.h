@@ -57,16 +57,27 @@ typedef struct kr_evt_finger_touch_event {
 	int finger, x, y;
 } kr_evt_finger_touch_event_t;
 
-typedef struct kr_evt_primary_move_event {
+typedef struct kr_evt_primary_event {
 	int x, y;
-} kr_evt_primary_move_event_t;
+} kr_evt_primary_event_t;
 
-typedef struct kr_evt_primary_button_event {
-	int x, y;
-} kr_evt_primary_button_event_t;
+typedef union kr_evt_data {
+	kr_evt_key_event_t key;
+	kr_evt_key_event_press_t key_press;
+	kr_evt_mouse_move_event_t mouse_move;
+	kr_evt_mouse_button_event_t mouse_button;
+	kr_evt_mouse_scroll_event_t mouse_scroll;
+	kr_evt_finger_touch_event_t touch;
+	kr_evt_primary_event_t primary;
+} kr_evt_data_t;
+
+typedef struct kr_evt_event {
+	kr_evt_event_type_t event;
+	kr_evt_data_t data;
+} kr_evt_event_t;
 
 /// <summary>
-/// Initialize the event handler. Needs to be called before using events.
+/// Initialize the event handler. This is being called automatically.
 /// </summary>
 void kr_evt_init(void);
 
@@ -83,10 +94,11 @@ void kr_evt_destroy(void);
 /// Either make a copy of the data or handle immediately inside the callback.
 /// </summary>
 /// <param name="value">Callback function to handle events</param>
-void kr_evt_add_observer(void (*value)(kr_evt_event_type_t, void *));
+void kr_evt_add_observer(void (*value)(kr_evt_event_t));
 
 /// <summary>
 /// Remove an observer.
 /// </summary>
-/// <param name="value">Previously registered callback function</param>
-void kr_evt_remove_observer(void (*value)(kr_evt_event_type_t, void *));
+/// <param name="value">Previously registered callback function that takes `kr_evt_event_t` as
+/// parameter</param>
+void kr_evt_remove_observer(void (*value)(kr_evt_event_t));

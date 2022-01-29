@@ -72,35 +72,28 @@ static enum nk_keys map_kinc_to_nk(int keycode) {
 	return NK_KEY_NONE;
 }
 
-static inline void notify(kr_evt_event_type_t evt, void *data) {
-	switch (evt) {
+static inline void notify(kr_evt_event_t evt) {
+	switch (evt.event) {
 	case KR_EVT_KEY_DOWN: {
-		kr_evt_key_event_t *k = (kr_evt_key_event_t *)data;
-		nk_input_key(&nkctx, map_kinc_to_nk(k->keycode), 1);
+		nk_input_key(&nkctx, map_kinc_to_nk(evt.data.key.keycode), 1);
 	} break;
 	case KR_EVT_KEY_UP: {
-		kr_evt_key_event_t *k = (kr_evt_key_event_t *)data;
-		nk_input_key(&nkctx, map_kinc_to_nk(k->keycode), 0);
+		nk_input_key(&nkctx, map_kinc_to_nk(evt.data.key.keycode), 0);
 	} break;
 	case KR_EVT_KEY_PRESS: {
-		kr_evt_key_event_press_t *k = (kr_evt_key_event_press_t *)data;
-		nk_input_unicode(&nkctx, k->character);
+		nk_input_unicode(&nkctx, evt.data.key_press.character);
 	} break;
 	case KR_EVT_MOUSE_SCROLL: {
-		kr_evt_mouse_scroll_event_t *s = (kr_evt_mouse_scroll_event_t *)data;
-		nk_input_scroll(&nkctx, (struct nk_vec2){0, s->delta});
+		nk_input_scroll(&nkctx, (struct nk_vec2){0, evt.data.mouse_scroll.delta});
 	} break;
 	case KR_EVT_PRIMARY_MOVE: {
-		kr_evt_primary_move_event_t *m = (kr_evt_primary_move_event_t *)data;
-		nk_input_motion(&nkctx, m->x, m->y);
+		nk_input_motion(&nkctx, evt.data.primary.x, evt.data.primary.y);
 	} break;
 	case KR_EVT_PRIMARY_START: {
-		kr_evt_primary_button_event_t *m = (kr_evt_primary_button_event_t *)data;
-		nk_input_button(&nkctx, NK_BUTTON_LEFT, m->x, m->y, 1);
+		nk_input_button(&nkctx, NK_BUTTON_LEFT, evt.data.primary.x, evt.data.primary.y, 1);
 	} break;
 	case KR_EVT_PRIMARY_END: {
-		kr_evt_primary_button_event_t *m = (kr_evt_primary_button_event_t *)data;
-		nk_input_button(&nkctx, NK_BUTTON_LEFT, m->x, m->y, 0);
+		nk_input_button(&nkctx, NK_BUTTON_LEFT, evt.data.primary.x, evt.data.primary.y, 0);
 	} break;
 	case KR_EVT_FOREGROUND:
 	case KR_EVT_BACKGROUND:

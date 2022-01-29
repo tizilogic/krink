@@ -4,152 +4,156 @@
 #include <kinc/system.h>
 #include <stddef.h>
 #include <stdint.h>
-//#define KORE_IOS
 #if defined(KORE_IOS) || defined(KORE_ANDROID)
 #include <kinc/input/surface.h>
 #else
 #include <kinc/input/mouse.h>
 #endif
 
-typedef void (*observer_t)(kr_evt_event_type_t, void *);
+typedef void (*observer_t)(kr_evt_event_t);
 static observer_t observers[KR_EVT_MAX_OBSERVER];
 
-static void notify(kr_evt_event_type_t event, void *data) {
+static void notify(kr_evt_event_type_t event, kr_evt_data_t data) {
 	for (int i = 0; i < KR_EVT_MAX_OBSERVER; ++i) {
-		if (observers[i] != NULL) observers[i](event, data);
+		if (observers[i] != NULL) observers[i]((kr_evt_event_t){event, data});
 	}
 }
 
 static void key_up(int keycode) {
-	kr_evt_key_event_t data;
-	data.keycode = keycode;
-	notify(KR_EVT_KEY_UP, (void *)&data);
+	kr_evt_data_t data;
+	data.key.keycode = keycode;
+	notify(KR_EVT_KEY_UP, data);
 }
 
 static void key_down(int keycode) {
-	kr_evt_key_event_t data;
-	data.keycode = keycode;
-	notify(KR_EVT_KEY_DOWN, (void *)&data);
+	kr_evt_data_t data;
+	data.key.keycode = keycode;
+	notify(KR_EVT_KEY_DOWN, data);
 }
 
 static void key_press(unsigned character) {
-	kr_evt_key_event_press_t data;
-	data.character = character;
-	notify(KR_EVT_KEY_PRESS, (void *)&data);
+	kr_evt_data_t data;
+	data.key_press.character = character;
+	notify(KR_EVT_KEY_PRESS, data);
 }
 
 static void mouse_press(int window, int button, int x, int y) {
-	kr_evt_mouse_button_event_t data;
-	data.window = window;
-	data.button = button;
-	data.x = x;
-	data.y = y;
-	notify(KR_EVT_MOUSE_PRESS, (void *)&data);
+	kr_evt_data_t data;
+	data.mouse_button.window = window;
+	data.mouse_button.button = button;
+	data.mouse_button.x = x;
+	data.mouse_button.y = y;
+	notify(KR_EVT_MOUSE_PRESS, data);
 
 	if (button != 0) return;
-	kr_evt_primary_button_event_t pdata;
-	pdata.x = x;
-	pdata.y = y;
-	notify(KR_EVT_PRIMARY_START, (void *)&pdata);
+	kr_evt_data_t pdata;
+	pdata.primary.x = x;
+	pdata.primary.y = y;
+	notify(KR_EVT_PRIMARY_START, pdata);
 }
 
 static void mouse_release(int window, int button, int x, int y) {
-	kr_evt_mouse_button_event_t data;
-	data.window = window;
-	data.button = button;
-	data.x = x;
-	data.y = y;
-	notify(KR_EVT_MOUSE_RELEASE, (void *)&data);
+	kr_evt_data_t data;
+	data.mouse_button.window = window;
+	data.mouse_button.button = button;
+	data.mouse_button.x = x;
+	data.mouse_button.y = y;
+	notify(KR_EVT_MOUSE_RELEASE, data);
 
 	if (button != 0) return;
-	kr_evt_primary_button_event_t pdata;
-	pdata.x = x;
-	pdata.y = y;
-	notify(KR_EVT_PRIMARY_END, (void *)&pdata);
+	kr_evt_data_t pdata;
+	pdata.primary.x = x;
+	pdata.primary.y = y;
+	notify(KR_EVT_PRIMARY_END, pdata);
 }
 
 static void mouse_scroll(int window, int delta) {
-	kr_evt_mouse_scroll_event_t data;
-	data.window = window;
-	data.delta = delta;
-	notify(KR_EVT_MOUSE_SCROLL, (void *)&data);
+	kr_evt_data_t data;
+	data.mouse_scroll.window = window;
+	data.mouse_scroll.delta = delta;
+	notify(KR_EVT_MOUSE_SCROLL, data);
 }
 
 static void mouse_move(int window, int x, int y, int dx, int dy) {
-	kr_evt_mouse_move_event_t data;
-	data.window = window;
-	data.x = x;
-	data.y = y;
-	data.dx = dx;
-	data.dy = dy;
-	notify(KR_EVT_MOUSE_MOVE, (void *)&data);
+	kr_evt_data_t data;
+	data.mouse_move.window = window;
+	data.mouse_move.x = x;
+	data.mouse_move.y = y;
+	data.mouse_move.dx = dx;
+	data.mouse_move.dy = dy;
+	notify(KR_EVT_MOUSE_MOVE, data);
 
-	kr_evt_primary_move_event_t pdata;
-	pdata.x = x;
-	pdata.y = y;
-	notify(KR_EVT_PRIMARY_MOVE, (void *)&pdata);
+	kr_evt_data_t pdata;
+	pdata.primary.x = x;
+	pdata.primary.y = y;
+	notify(KR_EVT_PRIMARY_MOVE, pdata);
 }
 
 static void touch_start(int finger, int x, int y) {
-	kr_evt_finger_touch_event_t data;
-	data.finger = finger;
-	data.x = x;
-	data.y = y;
-	notify(KR_EVT_FINGER_START, (void *)&data);
+	kr_evt_data_t data;
+	data.touch.finger = finger;
+	data.touch.x = x;
+	data.touch.y = y;
+	notify(KR_EVT_FINGER_START, data);
 
 	if (finger != 0) return;
-	kr_evt_primary_button_event_t pdata;
-	pdata.x = x;
-	pdata.y = y;
-	notify(KR_EVT_PRIMARY_START, (void *)&pdata);
+	kr_evt_data_t pdata;
+	pdata.primary.x = x;
+	pdata.primary.y = y;
+	notify(KR_EVT_PRIMARY_START, pdata);
 }
 
 static void touch_end(int finger, int x, int y) {
-	kr_evt_finger_touch_event_t data;
-	data.finger = finger;
-	data.x = x;
-	data.y = y;
-	notify(KR_EVT_FINGER_END, (void *)&data);
+	kr_evt_data_t data;
+	data.touch.finger = finger;
+	data.touch.x = x;
+	data.touch.y = y;
+	notify(KR_EVT_FINGER_END, data);
 
 	if (finger != 0) return;
-	kr_evt_primary_button_event_t pdata;
-	pdata.x = x;
-	pdata.y = y;
-	notify(KR_EVT_PRIMARY_END, (void *)&pdata);
+	kr_evt_data_t pdata;
+	pdata.primary.x = x;
+	pdata.primary.y = y;
+	notify(KR_EVT_PRIMARY_END, pdata);
 }
 
 static void finger_move(int finger, int x, int y) {
-	kr_evt_finger_touch_event_t data;
-	data.finger = finger;
-	data.x = x;
-	data.y = y;
-	notify(KR_EVT_FINGER_MOVE, (void *)&data);
+	kr_evt_data_t data;
+	data.touch.finger = finger;
+	data.touch.x = x;
+	data.touch.y = y;
+	notify(KR_EVT_FINGER_MOVE, data);
 
 	if (finger != 0) return;
-	kr_evt_primary_move_event_t pdata;
-	pdata.x = x;
-	pdata.y = y;
-	notify(KR_EVT_PRIMARY_MOVE, (void *)&pdata);
+	kr_evt_data_t pdata;
+	pdata.primary.x = x;
+	pdata.primary.y = y;
+	notify(KR_EVT_PRIMARY_MOVE, pdata);
 }
 
 static void foreground(void) {
-	notify(KR_EVT_FOREGROUND, NULL);
+	kr_evt_data_t unused;
+	notify(KR_EVT_FOREGROUND, unused);
 }
 
 static void background(void) {
-	notify(KR_EVT_BACKGROUND, NULL);
+	kr_evt_data_t unused;
+	notify(KR_EVT_BACKGROUND, unused);
 }
 
 static void pause(void) {
-	notify(KR_EVT_PAUSE, NULL);
+	kr_evt_data_t unused;
+	notify(KR_EVT_PAUSE, unused);
 }
 
 static void resume(void) {
-	notify(KR_EVT_RESUME, NULL);
+	kr_evt_data_t unused;
+	notify(KR_EVT_RESUME, unused);
 }
 
 static void shutdown(void) {
-	notify(KR_EVT_SHUTDOWN, NULL);
+	kr_evt_data_t unused;
+	notify(KR_EVT_SHUTDOWN, unused);
 }
 
 void kr_evt_init(void) {
@@ -182,7 +186,7 @@ void kr_evt_destroy(void) {
 	// Maybe not needed?
 }
 
-void kr_evt_add_observer(void (*value)(kr_evt_event_type_t, void *)) {
+void kr_evt_add_observer(void (*value)(kr_evt_event_t)) {
 	for (int i = 0; i < KR_EVT_MAX_OBSERVER; ++i) {
 		if (observers[i] == NULL) {
 			observers[i] = value;
@@ -192,7 +196,7 @@ void kr_evt_add_observer(void (*value)(kr_evt_event_type_t, void *)) {
 	assert(0);
 }
 
-void kr_evt_remove_observer(void (*value)(kr_evt_event_type_t, void *)) {
+void kr_evt_remove_observer(void (*value)(kr_evt_event_t)) {
 	for (int i = 0; i < KR_EVT_MAX_OBSERVER; ++i) {
 		if (observers[i] == value) {
 			observers[i] = NULL;
