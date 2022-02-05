@@ -24,7 +24,7 @@ int kickstart(int argc, char **argv) {
 	heap = malloc(20 * 1024 * 1024);
 	assert(heap != NULL);
 	kr_init(heap, 20 * 1024 * 1024, NULL, 0);
-	kr_flecs_init();
+	kr_flecs_init(false);
 	kr_evt_init();
 	kr_g2_init(0, 1080, 1920);
 	kr_ttf_font_t font;
