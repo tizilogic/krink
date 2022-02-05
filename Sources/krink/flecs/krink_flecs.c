@@ -2,6 +2,8 @@
 #include "internal/os_api.h"
 #include "modules/animation_comp.h"
 #include "modules/animation_sys.h"
+#include "modules/fsm_comp.h"
+#include "modules/fsm_sys.h"
 #include "modules/input_comp.h"
 #include "modules/render_comp.h"
 #include "modules/render_sys.h"
@@ -372,6 +374,8 @@ void kr_flecs_init(bool with_flecs_rest) {
 	if (with_flecs_rest) ecs_singleton_set(kr_world, EcsRest, {0});
 #endif
 	ECS_IMPORT(kr_world, ComponentsInput);
+	ECS_IMPORT(kr_world, ComponentsFsm);
+	ECS_IMPORT(kr_world, SystemsFsm);
 	ECS_IMPORT(kr_world, ComponentsRender);
 	ECS_IMPORT(kr_world, SystemsRender);
 	ECS_IMPORT(kr_world, ComponentsAnimation);

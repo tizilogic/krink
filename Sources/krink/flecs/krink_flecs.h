@@ -16,7 +16,7 @@
     \brief Size of the internal eventbuffer that stores events between frames.
 */
 #ifndef KR_FLECS_EVT_BUFFER_SIZE
-#define KR_FLECS_EVT_BUFFER_SIZE 60
+#define KR_FLECS_EVT_BUFFER_SIZE 256
 #endif
 
 typedef struct kr_rect {
