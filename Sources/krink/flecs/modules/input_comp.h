@@ -42,6 +42,8 @@ ECS_STRUCT(KrSingletonInput, {
     KrMouseState mouse;
 });
 
+// TODO: Add remaining events
+
 void ComponentsInputImport(ecs_world_t *world);
 
 #ifdef __cplusplus
