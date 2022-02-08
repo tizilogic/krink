@@ -345,7 +345,7 @@ void SystemsDragImport(ecs_world_t *world) {
 	               .query.filter.expr =
 	                   "[in] components.render.KrDrawable, [in] components.drag.KrDragInfo, "
 	                   "[out] components.render.KrTranslation, [in] components.render.KrVisible, "
-	                   "[in] ?components.drag.KrDragActive",
+	                   "[in] ?components.drag.KrDragActive, !components.drag.KrDrop",
 	               .callback = UpdateDrag});
 
 	/* Enable Dragging */
