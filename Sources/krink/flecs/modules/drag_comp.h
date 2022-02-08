@@ -6,6 +6,12 @@
 
 /*! \file drag_comp.h
     \brief Provides flecs components for drag and drop.
+
+   To make a component dragable add the `KrDragable` component. A drag is tagged with `KrDragStart`
+   during the first frame of the drag and tagged with `KrDrop` in the last frame of a drag.
+
+   \note `KrDragStart` and `KrDrop` are only available in the exact frame that event happened.
+   To cancel a drag upon `KrDragStart` simply remove the `KrDragActive` tag
 */
 
 // Reflection system boilerplate
@@ -30,14 +36,13 @@ extern ECS_DECLARE(KrDrop);
 ECS_STRUCT(KrDragInfo, {
 	KrPos2 start_pos;
 	KrTranslation start_trans;
-	KrPos2 offset;
 });
 
 ECS_STRUCT(KrDragAABB, {
-    float x;
-    float y;
-    float hw;
-    float hh;
+	float x;
+	float y;
+	float hw;
+	float hh;
 });
 
 void ComponentsDragImport(ecs_world_t *world);

@@ -54,6 +54,7 @@ static inline KrDragAABB make_aabb(const kr_vec2_t *points, int count) {
 }
 
 static void UpdateAABB(ecs_iter_t *it) {
+	if (!ecs_term_is_set(it, 15)) return;
 	KrDrawable *drawable = ecs_term(it, KrDrawable, 1);
 	KrPos2 *pos = ecs_term(it, KrPos2, 2);
 	KrImage *image = ecs_term(it, KrImage, 3);
@@ -132,6 +133,7 @@ static void UpdateAABB(ecs_iter_t *it) {
 				} break;
 				case KR_COMP_PP_LINE:
 				default: {
+					kinc_log(KINC_LOG_LEVEL_INFO, "dropped through");
 					continue;
 				} break;
 				}
@@ -202,6 +204,7 @@ static void UpdateAABB(ecs_iter_t *it) {
 			count = 4;
 		} break;
 		default:
+			kinc_log(KINC_LOG_LEVEL_INFO, "dropped through 2");
 			continue;
 		}
 
@@ -221,21 +224,69 @@ static void UpdateAABB(ecs_iter_t *it) {
 	}
 }
 
+static inline bool point_in_aabb(float px, float py, const KrDragAABB *aabb) {
+	float s = kinc_abs(aabb->x - px);
+	float t = kinc_abs(aabb->y - py);
+	return s <= aabb->hw && t <= aabb->hh;
+}
+
 static void CheckDrag(ecs_iter_t *it) {
+	if (!ecs_term_is_set(it, 6)) return;
 	const KrSingletonInput *inp = ecs_singleton_get(it->world, KrSingletonInput);
 	if (!(inp->mouse.primary.down && inp->mouse.primary.triggered)) return;
 
 	KrDrawable *drawable = ecs_term(it, KrDrawable, 1);
-	KrPos2 *pos = ecs_term(it, KrPos2, 2);
-	KrImage *image = ecs_term(it, KrImage, 3);
-	KrRect *rect = ecs_term(it, KrRect, 4);
-	KrCircle *circle = ecs_term(it, KrCircle, 5);
-	KrTriangle *triangle = ecs_term(it, KrTriangle, 6);
-	KrTranslation *trans = ecs_term(it, KrTranslation, 7);
+	KrDragAABB *aabb = ecs_term(it, KrDragAABB, 2);
+	KrTranslation *trans = ecs_term(it, KrTranslation, 3);
+
+	for (int i = 0; i < it->count; ++i) {
+		if (point_in_aabb(inp->mouse.pos.x, inp->mouse.pos.y, &aabb[i])) {
+			ecs_set(it->world, it->entities[i], KrDragInfo,
+			        {.start_pos.x = inp->mouse.pos.x,
+			         .start_pos.y = inp->mouse.pos.y,
+			         .start_trans = trans[i]});
+			ecs_add(it->world, it->entities[i], KrDragActive);
+			ecs_add(it->world, it->entities[i], KrDragStart);
+			ecs_singleton_remove(it->world, KrInternalCanDrag);
+			return;
+		}
+	}
 }
 
 static int compare_depth(ecs_entity_t e1, const void *ptr1, ecs_entity_t e2, const void *ptr2) {
 	return ((KrDrawable *)ptr2)->depth - ((KrDrawable *)ptr1)->depth;
+}
+
+static void UpdateDrag(ecs_iter_t *it) {
+	const KrSingletonInput *inp = ecs_singleton_get(it->world, KrSingletonInput);
+	KrDrawable *drawable = ecs_term(it, KrDrawable, 1);
+	KrDragInfo *info = ecs_term(it, KrDragInfo, 2);
+	KrTranslation *trans = ecs_term(it, KrTranslation, 3);
+
+	if (ecs_has(it->world, it->entities[0], KrDragStart))
+		ecs_remove(it->world, it->entities[0], KrDragStart);
+
+	if (!ecs_term_is_set(it, 5)) {
+		ecs_remove(it->world, it->entities[0], KrDragInfo);
+		ecs_singleton_add(it->world, KrInternalCanDrag);
+		trans[0].x = info[0].start_trans.x;
+		trans[0].y = info[0].start_trans.y;
+		return;
+	}
+	else if (!inp->mouse.primary.down) {
+		ecs_remove(it->world, it->entities[0], KrDragActive);
+		ecs_add(it->world, it->entities[0], KrDrop);
+		ecs_singleton_add(it->world, KrInternalCanDrag);
+	}
+	trans[0].x = info[0].start_trans.x + (inp->mouse.pos.x - info[0].start_pos.x);
+	trans[0].y = info[0].start_trans.y + (inp->mouse.pos.y - info[0].start_pos.y);
+}
+
+static void CleanDropped(ecs_iter_t *it) {
+	KrDragInfo *info = ecs_term(it, KrDragInfo, 1);
+
+	ecs_remove(it->world, it->entities[0], KrDragInfo);
+	ecs_remove(it->world, it->entities[0], KrDrop);
 }
 
 void SystemsDragImport(ecs_world_t *world) {
@@ -249,7 +300,10 @@ void SystemsDragImport(ecs_world_t *world) {
 	ECS_TAG_DEFINE(world, KrInternalCanDrag);
 
 	/* Register systems */
-	ecs_term_t termbuff[16] = {
+	ECS_SYSTEM(world, CleanDropped, EcsOnUpdate, components.drag.KrDragInfo,
+	           components.drag.KrDrop);
+
+	ecs_term_t termbuff[15] = {
 	    /*  1 */ {ecs_id(KrDrawable), .inout = EcsIn},
 	    /*  2 */ {ecs_id(KrPos2), .oper = EcsOptional, .inout = EcsIn},
 	    /*  3 */ {ecs_id(KrImage), .oper = EcsOptional, .inout = EcsIn},
@@ -262,30 +316,37 @@ void SystemsDragImport(ecs_world_t *world) {
 	    /* 10 */ {ecs_id(KrScaleY), .oper = EcsOptional, .inout = EcsIn},
 	    /* 11 */ {ecs_id(KrTranslation), .oper = EcsOptional, .inout = EcsIn},
 	    /* 12 */ {ecs_id(KrDragAABB), .oper = EcsOptional, .inout = EcsInOut},
-	    /* 13 */ {KrDragable, .inout = EcsIn},
-	    /* 14 */ {KrVisible, .inout = EcsIn},
+	    /* 13 */ {KrDragable},
+	    /* 14 */ {KrVisible},
 	    /* 15 */
-	    {ecs_id(KrInternalCanDrag), .subj.entity = ecs_id(KrInternalCanDrag), .inout = EcsIn},
+	    {ecs_id(KrInternalCanDrag), .subj.entity = ecs_id(KrInternalCanDrag), .oper = EcsOptional},
 	};
 
-	ecs_system_init(world, &(ecs_system_desc_t){.entity = {.name = "Render", .add = {EcsOnUpdate}},
-	                                            .query.filter.terms_buffer_count = 16,
-	                                            .query.filter.terms_buffer = termbuff,
-	                                            .callback = UpdateAABB});
-
 	ecs_system_init(world,
-	                &(ecs_system_desc_t){
-	                    .entity = {.name = "CheckDrag", .add = {EcsOnUpdate}},
-	                    .query.order_by_component = ecs_id(KrDrawable),
-	                    .query.order_by = compare_depth,
-	                    .query.filter.expr =
-	                        "[in] components.render.KrDrawable, [in] ?components.render.KrPos2, "
-	                        "[in] ?components.render.KrImage, [in] ?components.render.KrRect, "
-	                        "[in] ?components.render.KrCircle, [in] ?components.render.KrTriangle, "
-	                        "[in] ?components.render.KrTranslation, "
-	                        "[in] KrInternalCanDrag(KrInternalCanDrag), "
-	                        "[in] components.render.KrVisible, [in] components.drag.KrDragable",
-	                    .callback = CheckDrag});
+	                &(ecs_system_desc_t){.entity = {.name = "UpdateAABB", .add = {EcsOnUpdate}},
+	                                     .query.filter.terms_buffer_count = 15,
+	                                     .query.filter.terms_buffer = termbuff,
+	                                     .callback = UpdateAABB});
+
+	ecs_system_init(
+	    world, &(ecs_system_desc_t){
+	               .entity = {.name = "CheckDrag", .add = {EcsOnUpdate}},
+	               .query.order_by_component = ecs_id(KrDrawable),
+	               .query.order_by = compare_depth,
+	               .query.filter.expr =
+	                   "[in] components.render.KrDrawable, [in] components.drag.KrDragAABB, "
+	                   "[in] components.render.KrTranslation, [in] components.render.KrVisible, "
+	                   "[in] components.drag.KrDragable, ?KrInternalCanDrag(KrInternalCanDrag)",
+	               .callback = CheckDrag});
+
+	ecs_system_init(
+	    world, &(ecs_system_desc_t){
+	               .entity = {.name = "UpdateDrag", .add = {EcsOnUpdate}},
+	               .query.filter.expr =
+	                   "[in] components.render.KrDrawable, [in] components.drag.KrDragInfo, "
+	                   "[out] components.render.KrTranslation, [in] components.render.KrVisible, "
+	                   "[in] ?components.drag.KrDragActive",
+	               .callback = UpdateDrag});
 
 	/* Enable Dragging */
 	ecs_singleton_add(world, KrInternalCanDrag);
