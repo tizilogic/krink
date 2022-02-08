@@ -21,7 +21,11 @@ static int evt_count = 0;
 static bool first_move = true;
 
 static void evt_on_notify(kr_evt_event_t evt) {
-	if (evt_count < KR_FLECS_EVT_BUFFER_SIZE) evt_buffer[evt_count++] = evt;
+	if (evt_count < KR_FLECS_EVT_BUFFER_SIZE) {
+		evt_buffer[evt_count++] = evt;
+		return;
+	}
+	kinc_log(KINC_LOG_LEVEL_ERROR, "Input buffer full");
 }
 
 static void InputSystem(ecs_iter_t *it) {
@@ -367,7 +371,7 @@ void kr_flecs_create_sequence(ecs_entity_t e, const kr_init_sequence_t *sequence
 /* Init/Destroy/Tick */
 
 void kr_flecs_init(bool with_flecs_rest) {
-	// kr_set_flecs_os_api();
+	kr_set_flecs_os_api();
 	kr_world = ecs_init();
 #ifndef NDEBUG
 	if (with_flecs_rest) ecs_singleton_set(kr_world, EcsRest, {0});
