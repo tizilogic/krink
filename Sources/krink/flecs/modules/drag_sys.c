@@ -54,7 +54,6 @@ static inline KrDragAABB make_aabb(const kr_vec2_t *points, int count) {
 }
 
 static void UpdateAABB(ecs_iter_t *it) {
-	if (!ecs_term_is_set(it, 15)) return;
 	KrDrawable *drawable = ecs_term(it, KrDrawable, 1);
 	KrPos2 *pos = ecs_term(it, KrPos2, 2);
 	KrImage *image = ecs_term(it, KrImage, 3);
@@ -231,7 +230,6 @@ static inline bool point_in_aabb(float px, float py, const KrDragAABB *aabb) {
 }
 
 static void CheckDrag(ecs_iter_t *it) {
-	if (!ecs_term_is_set(it, 6)) return;
 	const KrSingletonInput *inp = ecs_singleton_get(it->world, KrSingletonInput);
 	if (!(inp->mouse.primary.down && inp->mouse.primary.triggered)) return;
 
@@ -319,7 +317,7 @@ void SystemsDragImport(ecs_world_t *world) {
 	    /* 13 */ {KrDragable},
 	    /* 14 */ {KrVisible},
 	    /* 15 */
-	    {ecs_id(KrInternalCanDrag), .subj.entity = ecs_id(KrInternalCanDrag), .oper = EcsOptional},
+	    {ecs_id(KrInternalCanDrag), .subj.entity = ecs_id(KrInternalCanDrag)},
 	};
 
 	ecs_system_init(world,
@@ -336,7 +334,7 @@ void SystemsDragImport(ecs_world_t *world) {
 	               .query.filter.expr =
 	                   "[in] components.render.KrDrawable, [in] components.drag.KrDragAABB, "
 	                   "[in] components.render.KrTranslation, [in] components.render.KrVisible, "
-	                   "[in] components.drag.KrDragable, ?KrInternalCanDrag(KrInternalCanDrag)",
+	                   "[in] components.drag.KrDragable, KrInternalCanDrag(KrInternalCanDrag)",
 	               .callback = CheckDrag});
 
 	ecs_system_init(
