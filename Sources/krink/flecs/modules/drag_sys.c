@@ -12,6 +12,8 @@
 
 ECS_DECLARE(KrInternalCanDrag);
 
+static bool drag_active = false;
+
 static inline bool point_in_triangle(float px, float py, const KrTriangle *tr) {
 	float s = (tr->x1 - tr->x3) * (py - tr->y3) - (tr->y1 - tr->y3) * (px - tr->x3);
 	float t = (tr->x2 - tr->x1) * (py - tr->y1) - (tr->y2 - tr->y1) * (px - tr->x1);
@@ -230,6 +232,7 @@ static inline bool point_in_aabb(float px, float py, const KrDragAABB *aabb) {
 }
 
 static void CheckDrag(ecs_iter_t *it) {
+	if (drag_active) return;
 	const KrSingletonInput *inp = ecs_singleton_get(it->world, KrSingletonInput);
 	if (!(inp->mouse.primary.down && inp->mouse.primary.triggered)) return;
 
@@ -246,6 +249,7 @@ static void CheckDrag(ecs_iter_t *it) {
 			ecs_add(it->world, it->entities[i], KrDragActive);
 			ecs_add(it->world, it->entities[i], KrDragStart);
 			ecs_singleton_remove(it->world, KrInternalCanDrag);
+			drag_active = true;
 			return;
 		}
 	}
@@ -267,6 +271,7 @@ static void UpdateDrag(ecs_iter_t *it) {
 	if (!ecs_term_is_set(it, 5)) {
 		ecs_remove(it->world, it->entities[0], KrDragInfo);
 		ecs_singleton_add(it->world, KrInternalCanDrag);
+		drag_active = false;
 		trans[0].x = info[0].start_trans.x;
 		trans[0].y = info[0].start_trans.y;
 		return;
@@ -275,6 +280,7 @@ static void UpdateDrag(ecs_iter_t *it) {
 		ecs_remove(it->world, it->entities[0], KrDragActive);
 		ecs_add(it->world, it->entities[0], KrDrop);
 		ecs_singleton_add(it->world, KrInternalCanDrag);
+		drag_active = false;
 	}
 	trans[0].x = info[0].start_trans.x + (inp->mouse.pos.x - info[0].start_pos.x);
 	trans[0].y = info[0].start_trans.y + (inp->mouse.pos.y - info[0].start_pos.y);
