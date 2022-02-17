@@ -161,6 +161,7 @@ static void Render(ecs_iter_t *it) {
 
 		switch (drawable[i].pipeline) {
 		case KR_COMP_PP_IMAGE: {
+			kr_g2_set_bilinear_filter(image[i].bilinear);
 			kr_g2_draw_scaled_sub_image(image[i].image, image[i].sx, image[i].sy, image[i].sw,
 			                            image[i].sh, pos[i].x, pos[i].y, image[i].dw, image[i].dh);
 		} break;

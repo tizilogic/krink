@@ -31,6 +31,7 @@ typedef struct kr_init_sprite {
 	kr_image_t *image;
 	kr_rect_t src, dest;
 	uint32_t color;
+	bool bilinear;
 } kr_init_sprite_t;
 
 typedef struct kr_init_text {

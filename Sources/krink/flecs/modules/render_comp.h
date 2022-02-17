@@ -64,6 +64,7 @@ ECS_STRUCT(KrImage, {
 	float sh;
 	float dw;
 	float dh;
+	bool bilinear;
 });
 
 ECS_STRUCT(KrText, {

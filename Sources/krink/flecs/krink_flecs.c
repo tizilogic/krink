@@ -119,7 +119,8 @@ ecs_entity_t kr_flecs_create_sprite(kr_init_sprite_t args) {
 	         .sw = args.src.w,
 	         .sh = args.src.h,
 	         .dw = args.dest.w,
-	         .dh = args.dest.h});
+	         .dh = args.dest.h,
+			 .bilinear = args.bilinear});
 	return e;
 }
 
