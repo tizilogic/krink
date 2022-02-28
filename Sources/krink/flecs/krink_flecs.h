@@ -130,100 +130,114 @@ void kr_flecs_tick(void);
 /// <summary>
 /// Convenience function to change the depth value of a drawable entity.
 /// </summary>
+/// <param name="world">The world</param>
 /// <param name="e">The entity</param>
 /// <param name="depth">Draw depth value in the range -1024..1024</param>
-void kr_flecs_set_depth(ecs_entity_t e, int32_t depth);
+void kr_flecs_set_depth(ecs_world_t *world, ecs_entity_t e, int32_t depth);
 
 /// <summary>
 /// Factrory function to create a sprite.
 /// </summary>
+/// <param name="world">The world</param>
 /// <param name="args">Initializer</param>
 /// <returns>A fully set up entity</returns>
-ecs_entity_t kr_flecs_create_sprite(kr_init_sprite_t args);
+ecs_entity_t kr_flecs_create_sprite(ecs_world_t *world, kr_init_sprite_t args);
 
 /// <summary>
 /// Factrory function to create a text.
 /// </summary>
+/// <param name="world">The world</param>
 /// <param name="args">Initializer</param>
 /// <returns>A fully set up entity</returns>
-ecs_entity_t kr_flecs_create_text(kr_init_text_t args);
+ecs_entity_t kr_flecs_create_text(ecs_world_t *world, kr_init_text_t args);
 
 /// <summary>
 /// Factrory function to create a stroked rect.
 /// </summary>
+/// <param name="world">The world</param>
 /// <param name="args">Initializer</param>
 /// <returns>A fully set up entity</returns>
-ecs_entity_t kr_flecs_create_stroked_rect(kr_init_stroked_rect_t args);
+ecs_entity_t kr_flecs_create_stroked_rect(ecs_world_t *world, kr_init_stroked_rect_t args);
 
 /// <summary>
 /// Factrory function to create a filled rect.
 /// </summary>
+/// <param name="world">The world</param>
 /// <param name="args">Initializer</param>
 /// <returns>A fully set up entity</returns>
-ecs_entity_t kr_flecs_create_filled_rect(kr_init_filled_rect_t args);
+ecs_entity_t kr_flecs_create_filled_rect(ecs_world_t *world, kr_init_filled_rect_t args);
 
 /// <summary>
 /// Factrory function to create a stroked triangle.
 /// </summary>
+/// <param name="world">The world</param>
 /// <param name="args">Initializer</param>
 /// <returns>A fully set up entity</returns>
-ecs_entity_t kr_flecs_create_stroked_triangle(kr_init_stroked_triangle_t args);
+ecs_entity_t kr_flecs_create_stroked_triangle(ecs_world_t *world, kr_init_stroked_triangle_t args);
 
 /// <summary>
 /// Factrory function to create a filled triangle.
 /// </summary>
+/// <param name="world">The world</param>
 /// <param name="args">Initializer</param>
 /// <returns>A fully set up entity</returns>
-ecs_entity_t kr_flecs_create_filled_triangle(kr_init_filled_triangle_t args);
+ecs_entity_t kr_flecs_create_filled_triangle(ecs_world_t *world, kr_init_filled_triangle_t args);
 
 /// <summary>
 /// Factrory function to create a line.
 /// </summary>
+/// <param name="world">The world</param>
 /// <param name="args">Initializer</param>
 /// <returns>A fully set up entity</returns>
-ecs_entity_t kr_flecs_create_line(kr_init_line_t args);
+ecs_entity_t kr_flecs_create_line(ecs_world_t *world, kr_init_line_t args);
 
 /// <summary>
 /// Factrory function to create a SDF rect.
 /// </summary>
+/// <param name="world">The world</param>
 /// <param name="args">Initializer</param>
 /// <returns>A fully set up entity</returns>
-ecs_entity_t kr_flecs_create_sdf_rect(kr_init_sdf_rect_t args);
+ecs_entity_t kr_flecs_create_sdf_rect(ecs_world_t *world, kr_init_sdf_rect_t args);
 
 /// <summary>
 /// Factrory function to create a SDF rect with asymmetric corner radii.
 /// </summary>
+/// <param name="world">The world</param>
 /// <param name="args">Initializer</param>
 /// <returns>A fully set up entity</returns>
-ecs_entity_t kr_flecs_create_sdf_asymm_rect(kr_init_sdf_asymm_rect_t args);
+ecs_entity_t kr_flecs_create_sdf_asymm_rect(ecs_world_t *world, kr_init_sdf_asymm_rect_t args);
 
 /// <summary>
 /// Factrory function to create a SDF rect with a border.
 /// </summary>
+/// <param name="world">The world</param>
 /// <param name="args">Initializer</param>
 /// <returns>A fully set up entity</returns>
-ecs_entity_t kr_flecs_create_sdf_rect_wborder(kr_init_sdf_rect_wborder_t args);
+ecs_entity_t kr_flecs_create_sdf_rect_wborder(ecs_world_t *world, kr_init_sdf_rect_wborder_t args);
 
 /// <summary>
 /// Factrory function to create a SDF rect with asymmetric corner radii and border.
 /// </summary>
+/// <param name="world">The world</param>
 /// <param name="args">Initializer</param>
 /// <returns>A fully set up entity</returns>
-ecs_entity_t kr_flecs_create_sdf_asymm_rect_wborder(kr_init_sdf_asymm_rect_wborder_t args);
+ecs_entity_t kr_flecs_create_sdf_asymm_rect_wborder(ecs_world_t *world, kr_init_sdf_asymm_rect_wborder_t args);
 
 /// <summary>
 /// Factrory function to create a SDF circle.
 /// </summary>
+/// <param name="world">The world</param>
 /// <param name="args">Initializer</param>
 /// <returns>A fully set up entity</returns>
-ecs_entity_t kr_flecs_create_sdf_circle(kr_init_sdf_circle_t args);
+ecs_entity_t kr_flecs_create_sdf_circle(ecs_world_t *world, kr_init_sdf_circle_t args);
 
 /// <summary>
 /// Factrory function to create a SDF circle with border.
 /// </summary>
+/// <param name="world">The world</param>
 /// <param name="args">Initializer</param>
 /// <returns>A fully set up entity</returns>
-ecs_entity_t kr_flecs_create_sdf_circle_wborder(kr_init_sdf_circle_wborder_t args);
+ecs_entity_t kr_flecs_create_sdf_circle_wborder(ecs_world_t *world, kr_init_sdf_circle_wborder_t args);
 
 /* Animation */
 
@@ -259,13 +273,15 @@ typedef struct kr_init_sequence {
 /// <summary>
 /// Factrory function to create an animation for an entity.
 /// </summary>
+/// <param name="world">The world</param>
 /// <param name="e">The entity</param>
 /// <param name="anim">Initializer</param>
-void kr_flecs_create_animation(ecs_entity_t e, const kr_init_animation_t *anim);
+void kr_flecs_create_animation(ecs_world_t *world, ecs_entity_t e, const kr_init_animation_t *anim);
 
 /// <summary>
 /// Factrory function to create a sequence of animations for an entity.
 /// </summary>
+/// <param name="world">The world</param>
 /// <param name="e">The entity</param>
 /// <param name="sequence">Initializer</param>
-void kr_flecs_create_sequence(ecs_entity_t e, const kr_init_sequence_t *sequence);
+void kr_flecs_create_sequence(ecs_world_t *world, ecs_entity_t e, const kr_init_sequence_t *sequence);

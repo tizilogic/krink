@@ -33,15 +33,16 @@ int kickstart(int argc, char **argv) {
 	kr_nk_init(&font, 15, kr_malloc(5 * 1024 * 1024), 5 * 1024 * 1024);
 	struct nk_context *kos_nkctx = kr_nk_get_ctx();
 	ecs_entity_t e = kr_flecs_create_filled_rect(
+	    kr_world,
 	    (kr_init_filled_rect_t){.color = 0xff0000ff, .rect = {.x = 0, .y = 0, .w = 200, .h = 100}});
 	ecs_set(kr_world, e, KrTranslation, {10, 10});
-	kr_flecs_set_depth(e, -5);
+	kr_flecs_set_depth(kr_world, e, -5);
 
-	kr_flecs_create_text((kr_init_text_t){.color = 0xffffffff,
-	                                      .font = &font,
-	                                      .size = 30,
-	                                      .pos = {.x = 100, .y = 700},
-	                                      .text = "Empty Project Test"});
+	kr_flecs_create_text(kr_world, (kr_init_text_t){.color = 0xffffffff,
+	                                                .font = &font,
+	                                                .size = 30,
+	                                                .pos = {.x = 100, .y = 700},
+	                                                .text = "Empty Project Test"});
 
 	kinc_start();
 	kr_flecs_destroy();
