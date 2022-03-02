@@ -42,13 +42,7 @@ static void kr_flecs_free(void *ptr) {
 }
 
 // Threading
-static bool threading_enabled = false;
-
 static ecs_os_thread_t kr_new_thread(ecs_os_thread_callback_t callback, void *arg) {
-    if (!threading_enabled) {
-        kinc_threads_init();
-        threading_enabled = true;
-    }
     kinc_thread_t *thread = (kinc_thread_t *)kr_malloc(sizeof(kinc_thread_t));
     assert(thread != NULL);
     kinc_thread_init(thread, (void (*)(void *))callback, arg);

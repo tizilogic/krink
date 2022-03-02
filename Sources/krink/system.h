@@ -18,3 +18,8 @@
 /// <param name="num_glyphs">The length of `glyphs` if not `NULL` otherwise this
 /// is ignored</param>
 void kr_init(void *memblk, size_t size, int *glyphs, int num_glyphs);
+
+/// <summary>
+/// Needs to be called after using krink.
+/// </summary>
+void kr_destroy(void);
