@@ -51,7 +51,7 @@ static float max(float a, float b) {
 static void build_rect_pipeline(void) {
 	{
 		kinc_file_reader_t reader;
-		kinc_file_reader_open(&reader, "painter-sdf-rect.vert", KINC_FILE_TYPE_ASSET);
+		kinc_file_reader_open(&reader, "kr-painter-sdf-rect.vert", KINC_FILE_TYPE_ASSET);
 		size_t size = kinc_file_reader_size(&reader);
 		uint8_t *data = kr_malloc(size);
 		kinc_file_reader_read(&reader, data, size);
@@ -63,7 +63,7 @@ static void build_rect_pipeline(void) {
 
 	{
 		kinc_file_reader_t reader;
-		kinc_file_reader_open(&reader, "painter-sdf-rect.frag", KINC_FILE_TYPE_ASSET);
+		kinc_file_reader_open(&reader, "kr-painter-sdf-rect.frag", KINC_FILE_TYPE_ASSET);
 		size_t size = kinc_file_reader_size(&reader);
 		uint8_t *data = kr_malloc(size);
 		kinc_file_reader_read(&reader, data, size);
@@ -115,7 +115,7 @@ static void build_rect_pipeline(void) {
 static void build_circle_pipeline(void) {
 	{
 		kinc_file_reader_t reader;
-		kinc_file_reader_open(&reader, "painter-sdf-circle.vert", KINC_FILE_TYPE_ASSET);
+		kinc_file_reader_open(&reader, "kr-painter-sdf-circle.vert", KINC_FILE_TYPE_ASSET);
 		size_t size = kinc_file_reader_size(&reader);
 		uint8_t *data = kr_malloc(size);
 		kinc_file_reader_read(&reader, data, size);
@@ -127,7 +127,7 @@ static void build_circle_pipeline(void) {
 
 	{
 		kinc_file_reader_t reader;
-		kinc_file_reader_open(&reader, "painter-sdf-circle.frag", KINC_FILE_TYPE_ASSET);
+		kinc_file_reader_open(&reader, "kr-painter-sdf-circle.frag", KINC_FILE_TYPE_ASSET);
 		size_t size = kinc_file_reader_size(&reader);
 		uint8_t *data = kr_malloc(size);
 		kinc_file_reader_read(&reader, data, size);
@@ -178,7 +178,7 @@ static void build_circle_pipeline(void) {
 static void build_line_pipeline(void) {
 	{
 		kinc_file_reader_t reader;
-		kinc_file_reader_open(&reader, "painter-sdf-line.vert", KINC_FILE_TYPE_ASSET);
+		kinc_file_reader_open(&reader, "kr-painter-sdf-line.vert", KINC_FILE_TYPE_ASSET);
 		size_t size = kinc_file_reader_size(&reader);
 		uint8_t *data = kr_malloc(size);
 		kinc_file_reader_read(&reader, data, size);
@@ -190,7 +190,7 @@ static void build_line_pipeline(void) {
 
 	{
 		kinc_file_reader_t reader;
-		kinc_file_reader_open(&reader, "painter-sdf-line.frag", KINC_FILE_TYPE_ASSET);
+		kinc_file_reader_open(&reader, "kr-painter-sdf-line.frag", KINC_FILE_TYPE_ASSET);
 		size_t size = kinc_file_reader_size(&reader);
 		uint8_t *data = kr_malloc(size);
 		kinc_file_reader_read(&reader, data, size);

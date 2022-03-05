@@ -35,7 +35,7 @@ static int font_size = 0;
 void kr_tsp_init(void) {
 	{
 		kinc_file_reader_t reader;
-		kinc_file_reader_open(&reader, "painter-text.vert", KINC_FILE_TYPE_ASSET);
+		kinc_file_reader_open(&reader, "kr-painter-text.vert", KINC_FILE_TYPE_ASSET);
 		size_t size = kinc_file_reader_size(&reader);
 		uint8_t *data = kr_malloc(size);
 		kinc_file_reader_read(&reader, data, size);
@@ -47,7 +47,7 @@ void kr_tsp_init(void) {
 
 	{
 		kinc_file_reader_t reader;
-		kinc_file_reader_open(&reader, "painter-text.frag", KINC_FILE_TYPE_ASSET);
+		kinc_file_reader_open(&reader, "kr-painter-text.frag", KINC_FILE_TYPE_ASSET);
 		size_t size = kinc_file_reader_size(&reader);
 		uint8_t *data = kr_malloc(size);
 		kinc_file_reader_read(&reader, data, size);

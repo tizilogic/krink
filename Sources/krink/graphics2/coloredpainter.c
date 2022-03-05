@@ -35,7 +35,7 @@ static void csp_tris_end(bool rects_done);
 void kr_csp_init(void) {
 	{
 		kinc_file_reader_t reader;
-		kinc_file_reader_open(&reader, "painter-colored.vert", KINC_FILE_TYPE_ASSET);
+		kinc_file_reader_open(&reader, "kr-painter-colored.vert", KINC_FILE_TYPE_ASSET);
 		size_t size = kinc_file_reader_size(&reader);
 		uint8_t *data = kr_malloc(size);
 		kinc_file_reader_read(&reader, data, size);
@@ -47,7 +47,7 @@ void kr_csp_init(void) {
 
 	{
 		kinc_file_reader_t reader;
-		kinc_file_reader_open(&reader, "painter-colored.frag", KINC_FILE_TYPE_ASSET);
+		kinc_file_reader_open(&reader, "kr-painter-colored.frag", KINC_FILE_TYPE_ASSET);
 		size_t size = kinc_file_reader_size(&reader);
 		uint8_t *data = kr_malloc(size);
 		kinc_file_reader_read(&reader, data, size);
