@@ -10,6 +10,7 @@
 #include <kinc/math/core.h>
 #include <krink/math/matrix.h>
 #include <krink/math/vector.h>
+#include <kinc/log.h>
 
 static bool begin = false;
 static uint32_t g2_color = 0;
@@ -38,12 +39,15 @@ void kr_g2_set_window_size(int window, int window_width, int window_height) {
 	g2_width[window] = (float)window_width;
 	g2_height[window] = (float)window_height;
 
+	// TODO: Verify on all platforms
 	kr_matrix4x4_t proj;
 	if (!kinc_g4_render_targets_inverted_y()) {
-		proj = kr_matrix4x4_orthogonal_projection(0.0f, g2_width[window], 0.0f, g2_height[window],
+		kinc_log(KINC_LOG_LEVEL_INFO, "Non-Inverted Y render target");
+		proj = kr_matrix4x4_orthogonal_projection(0.0f, g2_width[window], g2_height[window], 0.0f,
 		                                          0.1f, 1000.0f);
 	}
 	else {
+		kinc_log(KINC_LOG_LEVEL_INFO, "Inverted Y render target");
 		proj = kr_matrix4x4_orthogonal_projection(0.0f, g2_width[window], g2_height[window], 0.0f,
 		                                          0.1f, 1000.0f);
 	}
