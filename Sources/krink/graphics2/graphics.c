@@ -74,14 +74,12 @@ void kr_g2_destroy(void) {
 
 void kr_g2_begin(int window) {
 	assert(!begin && g2_active_window == -1);
-	kinc_g4_begin(window);
 	g2_active_window = window;
 	begin = true;
 }
 
 void kr_g2_end(void) {
 	assert(begin && g2_active_window != -1);
-	kinc_g4_end(g2_active_window);
 	kr_csp_end();
 	kr_tsp_end();
 	kr_isp_end();

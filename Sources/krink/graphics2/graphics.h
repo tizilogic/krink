@@ -12,6 +12,8 @@
 
 /*! \file graphics.h
     \brief Provides a 2D drawing API.
+    \note Calling `kinc_g4_begin` and `kinc_g4_end` of the windows to be rendered to is the users
+   responsibility.
 */
 
 #ifdef __cplusplus

@@ -14,7 +14,9 @@
 static void *heap;
 
 static void update(void) {
+	kinc_g4_begin(0);
 	kr_flecs_tick();
+	kinc_g4_end(0);
 	kinc_g4_swap_buffers();
 }
 
