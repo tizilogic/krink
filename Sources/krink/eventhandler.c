@@ -1,6 +1,7 @@
 #include "eventhandler.h"
 #include <assert.h>
 #include <kinc/input/keyboard.h>
+#include <kinc/memory.h>
 #include <kinc/system.h>
 #include <stddef.h>
 #include <stdint.h>
@@ -133,26 +134,31 @@ static void finger_move(int finger, int x, int y) {
 
 static void foreground(void) {
 	kr_evt_data_t unused;
+	kinc_memset(&unused, 0, sizeof(kr_evt_data_t));
 	notify(KR_EVT_FOREGROUND, unused);
 }
 
 static void background(void) {
 	kr_evt_data_t unused;
+	kinc_memset(&unused, 0, sizeof(kr_evt_data_t));
 	notify(KR_EVT_BACKGROUND, unused);
 }
 
 static void pause(void) {
 	kr_evt_data_t unused;
+	kinc_memset(&unused, 0, sizeof(kr_evt_data_t));
 	notify(KR_EVT_PAUSE, unused);
 }
 
 static void resume(void) {
 	kr_evt_data_t unused;
+	kinc_memset(&unused, 0, sizeof(kr_evt_data_t));
 	notify(KR_EVT_RESUME, unused);
 }
 
 static void shutdown(void) {
 	kr_evt_data_t unused;
+	kinc_memset(&unused, 0, sizeof(kr_evt_data_t));
 	notify(KR_EVT_SHUTDOWN, unused);
 }
 
