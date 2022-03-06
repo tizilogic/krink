@@ -691,7 +691,7 @@ void kr_sdf_draw_line(float x0, float y0, float x1, float y1, float strength, fl
 	kr_vec2_t bw = kr_vec2_mult(fw, -1.0f);
 	kr_vec2_t up = (kr_vec2_t){fw.y, -fw.x};
 	kr_vec2_t down = kr_vec2_mult(up, -1.0f);
-	float hs = strength / 2.0;
+	float hs = strength / 2.0f;
 	fw = kr_vec2_mult(fw, hs);
 	bw = kr_vec2_mult(bw, hs);
 	up = kr_vec2_mult(up, hs);
@@ -714,7 +714,7 @@ void kr_sdf_draw_line(float x0, float y0, float x1, float y1, float strength, fl
 	sdf_line_set_rect_verts(p0.x, p0.y, p1.x, p1.y, p2.x, p2.y, p3.x, p3.y);
 	sdf_line_set_rect_colors(opacity, color);
 	sdf_line_set_rect_tex_coords(0.0f, 0.0f, u, v);
-	sdf_line_set_dim(u / 2.0f, v / 2.0);
+	sdf_line_set_dim(u / 2.0f, v / 2.0f);
 	sdf_line_set_smooth(smooth * f);
 
 	++line_buffer_index;
