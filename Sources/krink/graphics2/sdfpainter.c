@@ -6,6 +6,7 @@
 #include <kinc/graphics4/shader.h>
 #include <kinc/graphics4/vertexbuffer.h>
 #include <kinc/graphics4/vertexstructure.h>
+#include <kinc/math/core.h>
 #include <kinc/io/filereader.h>
 #include <krink/color.h>
 #include <krink/math/matrix.h>
@@ -44,9 +45,6 @@ static void sdf_rect_draw_buffer(bool end);
 static void sdf_circle_draw_buffer(bool end);
 static void sdf_line_draw_buffer(bool end);
 
-static float max(float a, float b) {
-	return (a > b ? a : b);
-}
 
 static void build_rect_pipeline(void) {
 	{
@@ -409,7 +407,7 @@ void kr_sdf_draw_rect(float x, float y, float width, float height, kr_sdf_corner
 	    kr_vec2_length(kr_vec2_subv((kr_vec2_t){p[0].x, p[0].y}, (kr_vec2_t){p[1].x, p[1].y}));
 	float u = w / (w > h ? w : h);
 	float v = h / (w > h ? w : h);
-	float f = (u >= v ? u / w : v / h) * max(w / width, h / height);
+	float f = (u >= v ? u / w : v / h) * kinc_max(w / width, h / height);
 
 	corner.top_right *= f;
 	corner.bottom_right *= f;
@@ -559,7 +557,7 @@ void kr_sdf_draw_circle(float x, float y, float radius, float border, float smoo
 	    kr_vec2_length(kr_vec2_subv((kr_vec2_t){p[0].x, p[0].y}, (kr_vec2_t){p[1].x, p[1].y}));
 	float u = w / (w > h ? w : h);
 	float v = h / (w > h ? w : h);
-	float f = (u >= v ? u / w : v / h) * max(w / (2 * radius), h / (2 * radius));
+	float f = (u >= v ? u / w : v / h) * kinc_max(w / (2 * radius), h / (2 * radius));
 
 	sdf_circle_set_rect_colors(opacity, color, border_color);
 	sdf_circle_set_rect_tex_coords(0.0f, 0.0f, 1.0f, 1.0f);
@@ -711,7 +709,7 @@ void kr_sdf_draw_line(float x0, float y0, float x1, float y1, float strength, fl
 	float u = w / (w > h ? w : h);
 	float v = h / (w > h ? w : h);
 	float wd = kr_vec2_length(kr_vec2_subv(a, b));
-	float f = (u >= v ? u / w : v / h) * max(w / wd, h / strength);
+	float f = (u >= v ? u / w : v / h) * kinc_max(w / wd, h / strength);
 
 	sdf_line_set_rect_verts(p0.x, p0.y, p1.x, p1.y, p2.x, p2.y, p3.x, p3.y);
 	sdf_line_set_rect_colors(opacity, color);

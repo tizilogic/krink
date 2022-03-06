@@ -387,7 +387,7 @@ void kr_flecs_init(bool with_flecs_rest) {
 	ecs_singleton_set(kr_world, KrSingletonClearColor, {.color = 0});
 
 	kr_evt_add_observer(evt_on_notify);
-	ecs_singleton_set(kr_world, KrSingletonInput, {});
+	ecs_singleton_set(kr_world, KrSingletonInput, {0});
 	ECS_SYSTEM(kr_world, InputSystem, EcsOnLoad, KrSingletonInput);
 	kinc_log(KINC_LOG_LEVEL_INFO, "flecs initialized");
 }
