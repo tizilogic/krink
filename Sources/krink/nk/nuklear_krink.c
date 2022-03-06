@@ -144,7 +144,12 @@ NK_API void kr_nk_render(int window, struct nk_color clear) {
 			break;
 		case NK_COMMAND_SCISSOR: {
 			const struct nk_command_scissor *s = (const struct nk_command_scissor *)cmd;
-			kr_g2_scissor((float)s->x, (float)s->y, (float)s->w, (float)s->h);
+			if (s->x < 0) {
+				kr_g2_disable_scissor();
+			}
+			else {
+				kr_g2_scissor((float)s->x, (float)s->y, (float)s->w, (float)s->h);
+			}
 		} break;
 		case NK_COMMAND_LINE: {
 			const struct nk_command_line *l = (const struct nk_command_line *)cmd;
