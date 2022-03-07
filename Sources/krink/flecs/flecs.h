@@ -55,6 +55,7 @@
 #define FLECS_TIMER         /* Timer support */
 #define FLECS_META          /* Reflection support */
 #define FLECS_META_C        /* Utilities for populating reflection data */
+#define FLECS_UNITS         /* Builtin standard units */
 #define FLECS_EXPR          /* Parsing strings to/from component values */
 #define FLECS_JSON          /* Parsing JSON to/from component values */
 #define FLECS_DOC           /* Document entities & components */
@@ -6799,7 +6800,7 @@ void* ecs_term_w_size(
     size_t size,
     int32_t index);
 
-/** Test whether the term is readonly
+/** Test whether the term is readonly.
  * This operation returns whether this is a readonly term. Readonly terms are
  * annotated with [in], or are added as a const type in the C++ API.
  *
@@ -6811,6 +6812,21 @@ FLECS_API
 bool ecs_term_is_readonly(
     const ecs_iter_t *it,
     int32_t index);    
+
+/** Test whether the term is writeonly.
+ * This operation returns whether this is a writeonly term. Writeonly terms are
+ * annotated with [out].
+ * 
+ * Serializers are not required to serialize the values of a writeonly term.
+ *
+ * @param it The iterator.
+ * @param index The index of the term in the query.
+ * @return Whether the term is writeonly.
+ */
+FLECS_API
+bool ecs_term_is_writeonly(
+    const ecs_iter_t *it,
+    int32_t index);
 
 /** Test whether term is set.
  * 
@@ -7483,6 +7499,435 @@ void* ecs_record_get_column(
     size_t c_size);
 
 /** @} */
+
+/**
+ * @file flecs_c.h
+ * @brief Extends the core API with convenience functions/macro's for C applications.
+ */
+
+#ifndef FLECS_C_
+#define FLECS_C_
+
+/**
+ * @defgroup create_macros Macro's that help with creation of ECS objects.
+ * @{
+ */
+
+/* Use for declaring entity, tag, prefab / any other entity identifier */
+#define ECS_DECLARE(id)\
+    ecs_entity_t id, ecs_id(id)
+
+#define ECS_ENTITY_DEFINE(world, id, ...) \
+    { \
+        ecs_entity_desc_t desc = {0}; \
+        desc.entity = id; \
+        desc.name = #id; \
+        desc.add_expr = #__VA_ARGS__; \
+        id = ecs_entity_init(world, &desc); \
+        ecs_id(id) = id; \
+    } \
+    (void)id; \
+    (void)ecs_id(id);
+
+#define ECS_ENTITY(world, id, ...) \
+    ecs_entity_t ecs_id(id); \
+    ecs_entity_t id = 0; \
+    ECS_ENTITY_DEFINE(world, id, __VA_ARGS__);
+
+#define ECS_TAG_DEFINE(world, id)         ECS_ENTITY_DEFINE(world, id, 0)
+#define ECS_TAG(world, id)                ECS_ENTITY(world, id, 0)
+
+#define ECS_PREFAB_DEFINE(world, id, ...) ECS_ENTITY_DEFINE(world, id, Prefab, __VA_ARGS__)
+#define ECS_PREFAB(world, id, ...)        ECS_ENTITY(world, id, Prefab, __VA_ARGS__)
+
+/* Use for declaring component identifiers */
+#define ECS_COMPONENT_DECLARE(id)         ecs_entity_t ecs_id(id)
+#define ECS_COMPONENT_DEFINE(world, id) \
+    {\
+        ecs_component_desc_t desc = {0}; \
+        desc.entity.entity = ecs_id(id); \
+        desc.entity.name = #id; \
+        desc.entity.symbol = #id; \
+        desc.size = sizeof(id); \
+        desc.alignment = ECS_ALIGNOF(id); \
+        ecs_id(id) = ecs_component_init(world, &desc);\
+        ecs_assert(ecs_id(id) != 0, ECS_INVALID_PARAMETER, NULL);\
+    }
+
+#define ECS_COMPONENT(world, id)\
+    ecs_entity_t ecs_id(id) = 0;\
+    ECS_COMPONENT_DEFINE(world, id);\
+    (void)ecs_id(id)
+
+/* Use for declaring trigger, observer and system identifiers */
+#define ECS_SYSTEM_DECLARE(id)         ecs_entity_t ecs_id(id)
+
+/* Triggers */
+#define ECS_TRIGGER_DEFINE(world, id, kind, component) \
+    {\
+        ecs_trigger_desc_t desc = {0}; \
+        desc.entity.entity = ecs_id(id); \
+        desc.entity.name = #id;\
+        desc.callback = id;\
+        desc.expr = #component;\
+        desc.events[0] = kind;\
+        ecs_id(id) = ecs_trigger_init(world, &desc);\
+        ecs_assert(ecs_id(id) != 0, ECS_INVALID_PARAMETER, NULL);\
+    }
+
+#define ECS_TRIGGER(world, id, kind, component) \
+    ecs_entity_t ecs_id(id) = 0; \
+    ECS_TRIGGER_DEFINE(world, id, kind, component);\
+    ecs_entity_t id = ecs_id(id);\
+    (void)ecs_id(id);\
+    (void)id;
+
+/* Observers */
+#define ECS_OBSERVER_DEFINE(world, id, kind, ...)\
+    {\
+        ecs_observer_desc_t desc = {0};\
+        desc.entity.entity = ecs_id(id); \
+        desc.entity.name = #id;\
+        desc.callback = id;\
+        desc.filter.expr = #__VA_ARGS__;\
+        desc.events[0] = kind;\
+        ecs_id(id) = ecs_observer_init(world, &desc);\
+        ecs_assert(ecs_id(id) != 0, ECS_INVALID_PARAMETER, NULL);\
+    }
+
+#define ECS_OBSERVER(world, id, kind, ...)\
+    ecs_entity_t ecs_id(id) = 0; \
+    ECS_OBSERVER_DEFINE(world, id, kind, __VA_ARGS__);\
+    ecs_entity_t id = ecs_id(id);\
+    (void)ecs_id(id);\
+    (void)id;
+
+/** @} */
+
+
+/**
+ * @defgroup function_macros Convenience macro's that wrap ECS operations
+ * @{
+ */
+
+
+/* -- World API -- */
+
+#define ecs_set_component_actions(world, T, ...)\
+    ecs_set_component_actions_w_id(world, ecs_id(T), &(EcsComponentLifecycle)__VA_ARGS__)
+
+/* -- New -- */
+
+#define ecs_new(world, T) ecs_new_w_id(world, ecs_id(T))
+
+#define ecs_new_w_pair(world, relation, object)\
+    ecs_new_w_id(world, ecs_pair(relation, object))
+
+#define ecs_bulk_new(world, component, count)\
+    ecs_bulk_new_w_id(world, ecs_id(component), count)
+
+#define ecs_new_entity(world, n)\
+    ecs_entity_init(world, &(ecs_entity_desc_t) {\
+        .name = n,\
+    })
+
+#define ecs_new_prefab(world, n)\
+    ecs_entity_init(world, &(ecs_entity_desc_t) {\
+        .name = n,\
+        .add = {EcsPrefab}\
+    })
+
+/* -- Add -- */
+
+#define ecs_add(world, entity, T)\
+    ecs_add_id(world, entity, ecs_id(T))
+
+#define ecs_add_pair(world, subject, relation, object)\
+    ecs_add_id(world, subject, ecs_pair(relation, object))
+
+
+/* -- Remove -- */
+
+#define ecs_remove(world, entity, T)\
+    ecs_remove_id(world, entity, ecs_id(T))
+
+#define ecs_remove_pair(world, subject, relation, object)\
+    ecs_remove_id(world, subject, ecs_pair(relation, object))
+
+
+/* -- Bulk remove/delete -- */
+
+#define ecs_delete_children(world, parent)\
+    ecs_delete_with(world, ecs_pair(EcsChildOf, parent))
+
+
+/* -- Set -- */
+
+#define ecs_set_ptr(world, entity, component, ptr)\
+    ecs_set_id(world, entity, ecs_id(component), sizeof(component), ptr)
+
+#define ecs_set(world, entity, component, ...)\
+    ecs_set_id(world, entity, ecs_id(component), sizeof(component), &(component)__VA_ARGS__)
+
+#define ecs_set_pair(world, subject, relation, object, ...)\
+    ecs_set_id(world, subject,\
+        ecs_pair(ecs_id(relation), object),\
+        sizeof(relation), &(relation)__VA_ARGS__)
+
+#define ecs_set_pair_object(world, subject, relation, object, ...)\
+    ecs_set_id(world, subject,\
+        ecs_pair(relation, ecs_id(object)),\
+        sizeof(object), &(object)__VA_ARGS__)
+
+#define ecs_set_override(world, entity, T, ...)\
+    ecs_add_id(world, entity, ECS_OVERRIDE | ecs_id(T));\
+    ecs_set(world, entity, T, __VA_ARGS__)
+
+/* -- Emplace -- */
+
+#define ecs_emplace(world, entity, T)\
+    (ECS_CAST(T*, ecs_emplace_id(world, entity, ecs_id(T))))
+
+
+/* -- Get -- */
+
+#define ecs_get_ref(world, ref, entity, T)\
+    (ECS_CAST(const T*, ecs_get_ref_id(world, ref, entity, ecs_id(T))))
+
+#define ecs_get(world, entity, T)\
+    (ECS_CAST(const T*, ecs_get_id(world, entity, ecs_id(T))))
+
+#define ecs_get_pair(world, subject, relation, object)\
+    (ECS_CAST(relation*, ecs_get_id(world, subject,\
+        ecs_pair(ecs_id(relation), object))))
+
+#define ecs_get_pair_object(world, subject, relation, object)\
+    (ECS_CAST(object*, ecs_get_id(world, subject,\
+        ecs_pair(relation, ecs_id(object)))))
+
+
+/* -- Get mut & Modified -- */
+
+#define ecs_get_mut(world, entity, T, is_added)\
+    (ECS_CAST(T*, ecs_get_mut_id(world, entity, ecs_id(T), is_added)))
+
+#define ecs_get_mut_pair(world, subject, relation, object, is_added)\
+    (ECS_CAST(relation*, ecs_get_mut_id(world, subject,\
+        ecs_pair(ecs_id(relation), object), is_added)))
+
+#define ecs_get_mut_pair_object(world, subject, relation, object, is_added)\
+    (ECS_CAST(object*, ecs_get_mut_id(world, subject,\
+        ecs_pair(relation, ecs_id(object)), is_added)))
+
+#define ecs_modified(world, entity, component)\
+    ecs_modified_id(world, entity, ecs_id(component))
+
+#define ecs_modified_pair(world, subject, relation, object)\
+    ecs_modified_id(world, subject, ecs_pair(relation, object))
+
+
+/* -- Singletons -- */
+
+#define ecs_singleton_add(world, comp)\
+    ecs_add(world, ecs_id(comp), comp)
+
+#define ecs_singleton_remove(world, comp)\
+    ecs_remove(world, ecs_id(comp), comp)
+
+#define ecs_singleton_get(world, comp)\
+    ecs_get(world, ecs_id(comp), comp)
+
+#define ecs_singleton_set(world, comp, ...)\
+    ecs_set(world, ecs_id(comp), comp, __VA_ARGS__)
+
+#define ecs_singleton_get_mut(world, comp)\
+    ecs_get_mut(world, ecs_id(comp), comp, NULL)
+
+#define ecs_singleton_modified(world, comp)\
+    ecs_modified(world, ecs_id(comp), comp)
+
+
+/* -- Has, Owns & Shares -- */
+
+#define ecs_has(world, entity, T)\
+    ecs_has_id(world, entity, ecs_id(T))
+
+#define ecs_has_pair(world, entity, relation, object)\
+    ecs_has_id(world, entity, ecs_pair(relation, object))
+
+#define ecs_owns_id(world, entity, id)\
+    (ecs_search(world, ecs_get_table(world, entity), id, 0) != -1)
+
+#define ecs_owns_pair(world, entity, relation, object)\
+    ecs_owns_id(world, entity, ecs_pair(relation, object))
+
+#define ecs_owns(world, entity, T)\
+    ecs_owns_id(world, entity, ecs_id(T))
+
+#define ecs_shares_id(world, entity, id)\
+    (ecs_search_relation(world, ecs_get_table(world, entity), 0, ecs_id(id), \
+        EcsIsA, 1, 0, 0, 0, 0) != -1)
+
+#define ecs_shares_pair(world, entity, relation, object)\
+    (ecs_shares_id(world, entity, ecs_pair(relation, object)))
+
+#define ecs_shares(world, entity, T)\
+    (ecs_shares_id(world, entity, ecs_id(T)))
+
+
+/* -- Enable / Disable component -- */
+
+#define ecs_enable_component(world, entity, T, enable)\
+    ecs_enable_component_w_id(world, entity, ecs_id(T), enable)
+
+#define ecs_is_component_enabled(world, entity, T)\
+    ecs_is_component_enabled_w_id(world, entity, ecs_id(T))
+
+
+/* -- Count -- */
+
+#define ecs_count(world, type)\
+    ecs_count_id(world, ecs_id(type))
+
+
+/* -- Lookups & Paths -- */
+
+#define ecs_lookup_path(world, parent, path)\
+    ecs_lookup_path_w_sep(world, parent, path, ".", NULL, true)
+
+#define ecs_lookup_fullpath(world, path)\
+    ecs_lookup_path_w_sep(world, 0, path, ".", NULL, true)
+
+#define ecs_get_path(world, parent, child)\
+    ecs_get_path_w_sep(world, parent, child, ".", NULL)
+
+#define ecs_get_fullpath(world, child)\
+    ecs_get_path_w_sep(world, 0, child, ".", NULL)
+
+#define ecs_get_fullpath_buf(world, child, buf)\
+    ecs_get_path_w_sep_buf(world, 0, child, ".", NULL, buf)
+
+#define ecs_new_from_path(world, parent, path)\
+    ecs_new_from_path_w_sep(world, parent, path, ".", NULL)
+
+#define ecs_new_from_fullpath(world, path)\
+    ecs_new_from_path_w_sep(world, 0, path, ".", NULL)
+
+#define ecs_add_path(world, entity, parent, path)\
+    ecs_add_path_w_sep(world, entity, parent, path, ".", NULL)
+
+#define ecs_add_fullpath(world, entity, path)\
+    ecs_add_path_w_sep(world, entity, 0, path, ".", NULL)
+
+
+/* -- Queries -- */
+
+#define ecs_query_table_count(query) query->cache.tables.count
+#define ecs_query_empty_table_count(query) query->cache.empty_tables.count
+
+/* -- Iterators -- */
+
+#define ecs_term_id(it, index)\
+    ((it)->ids[(index) - 1])
+
+#define ecs_term_source(it, index)\
+    ((it)->subjects ? (it)->subjects[(index) - 1] : 0)
+
+#define ecs_term_size(it, index)\
+    ((index) == 0 ? sizeof(ecs_entity_t) : ECS_CAST(size_t, (it)->sizes[(index) - 1]))
+
+#define ecs_term_is_owned(it, index)\
+    ((it)->subjects == NULL || (it)->subjects[(index) - 1] == 0)
+
+#define ecs_term(it, T, index)\
+    (ECS_CAST(T*, ecs_term_w_size(it, sizeof(T), index)))
+
+#define ecs_iter_column(it, T, index)\
+    (ECS_CAST(T*, ecs_iter_column_w_size(it, sizeof(T), index)))
+
+/** @} */
+
+/**
+ * @defgroup utilities Utility macro's for commonly used operations
+ * @{
+ */
+
+#define ecs_childof(parent) ecs_pair(EcsChildOf, parent)
+
+#define ecs_isa(base) ecs_pair(EcsIsA, base)
+
+/** @} */
+
+/**
+ * @defgroup temporary_macros Temp macro's for easing the transition to v3
+ * @{
+ */
+
+/** Declare a constructor.
+ * Example:
+ *   ECS_CTOR(MyType, ptr, { ptr->value = NULL; });
+ */
+#define ECS_CTOR(type, var, ...)\
+    ECS_XTOR_IMPL(type, ctor, var, __VA_ARGS__)
+
+/** Declare a destructor.
+ * Example:
+ *   ECS_DTOR(MyType, ptr, { free(ptr->value); });
+ */
+#define ECS_DTOR(type, var, ...)\
+    ECS_XTOR_IMPL(type, dtor, var, __VA_ARGS__)
+
+/** Declare a copy action.
+ * Example:
+ *   ECS_COPY(MyType, dst, src, { dst->value = strdup(src->value); });
+ */
+#define ECS_COPY(type, dst_var, src_var, ...)\
+    ECS_COPY_IMPL(type, dst_var, src_var, __VA_ARGS__)
+
+/** Declare a move action.
+ * Example:
+ *   ECS_MOVE(MyType, dst, src, { dst->value = src->value; src->value = 0; });
+ */
+#define ECS_MOVE(type, dst_var, src_var, ...)\
+    ECS_MOVE_IMPL(type, dst_var, src_var, __VA_ARGS__)
+
+/** Declare an on_set action.
+ * Example:
+ *   ECS_ON_SET(MyType, ptr, { printf("%d\n", ptr->value); });
+ */
+#define ECS_ON_SET(type, ptr, ...)\
+    ECS_ON_SET_IMPL(type, ptr, __VA_ARGS__)
+
+/* Map from typename to function name of component lifecycle action */
+#define ecs_ctor(type) type##_ctor
+#define ecs_dtor(type) type##_dtor
+#define ecs_copy(type) type##_copy
+#define ecs_move(type) type##_move
+#define ecs_on_set(type) type##_on_set
+
+#define ecs_query_new(world, q_expr)\
+    ecs_query_init(world, &(ecs_query_desc_t){\
+        .filter.expr = q_expr\
+    })
+
+#define ecs_rule_new(world, q_expr)\
+    ecs_rule_init(world, &(ecs_filter_desc_t){\
+        .expr = q_expr\
+    })
+
+#define ECS_TYPE(world, id, ...) \
+    ecs_entity_t id = ecs_type_init(world, &(ecs_type_desc_t){\
+        .entity.name = #id,\
+        .ids_expr = #__VA_ARGS__\
+    });\
+    ecs_assert(id != 0, ECS_INVALID_PARAMETER, NULL);\
+    (void)id;
+
+/** @} */
+
+
+#endif // FLECS_C_
+
 
 #ifdef FLECS_APP
 /**
@@ -8924,6 +9369,187 @@ int ecs_iter_to_json_buf(
 #if defined(FLECS_EXPR) || defined(FLECS_META_C)
 #define FLECS_META
 #endif
+#ifdef FLECS_UNITS
+/**
+ * @file units.h
+ * @brief Units module.
+ *
+ * Builtin standard units. The units addon is not imported by default, even if
+ * the addon is included in the build. To import the module, do:
+ *
+ * In C:
+ *   ECS_IMPORT(world, FlecsUnits);
+ * 
+ * In C++:
+ *   world.import<flecs::units>();
+ *
+ * As a result this module behaves just like an application-defined module, 
+ * which means that the ids generated for the entities inside the module are not
+ * fixed, and depend on the order in which the module is imported.
+ */
+
+#ifdef FLECS_UNITS
+
+#ifndef FLECS_MODULE
+#define FLECS_MODULE
+#endif
+
+#ifndef FLECS_META
+#define FLECS_META
+#endif
+
+#ifndef FLECS_UNITS_H
+#define FLECS_UNITS_H
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+////////////////////////////////////////////////////////////////////////////////
+//// Unit prefixes
+////////////////////////////////////////////////////////////////////////////////
+
+FLECS_API extern ECS_DECLARE(EcsUnitPrefixes); /* Parent scope for prefixes */
+
+FLECS_API extern ECS_DECLARE(EcsYocto);
+FLECS_API extern ECS_DECLARE(EcsZepto);
+FLECS_API extern ECS_DECLARE(EcsAtto);
+FLECS_API extern ECS_DECLARE(EcsFemto);
+FLECS_API extern ECS_DECLARE(EcsPico);
+FLECS_API extern ECS_DECLARE(EcsNano);
+FLECS_API extern ECS_DECLARE(EcsMicro);
+FLECS_API extern ECS_DECLARE(EcsMilli);
+FLECS_API extern ECS_DECLARE(EcsCenti);
+FLECS_API extern ECS_DECLARE(EcsDeci);
+FLECS_API extern ECS_DECLARE(EcsDeca);
+FLECS_API extern ECS_DECLARE(EcsHecto);
+FLECS_API extern ECS_DECLARE(EcsKilo);
+FLECS_API extern ECS_DECLARE(EcsMega);
+FLECS_API extern ECS_DECLARE(EcsGiga);
+FLECS_API extern ECS_DECLARE(EcsTera);
+FLECS_API extern ECS_DECLARE(EcsPeta);
+FLECS_API extern ECS_DECLARE(EcsExa);
+FLECS_API extern ECS_DECLARE(EcsZetta);
+FLECS_API extern ECS_DECLARE(EcsYotta);
+
+FLECS_API extern ECS_DECLARE(EcsKibi);
+FLECS_API extern ECS_DECLARE(EcsMebi);
+FLECS_API extern ECS_DECLARE(EcsGibi);
+FLECS_API extern ECS_DECLARE(EcsTebi);
+FLECS_API extern ECS_DECLARE(EcsPebi);
+FLECS_API extern ECS_DECLARE(EcsExbi);
+FLECS_API extern ECS_DECLARE(EcsZebi);
+FLECS_API extern ECS_DECLARE(EcsYobi);
+
+
+////////////////////////////////////////////////////////////////////////////////
+//// Units & quantities
+////////////////////////////////////////////////////////////////////////////////
+
+FLECS_API extern ECS_DECLARE(EcsDuration);
+FLECS_API extern     ECS_DECLARE(EcsPicoSeconds);
+FLECS_API extern     ECS_DECLARE(EcsNanoSeconds);
+FLECS_API extern     ECS_DECLARE(EcsMicroSeconds);
+FLECS_API extern     ECS_DECLARE(EcsMilliSeconds);
+FLECS_API extern     ECS_DECLARE(EcsSeconds);
+FLECS_API extern     ECS_DECLARE(EcsMinutes);
+FLECS_API extern     ECS_DECLARE(EcsHours);
+FLECS_API extern     ECS_DECLARE(EcsDays);
+
+FLECS_API extern ECS_DECLARE(EcsTime);
+FLECS_API extern     ECS_DECLARE(EcsDate);
+
+FLECS_API extern ECS_DECLARE(EcsMass);
+FLECS_API extern     ECS_DECLARE(EcsGrams);
+FLECS_API extern     ECS_DECLARE(EcsKiloGrams);
+
+FLECS_API extern ECS_DECLARE(EcsElectricCurrent);
+FLECS_API extern     ECS_DECLARE(EcsAmpere);
+
+FLECS_API extern ECS_DECLARE(EcsAmount);
+FLECS_API extern     ECS_DECLARE(EcsMole);
+
+FLECS_API extern ECS_DECLARE(EcsLuminousIntensity);
+FLECS_API extern     ECS_DECLARE(EcsCandela);
+
+FLECS_API extern ECS_DECLARE(EcsForce);
+FLECS_API extern     ECS_DECLARE(EcsNewton);
+
+FLECS_API extern ECS_DECLARE(EcsLength);
+FLECS_API extern     ECS_DECLARE(EcsMeters);
+FLECS_API extern         ECS_DECLARE(EcsPicoMeters);
+FLECS_API extern         ECS_DECLARE(EcsNanoMeters);
+FLECS_API extern         ECS_DECLARE(EcsMicroMeters);
+FLECS_API extern         ECS_DECLARE(EcsMilliMeters);
+FLECS_API extern         ECS_DECLARE(EcsCentiMeters);
+FLECS_API extern         ECS_DECLARE(EcsKiloMeters);
+FLECS_API extern     ECS_DECLARE(EcsMiles);
+
+FLECS_API extern ECS_DECLARE(EcsPressure);
+FLECS_API extern     ECS_DECLARE(EcsPascal);
+FLECS_API extern     ECS_DECLARE(EcsBar);
+
+FLECS_API extern ECS_DECLARE(EcsSpeed);
+FLECS_API extern     ECS_DECLARE(EcsMetersPerSecond);
+FLECS_API extern     ECS_DECLARE(EcsKiloMetersPerHour);
+FLECS_API extern     ECS_DECLARE(EcsMilesPerHour);
+
+FLECS_API extern ECS_DECLARE(EcsTemperature);
+FLECS_API extern     ECS_DECLARE(EcsKelvin);
+FLECS_API extern     ECS_DECLARE(EcsCelsius);
+FLECS_API extern     ECS_DECLARE(EcsFahrenheit);
+
+FLECS_API extern ECS_DECLARE(EcsAcceleration);
+
+FLECS_API extern ECS_DECLARE(EcsData);
+FLECS_API extern     ECS_DECLARE(EcsBits);
+FLECS_API extern         ECS_DECLARE(EcsKiloBits);
+FLECS_API extern         ECS_DECLARE(EcsMegaBits);
+FLECS_API extern         ECS_DECLARE(EcsGigaBits);
+FLECS_API extern     ECS_DECLARE(EcsBytes);
+FLECS_API extern         ECS_DECLARE(EcsKiloBytes);
+FLECS_API extern         ECS_DECLARE(EcsMegaBytes);
+FLECS_API extern         ECS_DECLARE(EcsGigaBytes);
+FLECS_API extern         ECS_DECLARE(EcsKibiBytes);
+FLECS_API extern         ECS_DECLARE(EcsMebiBytes);
+FLECS_API extern         ECS_DECLARE(EcsGibiBytes);
+
+FLECS_API extern ECS_DECLARE(EcsDataRate);
+FLECS_API extern     ECS_DECLARE(EcsBitsPerSecond);
+FLECS_API extern     ECS_DECLARE(EcsKiloBitsPerSecond);
+FLECS_API extern     ECS_DECLARE(EcsMegaBitsPerSecond);
+FLECS_API extern     ECS_DECLARE(EcsGigaBitsPerSecond);
+FLECS_API extern     ECS_DECLARE(EcsBytesPerSecond);
+FLECS_API extern     ECS_DECLARE(EcsKiloBytesPerSecond);
+FLECS_API extern     ECS_DECLARE(EcsMegaBytesPerSecond);
+FLECS_API extern     ECS_DECLARE(EcsGigaBytesPerSecond);
+
+FLECS_API extern ECS_DECLARE(EcsPercentage);
+
+FLECS_API extern ECS_DECLARE(EcsAngle);
+FLECS_API extern     ECS_DECLARE(EcsRadians);
+FLECS_API extern     ECS_DECLARE(EcsDegrees);
+
+FLECS_API extern ECS_DECLARE(EcsBel);
+FLECS_API extern ECS_DECLARE(EcsDeciBel);
+
+////////////////////////////////////////////////////////////////////////////////
+//// Module
+////////////////////////////////////////////////////////////////////////////////
+
+FLECS_API
+void FlecsUnitsImport(
+    ecs_world_t *world);
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif
+
+#endif
+
+#endif
 #ifdef FLECS_META
 /**
  * @file meta.h
@@ -9030,7 +9656,10 @@ FLECS_API extern const ecs_entity_t ecs_id(EcsMember);
 FLECS_API extern const ecs_entity_t ecs_id(EcsStruct);
 FLECS_API extern const ecs_entity_t ecs_id(EcsArray);
 FLECS_API extern const ecs_entity_t ecs_id(EcsVector);
+FLECS_API extern const ecs_entity_t ecs_id(EcsUnit);
+FLECS_API extern const ecs_entity_t ecs_id(EcsUnitPrefix);
 FLECS_API extern const ecs_entity_t EcsConstant;
+FLECS_API extern const ecs_entity_t EcsQuantity;
 
 /** Primitive type component ids */
 FLECS_API extern const ecs_entity_t ecs_id(ecs_bool_t);
@@ -9095,6 +9724,7 @@ typedef struct EcsPrimitive {
 typedef struct EcsMember {
     ecs_entity_t type;
     int32_t count;
+    ecs_entity_t unit;
 } EcsMember;
 
 /* Element type of members vector in EcsStruct */
@@ -9106,6 +9736,10 @@ typedef struct ecs_member_t {
     /* May be set when used with ecs_struct_desc_t */
     int32_t count;
     int32_t offset;
+
+    /* May be set when used with ecs_struct_desc_t, will be auto-populated if
+     * type entity is also a unit */
+    ecs_entity_t unit;
 
     /* Should not be set by ecs_struct_desc_t */
     ecs_size_t size;
@@ -9159,6 +9793,34 @@ typedef struct EcsVector {
 } EcsVector;
 
 
+/** Units */
+
+/* Helper type to describe translation between two units. Note that this
+ * is not intended as a generic approach to unit conversions (e.g. from celsius
+ * to fahrenheit) but to translate between units that derive from the same base 
+ * (e.g. meters to kilometers). 
+ * 
+ * Note that power is applied to the factor. When describing a translation of
+ * 1000, either use {factor = 1000, power = 1} or {factor = 1, power = 3}. */
+typedef struct ecs_unit_translation_t {
+    int32_t factor; /* Factor to apply (e.g. "1000", "1000000", "1024") */
+    int32_t power; /* Power to apply to factor (e.g. "1", "3", "-9") */
+} ecs_unit_translation_t;
+
+typedef struct EcsUnit {
+    char *symbol;
+    ecs_entity_t prefix; /* Order of magnitude prefix relative to derived */
+    ecs_entity_t base; /* Base unit (e.g. "meters") */
+    ecs_entity_t over; /* Over unit (e.g. "per second") */
+    ecs_unit_translation_t translation; /* Translation for derived unit */
+} EcsUnit;
+
+typedef struct EcsUnitPrefix {
+    char *symbol;   /* Symbol of prefix (e.g. "K", "M", "Ki") */
+    ecs_unit_translation_t translation; /* Translation of prefix */
+} EcsUnitPrefix;
+
+
 /** Serializer utilities */
 
 typedef enum ecs_meta_type_op_kind_t {
@@ -9201,6 +9863,7 @@ typedef struct ecs_meta_type_op_t {
     int32_t op_count;       /* Number of operations until next field or end */
     ecs_size_t size;        /* Size of type of operation */
     ecs_entity_t type;
+    ecs_entity_t unit;
     ecs_hashmap_t *members; /* string -> member index (structs only) */
 } ecs_meta_type_op_t;
 
@@ -9281,12 +9944,22 @@ int ecs_meta_pop(
 /** Is the current scope a collection? */
 FLECS_API
 bool ecs_meta_is_collection(
-    ecs_meta_cursor_t *cursor);
+    const ecs_meta_cursor_t *cursor);
 
 /** Get type of current element. */
 FLECS_API
 ecs_entity_t ecs_meta_get_type(
-    ecs_meta_cursor_t *cursor);
+    const ecs_meta_cursor_t *cursor);
+
+/** Get unit of current element. */
+FLECS_API
+ecs_entity_t ecs_meta_get_unit(
+    const ecs_meta_cursor_t *cursor);
+
+/** Get member name of current member */
+FLECS_API
+const char* ecs_meta_get_member(
+    const ecs_meta_cursor_t *cursor);
 
 /** The set functions assign the field with the specified value. If the value
  * does not have the same type as the field, it will be cased to the field type.
@@ -9344,6 +10017,48 @@ int ecs_meta_set_entity(
 FLECS_API
 int ecs_meta_set_null(
     ecs_meta_cursor_t *cursor);
+
+
+/** Functions for getting members. */
+
+/** Get field value as boolean. */
+FLECS_API
+bool ecs_meta_get_bool(
+    const ecs_meta_cursor_t *cursor);
+
+/** Get field value as char. */
+FLECS_API
+char ecs_meta_get_char(
+    const ecs_meta_cursor_t *cursor);
+
+/** Get field value as signed integer. */
+FLECS_API
+int64_t ecs_meta_get_int(
+    const ecs_meta_cursor_t *cursor);
+
+/** Get field value as unsigned integer. */
+FLECS_API
+uint64_t ecs_meta_get_uint(
+    const ecs_meta_cursor_t *cursor);
+
+/** Get field value as float. */
+FLECS_API
+double ecs_meta_get_float(
+    const ecs_meta_cursor_t *cursor);
+
+/** Get field value as string. 
+ * This operation does not perform conversions. If the field is not a string,
+ * this operation will fail.
+ */
+FLECS_API
+const char* ecs_meta_get_string(
+    const ecs_meta_cursor_t *cursor);
+
+/** Get field value as entity. 
+ * This operation does not perform conversions. */
+FLECS_API
+ecs_entity_t ecs_meta_get_entity(
+    const ecs_meta_cursor_t *cursor);
 
 
 /** API functions for creating meta types */
@@ -9424,6 +10139,63 @@ FLECS_API
 ecs_entity_t ecs_struct_init(
     ecs_world_t *world,
     const ecs_struct_desc_t *desc);
+
+/** Used with ecs_unit_init. */
+typedef struct ecs_unit_desc_t {
+    ecs_entity_desc_t entity;
+    
+    /* Unit symbol, e.g. "m", "%", "g". (optional) */
+    const char *symbol;
+
+    /* Unit quantity, e.g. distance, percentage, weight. (optional) */
+    ecs_entity_t quantity;
+
+    /* Base unit, e.g. "meters" (optional) */
+    ecs_entity_t base;
+
+    /* Over unit, e.g. "per second" (optional) */
+    ecs_entity_t over;
+
+    /* Translation to apply to derived unit (optional) */
+    ecs_unit_translation_t translation;
+
+    /* Prefix indicating order of magnitude relative to the derived unit. If set
+     * together with "translation", the values must match. If translation is not 
+     * set, setting prefix will autopopulate it. 
+     * Additionally, setting the prefix will enforce that the symbol (if set)
+     * is consistent with the prefix symbol + symbol of the derived unit. If the
+     * symbol is not set, it will be auto populated. */
+    ecs_entity_t prefix;
+} ecs_unit_desc_t;
+
+/** Create a new unit */
+FLECS_API
+ecs_entity_t ecs_unit_init(
+    ecs_world_t *world,
+    const ecs_unit_desc_t *desc);
+
+/** Used with ecs_unit_prefix_init. */
+typedef struct ecs_unit_prefix_desc_t {
+    ecs_entity_desc_t entity;
+    
+    /* Unit symbol, e.g. "m", "%", "g". (optional) */
+    const char *symbol;
+
+    /* Translation to apply to derived unit (optional) */
+    ecs_unit_translation_t translation;
+} ecs_unit_prefix_desc_t;
+
+/** Create a new unit prefix */
+FLECS_API
+ecs_entity_t ecs_unit_prefix_init(
+    ecs_world_t *world,
+    const ecs_unit_prefix_desc_t *desc);
+
+/** Create a new quantity */
+FLECS_API
+ecs_entity_t ecs_quantity_init(
+    ecs_world_t *world,
+    const ecs_entity_desc_t *desc);
 
 /* Module import */
 FLECS_API
@@ -10910,435 +11682,6 @@ ecs_entity_t ecs_module_init(
 #endif
 
 #endif
-
-/**
- * @file flecs_c.h
- * @brief Extends the core API with convenience functions/macro's for C applications.
- */
-
-#ifndef FLECS_C_
-#define FLECS_C_
-
-/**
- * @defgroup create_macros Macro's that help with creation of ECS objects.
- * @{
- */
-
-/* Use for declaring entity, tag, prefab / any other entity identifier */
-#define ECS_DECLARE(id)\
-    ecs_entity_t id, ecs_id(id)
-
-#define ECS_ENTITY_DEFINE(world, id, ...) \
-    { \
-        ecs_entity_desc_t desc = {0}; \
-        desc.entity = id; \
-        desc.name = #id; \
-        desc.add_expr = #__VA_ARGS__; \
-        id = ecs_entity_init(world, &desc); \
-        ecs_id(id) = id; \
-    } \
-    (void)id; \
-    (void)ecs_id(id);
-
-#define ECS_ENTITY(world, id, ...) \
-    ecs_entity_t ecs_id(id); \
-    ecs_entity_t id = 0; \
-    ECS_ENTITY_DEFINE(world, id, __VA_ARGS__);
-
-#define ECS_TAG_DEFINE(world, id)         ECS_ENTITY_DEFINE(world, id, 0)
-#define ECS_TAG(world, id)                ECS_ENTITY(world, id, 0)
-
-#define ECS_PREFAB_DEFINE(world, id, ...) ECS_ENTITY_DEFINE(world, id, Prefab, __VA_ARGS__)
-#define ECS_PREFAB(world, id, ...)        ECS_ENTITY(world, id, Prefab, __VA_ARGS__)
-
-/* Use for declaring component identifiers */
-#define ECS_COMPONENT_DECLARE(id)         ecs_entity_t ecs_id(id)
-#define ECS_COMPONENT_DEFINE(world, id) \
-    {\
-        ecs_component_desc_t desc = {0}; \
-        desc.entity.entity = ecs_id(id); \
-        desc.entity.name = #id; \
-        desc.entity.symbol = #id; \
-        desc.size = sizeof(id); \
-        desc.alignment = ECS_ALIGNOF(id); \
-        ecs_id(id) = ecs_component_init(world, &desc);\
-        ecs_assert(ecs_id(id) != 0, ECS_INVALID_PARAMETER, NULL);\
-    }
-
-#define ECS_COMPONENT(world, id)\
-    ecs_entity_t ecs_id(id) = 0;\
-    ECS_COMPONENT_DEFINE(world, id);\
-    (void)ecs_id(id)
-
-/* Use for declaring trigger, observer and system identifiers */
-#define ECS_SYSTEM_DECLARE(id)         ecs_entity_t ecs_id(id)
-
-/* Triggers */
-#define ECS_TRIGGER_DEFINE(world, id, kind, component) \
-    {\
-        ecs_trigger_desc_t desc = {0}; \
-        desc.entity.entity = ecs_id(id); \
-        desc.entity.name = #id;\
-        desc.callback = id;\
-        desc.expr = #component;\
-        desc.events[0] = kind;\
-        ecs_id(id) = ecs_trigger_init(world, &desc);\
-        ecs_assert(ecs_id(id) != 0, ECS_INVALID_PARAMETER, NULL);\
-    }
-
-#define ECS_TRIGGER(world, id, kind, component) \
-    ecs_entity_t ecs_id(id) = 0; \
-    ECS_TRIGGER_DEFINE(world, id, kind, component);\
-    ecs_entity_t id = ecs_id(id);\
-    (void)ecs_id(id);\
-    (void)id;
-
-/* Observers */
-#define ECS_OBSERVER_DEFINE(world, id, kind, ...)\
-    {\
-        ecs_observer_desc_t desc = {0};\
-        desc.entity.entity = ecs_id(id); \
-        desc.entity.name = #id;\
-        desc.callback = id;\
-        desc.filter.expr = #__VA_ARGS__;\
-        desc.events[0] = kind;\
-        ecs_id(id) = ecs_observer_init(world, &desc);\
-        ecs_assert(ecs_id(id) != 0, ECS_INVALID_PARAMETER, NULL);\
-    }
-
-#define ECS_OBSERVER(world, id, kind, ...)\
-    ecs_entity_t ecs_id(id) = 0; \
-    ECS_OBSERVER_DEFINE(world, id, kind, __VA_ARGS__);\
-    ecs_entity_t id = ecs_id(id);\
-    (void)ecs_id(id);\
-    (void)id;
-
-/** @} */
-
-
-/**
- * @defgroup function_macros Convenience macro's that wrap ECS operations
- * @{
- */
-
-
-/* -- World API -- */
-
-#define ecs_set_component_actions(world, T, ...)\
-    ecs_set_component_actions_w_id(world, ecs_id(T), &(EcsComponentLifecycle)__VA_ARGS__)
-
-/* -- New -- */
-
-#define ecs_new(world, T) ecs_new_w_id(world, ecs_id(T))
-
-#define ecs_new_w_pair(world, relation, object)\
-    ecs_new_w_id(world, ecs_pair(relation, object))
-
-#define ecs_bulk_new(world, component, count)\
-    ecs_bulk_new_w_id(world, ecs_id(component), count)
-
-#define ecs_new_entity(world, n)\
-    ecs_entity_init(world, &(ecs_entity_desc_t) {\
-        .name = n,\
-    })
-
-#define ecs_new_prefab(world, n)\
-    ecs_entity_init(world, &(ecs_entity_desc_t) {\
-        .name = n,\
-        .add = {EcsPrefab}\
-    })
-
-/* -- Add -- */
-
-#define ecs_add(world, entity, T)\
-    ecs_add_id(world, entity, ecs_id(T))
-
-#define ecs_add_pair(world, subject, relation, object)\
-    ecs_add_id(world, subject, ecs_pair(relation, object))
-
-
-/* -- Remove -- */
-
-#define ecs_remove(world, entity, T)\
-    ecs_remove_id(world, entity, ecs_id(T))
-
-#define ecs_remove_pair(world, subject, relation, object)\
-    ecs_remove_id(world, subject, ecs_pair(relation, object))
-
-
-/* -- Bulk remove/delete -- */
-
-#define ecs_delete_children(world, parent)\
-    ecs_delete_with(world, ecs_pair(EcsChildOf, parent))
-
-
-/* -- Set -- */
-
-#define ecs_set_ptr(world, entity, component, ptr)\
-    ecs_set_id(world, entity, ecs_id(component), sizeof(component), ptr)
-
-#define ecs_set(world, entity, component, ...)\
-    ecs_set_id(world, entity, ecs_id(component), sizeof(component), &(component)__VA_ARGS__)
-
-#define ecs_set_pair(world, subject, relation, object, ...)\
-    ecs_set_id(world, subject,\
-        ecs_pair(ecs_id(relation), object),\
-        sizeof(relation), &(relation)__VA_ARGS__)
-
-#define ecs_set_pair_object(world, subject, relation, object, ...)\
-    ecs_set_id(world, subject,\
-        ecs_pair(relation, ecs_id(object)),\
-        sizeof(object), &(object)__VA_ARGS__)
-
-#define ecs_set_override(world, entity, T, ...)\
-    ecs_add_id(world, entity, ECS_OVERRIDE | ecs_id(T));\
-    ecs_set(world, entity, T, __VA_ARGS__)
-
-/* -- Emplace -- */
-
-#define ecs_emplace(world, entity, T)\
-    (ECS_CAST(T*, ecs_emplace_id(world, entity, ecs_id(T))))
-
-
-/* -- Get -- */
-
-#define ecs_get_ref(world, ref, entity, T)\
-    (ECS_CAST(const T*, ecs_get_ref_id(world, ref, entity, ecs_id(T))))
-
-#define ecs_get(world, entity, T)\
-    (ECS_CAST(const T*, ecs_get_id(world, entity, ecs_id(T))))
-
-#define ecs_get_pair(world, subject, relation, object)\
-    (ECS_CAST(relation*, ecs_get_id(world, subject,\
-        ecs_pair(ecs_id(relation), object))))
-
-#define ecs_get_pair_object(world, subject, relation, object)\
-    (ECS_CAST(object*, ecs_get_id(world, subject,\
-        ecs_pair(relation, ecs_id(object)))))
-
-
-/* -- Get mut & Modified -- */
-
-#define ecs_get_mut(world, entity, T, is_added)\
-    (ECS_CAST(T*, ecs_get_mut_id(world, entity, ecs_id(T), is_added)))
-
-#define ecs_get_mut_pair(world, subject, relation, object, is_added)\
-    (ECS_CAST(relation*, ecs_get_mut_id(world, subject,\
-        ecs_pair(ecs_id(relation), object), is_added)))
-
-#define ecs_get_mut_pair_object(world, subject, relation, object, is_added)\
-    (ECS_CAST(object*, ecs_get_mut_id(world, subject,\
-        ecs_pair(relation, ecs_id(object)), is_added)))
-
-#define ecs_modified(world, entity, component)\
-    ecs_modified_id(world, entity, ecs_id(component))
-
-#define ecs_modified_pair(world, subject, relation, object)\
-    ecs_modified_id(world, subject, ecs_pair(relation, object))
-
-
-/* -- Singletons -- */
-
-#define ecs_singleton_add(world, comp)\
-    ecs_add(world, ecs_id(comp), comp)
-
-#define ecs_singleton_remove(world, comp)\
-    ecs_remove(world, ecs_id(comp), comp)
-
-#define ecs_singleton_get(world, comp)\
-    ecs_get(world, ecs_id(comp), comp)
-
-#define ecs_singleton_set(world, comp, ...)\
-    ecs_set(world, ecs_id(comp), comp, __VA_ARGS__)
-
-#define ecs_singleton_get_mut(world, comp)\
-    ecs_get_mut(world, ecs_id(comp), comp, NULL)
-
-#define ecs_singleton_modified(world, comp)\
-    ecs_modified(world, ecs_id(comp), comp)
-
-
-/* -- Has, Owns & Shares -- */
-
-#define ecs_has(world, entity, T)\
-    ecs_has_id(world, entity, ecs_id(T))
-
-#define ecs_has_pair(world, entity, relation, object)\
-    ecs_has_id(world, entity, ecs_pair(relation, object))
-
-#define ecs_owns_id(world, entity, id)\
-    (ecs_search(world, ecs_get_table(world, entity), id, 0) != -1)
-
-#define ecs_owns_pair(world, entity, relation, object)\
-    ecs_owns_id(world, entity, ecs_pair(relation, object))
-
-#define ecs_owns(world, entity, T)\
-    ecs_owns_id(world, entity, ecs_id(T))
-
-#define ecs_shares_id(world, entity, id)\
-    (ecs_search_relation(world, ecs_get_table(world, entity), 0, ecs_id(id), \
-        EcsIsA, 1, 0, 0, 0, 0) != -1)
-
-#define ecs_shares_pair(world, entity, relation, object)\
-    (ecs_shares_id(world, entity, ecs_pair(relation, object)))
-
-#define ecs_shares(world, entity, T)\
-    (ecs_shares_id(world, entity, ecs_id(T)))
-
-
-/* -- Enable / Disable component -- */
-
-#define ecs_enable_component(world, entity, T, enable)\
-    ecs_enable_component_w_id(world, entity, ecs_id(T), enable)
-
-#define ecs_is_component_enabled(world, entity, T)\
-    ecs_is_component_enabled_w_id(world, entity, ecs_id(T))
-
-
-/* -- Count -- */
-
-#define ecs_count(world, type)\
-    ecs_count_id(world, ecs_id(type))
-
-
-/* -- Lookups & Paths -- */
-
-#define ecs_lookup_path(world, parent, path)\
-    ecs_lookup_path_w_sep(world, parent, path, ".", NULL, true)
-
-#define ecs_lookup_fullpath(world, path)\
-    ecs_lookup_path_w_sep(world, 0, path, ".", NULL, true)
-
-#define ecs_get_path(world, parent, child)\
-    ecs_get_path_w_sep(world, parent, child, ".", NULL)
-
-#define ecs_get_fullpath(world, child)\
-    ecs_get_path_w_sep(world, 0, child, ".", NULL)
-
-#define ecs_get_fullpath_buf(world, child, buf)\
-    ecs_get_path_w_sep_buf(world, 0, child, ".", NULL, buf)
-
-#define ecs_new_from_path(world, parent, path)\
-    ecs_new_from_path_w_sep(world, parent, path, ".", NULL)
-
-#define ecs_new_from_fullpath(world, path)\
-    ecs_new_from_path_w_sep(world, 0, path, ".", NULL)
-
-#define ecs_add_path(world, entity, parent, path)\
-    ecs_add_path_w_sep(world, entity, parent, path, ".", NULL)
-
-#define ecs_add_fullpath(world, entity, path)\
-    ecs_add_path_w_sep(world, entity, 0, path, ".", NULL)
-
-
-/* -- Queries -- */
-
-#define ecs_query_table_count(query) query->cache.tables.count
-#define ecs_query_empty_table_count(query) query->cache.empty_tables.count
-
-/* -- Iterators -- */
-
-#define ecs_term_id(it, index)\
-    ((it)->ids[(index) - 1])
-
-#define ecs_term_source(it, index)\
-    ((it)->subjects ? (it)->subjects[(index) - 1] : 0)
-
-#define ecs_term_size(it, index)\
-    ((index) == 0 ? sizeof(ecs_entity_t) : ECS_CAST(size_t, (it)->sizes[(index) - 1]))
-
-#define ecs_term_is_owned(it, index)\
-    ((it)->subjects == NULL || (it)->subjects[(index) - 1] == 0)
-
-#define ecs_term(it, T, index)\
-    (ECS_CAST(T*, ecs_term_w_size(it, sizeof(T), index)))
-
-#define ecs_iter_column(it, T, index)\
-    (ECS_CAST(T*, ecs_iter_column_w_size(it, sizeof(T), index)))
-
-/** @} */
-
-/**
- * @defgroup utilities Utility macro's for commonly used operations
- * @{
- */
-
-#define ecs_childof(parent) ecs_pair(EcsChildOf, parent)
-
-#define ecs_isa(base) ecs_pair(EcsIsA, base)
-
-/** @} */
-
-/**
- * @defgroup temporary_macros Temp macro's for easing the transition to v3
- * @{
- */
-
-/** Declare a constructor.
- * Example:
- *   ECS_CTOR(MyType, ptr, { ptr->value = NULL; });
- */
-#define ECS_CTOR(type, var, ...)\
-    ECS_XTOR_IMPL(type, ctor, var, __VA_ARGS__)
-
-/** Declare a destructor.
- * Example:
- *   ECS_DTOR(MyType, ptr, { free(ptr->value); });
- */
-#define ECS_DTOR(type, var, ...)\
-    ECS_XTOR_IMPL(type, dtor, var, __VA_ARGS__)
-
-/** Declare a copy action.
- * Example:
- *   ECS_COPY(MyType, dst, src, { dst->value = strdup(src->value); });
- */
-#define ECS_COPY(type, dst_var, src_var, ...)\
-    ECS_COPY_IMPL(type, dst_var, src_var, __VA_ARGS__)
-
-/** Declare a move action.
- * Example:
- *   ECS_MOVE(MyType, dst, src, { dst->value = src->value; src->value = 0; });
- */
-#define ECS_MOVE(type, dst_var, src_var, ...)\
-    ECS_MOVE_IMPL(type, dst_var, src_var, __VA_ARGS__)
-
-/** Declare an on_set action.
- * Example:
- *   ECS_ON_SET(MyType, ptr, { printf("%d\n", ptr->value); });
- */
-#define ECS_ON_SET(type, ptr, ...)\
-    ECS_ON_SET_IMPL(type, ptr, __VA_ARGS__)
-
-/* Map from typename to function name of component lifecycle action */
-#define ecs_ctor(type) type##_ctor
-#define ecs_dtor(type) type##_dtor
-#define ecs_copy(type) type##_copy
-#define ecs_move(type) type##_move
-#define ecs_on_set(type) type##_on_set
-
-#define ecs_query_new(world, q_expr)\
-    ecs_query_init(world, &(ecs_query_desc_t){\
-        .filter.expr = q_expr\
-    })
-
-#define ecs_rule_new(world, q_expr)\
-    ecs_rule_init(world, &(ecs_filter_desc_t){\
-        .expr = q_expr\
-    })
-
-#define ECS_TYPE(world, id, ...) \
-    ecs_entity_t id = ecs_type_init(world, &(ecs_type_desc_t){\
-        .entity.name = #id,\
-        .ids_expr = #__VA_ARGS__\
-    });\
-    ecs_assert(id != 0, ECS_INVALID_PARAMETER, NULL);\
-    (void)id;
-
-/** @} */
-
-
-#endif // FLECS_C_
-
 
 #ifdef FLECS_CPP
 /**
@@ -12903,10 +13246,12 @@ using u8_t = ecs_u8_t;
 using u16_t = ecs_u16_t;
 using u32_t = ecs_u32_t;
 using u64_t = ecs_u64_t;
+using uptr_t = ecs_uptr_t;
 using i8_t = ecs_i8_t;
 using i16_t = ecs_i16_t;
 using i32_t = ecs_i32_t;
 using i64_t = ecs_i64_t;
+using iptr_t = ecs_iptr_t;
 using f32_t = ecs_f32_t;
 using f64_t = ecs_f64_t;
 
@@ -12925,6 +13270,7 @@ using Member = EcsMember;
 using Struct = EcsStruct;
 using Array = EcsArray;
 using Vector = EcsVector;
+using Unit = EcsUnit;
 
 static const flecs::entity_t Bool = ecs_id(ecs_bool_t);
 static const flecs::entity_t Char = ecs_id(ecs_char_t);
@@ -12945,6 +13291,7 @@ static const flecs::entity_t String = ecs_id(ecs_string_t);
 static const flecs::entity_t Entity = ecs_id(ecs_entity_t);
 
 static const flecs::entity_t Constant = EcsConstant;
+static const flecs::entity_t Quantity = EcsQuantity;
 
 namespace meta {
 
@@ -12973,9 +13320,13 @@ struct cursor {
         return ecs_meta_is_collection(&m_cursor);
     }
 
-    flecs::entity_t get_type() {
-        return ecs_meta_get_type(&m_cursor);
+    flecs::string_view get_member() const {
+        return flecs::string_view(ecs_meta_get_member(&m_cursor));
     }
+
+    flecs::entity get_type() const;
+
+    flecs::entity get_unit() const;
 
     void* get_ptr() {
         return ecs_meta_get_ptr(&m_cursor);
@@ -13017,6 +13368,33 @@ struct cursor {
         return ecs_meta_set_null(&m_cursor);
     }
 
+
+    bool get_bool() const {
+        return ecs_meta_get_bool(&m_cursor);
+    }
+
+    char get_char() const {
+        return ecs_meta_get_char(&m_cursor);
+    }
+
+    int64_t get_int() const {
+        return ecs_meta_get_int(&m_cursor);
+    }
+
+    uint64_t get_uint() const {
+        return ecs_meta_get_uint(&m_cursor);
+    }
+
+    double get_float() const {
+        return ecs_meta_get_float(&m_cursor);
+    }
+
+    const char *get_string() const {
+        return ecs_meta_get_string(&m_cursor);
+    }
+
+    flecs::entity get_entity() const;
+
     ecs_meta_cursor_t m_cursor;
 };
 
@@ -13027,6 +13405,176 @@ void init(flecs::world& world);
 } // namespace _
 } // namespace meta
 } // namespace flecs
+
+#endif
+#ifdef FLECS_UNITS
+#pragma once
+
+namespace flecs {
+struct units {
+
+////////////////////////////////////////////////////////////////////////////////
+//// Unit prefixes
+////////////////////////////////////////////////////////////////////////////////
+
+struct Prefixes { };
+
+struct Yocto { };
+struct Zepto { };
+struct Atto { };
+struct Femto { };
+struct Pico { };
+struct Nano { };
+struct Micro { };
+struct Milli { };
+struct Centi { };
+struct Deci { };
+struct Deca { };
+struct Hecto { };
+struct Kilo { };
+struct Mega { };
+struct Giga { };
+struct Tera { };
+struct Peta { };
+struct Exa { };
+struct Zetta { };
+struct Yotta { };
+struct Kibi { };
+struct Mebi { };
+struct Gibi { };
+struct Tebi { };
+struct Pebi { };
+struct Exbi { };
+struct Zebi { };
+struct Yobi { };
+
+
+////////////////////////////////////////////////////////////////////////////////
+//// Quantities
+////////////////////////////////////////////////////////////////////////////////
+
+struct Duration { };
+struct Time { };
+struct Mass { };
+struct ElectricCurrent { };
+struct LuminousIntensity { };
+struct Force { };
+struct Amount { };
+struct Length { };
+struct Pressure { };
+struct Speed { };
+struct Temperature { };
+struct Data { };
+struct DataRate { };
+struct Angle { };
+
+
+////////////////////////////////////////////////////////////////////////////////
+//// Units
+////////////////////////////////////////////////////////////////////////////////
+
+struct duration {
+struct PicoSeconds { };
+struct NanoSeconds { };
+struct MicroSeconds { };
+struct MilliSeconds { };
+struct Seconds { };
+struct Minutes { };
+struct Hours { };
+struct Days { };
+};
+
+struct angle {
+struct Radians { };
+struct Degrees { };
+};
+
+struct time {
+struct Date { };
+};
+
+struct mass {
+struct Grams { };
+struct KiloGrams { };
+};
+
+struct electric_current {
+struct Ampere { };
+};
+
+struct amount {
+struct Mole { };
+};
+
+struct luminous_intensity {
+struct Candela { };
+};
+
+struct force {
+struct Newton { };
+};
+
+struct length {
+struct Meters { };
+struct PicoMeters { };
+struct NanoMeters { };
+struct MicroMeters { };
+struct MilliMeters { };
+struct CentiMeters { };
+struct KiloMeters { };
+struct Miles { };
+};
+
+struct pressure {
+struct Pascal { };
+struct Bar { };
+};
+
+struct speed {
+struct MetersPerSecond { };
+struct KiloMetersPerHour { };
+struct MilesPerHour { };
+};
+
+struct temperature {
+struct Kelvin { };
+struct Celsius { };
+struct Fahrenheit { };
+};
+
+struct data {
+struct Bits { };
+struct KiloBits { };
+struct MegaBits { };
+struct GigaBits { };
+struct Bytes { };
+struct KiloBytes { };
+struct MegaBytes { };
+struct GigaBytes { };
+struct KibiBytes { };
+struct MebiBytes { };
+struct GibiBytes { };
+};
+
+struct datarate {
+struct BitsPerSecond { };
+struct KiloBitsPerSecond { };
+struct MegaBitsPerSecond { };
+struct GigaBitsPerSecond { };
+struct BytesPerSecond { };
+struct KiloBytesPerSecond { };
+struct MegaBytesPerSecond { };
+struct GigaBytesPerSecond { };
+};
+
+struct Percentage { };
+struct Bel { };
+struct DeciBel { };
+
+units(flecs::world& world);
+
+};
+}
 
 #endif
 #ifdef FLECS_JSON
@@ -16815,6 +17363,86 @@ Self& set_doc_link(const char *link) {
 
 #   endif
 
+#   ifdef FLECS_META
+
+/** Make entity a unit */
+Self& unit(
+    const char *symbol, 
+    flecs::entity_t prefix = 0,
+    flecs::entity_t base = 0,
+    flecs::entity_t over = 0,
+    int32_t factor = 0,
+    int32_t power = 0) 
+{
+    ecs_unit_desc_t desc = {};
+    desc.entity.entity = this->m_id;
+    desc.symbol = const_cast<char*>(symbol); /* safe, will be copied in */
+    desc.base = base;
+    desc.over = over;
+    desc.prefix = prefix;
+    desc.translation.factor = factor;
+    desc.translation.power = power;
+    ecs_unit_init(this->world(), &desc);
+
+    return to_base();
+}
+
+/** Make entity a derived unit */
+Self& unit( 
+    flecs::entity_t prefix = 0,
+    flecs::entity_t base = 0,
+    flecs::entity_t over = 0,
+    int32_t factor = 0,
+    int32_t power = 0) 
+{
+    ecs_unit_desc_t desc = {};
+    desc.entity.entity = this->m_id;
+    desc.base = base;
+    desc.over = over;
+    desc.prefix = prefix;
+    desc.translation.factor = factor;
+    desc.translation.power = power;
+    ecs_unit_init(this->world(), &desc);
+
+    return to_base();
+}
+
+/** Make entity a derived unit */
+Self& unit_prefix( 
+    const char *symbol,
+    int32_t factor = 0,
+    int32_t power = 0) 
+{
+    ecs_unit_prefix_desc_t desc = {};
+    desc.entity.entity = this->m_id;
+    desc.symbol = const_cast<char*>(symbol); /* safe, will be copied in */
+    desc.translation.factor = factor;
+    desc.translation.power = power;
+    ecs_unit_prefix_init(this->world(), &desc);
+
+    return to_base();
+}
+
+/** Add quantity to unit */
+Self& quantity(flecs::entity_t quantity) {
+    ecs_add_pair(this->world(), this->id(), flecs::Quantity, quantity);
+    return to_base();
+}
+
+/** Make entity a unity prefix */
+template <typename Quantity>
+Self& quantity() {
+    return this->quantity(_::cpp_type<Quantity>::id(this->world()));
+}
+
+/** Make entity a quantity */
+Self& quantity() {
+    ecs_add_id(this->world(), this->id(), flecs::Quantity);
+    return to_base();
+}
+
+#   endif
+
 protected:
     Self& to_base() {
         return *static_cast<Self*>(this);
@@ -16849,8 +17477,8 @@ struct entity : entity_builder<entity>
      * @param world The world in which the entity is created.
      * @param id The entity id.
      */
-    explicit entity(flecs::world_t *world, flecs::id_t id) {
-        m_world = world;
+    explicit entity(const flecs::world_t *world, flecs::id_t id) {
+        m_world = const_cast<flecs::world_t*>(world);
         m_id = id;
     }
 
@@ -17058,14 +17686,15 @@ struct entity : entity_builder<entity>
      * @param world The world.
      */
     static
-    flecs::entity null(const flecs::world& world) {
-        return flecs::entity(world.get_world().c_ptr(), 
-            static_cast<entity_t>(0));
+    flecs::entity null(const flecs::world_t *world) {
+        flecs::entity result;
+        result.m_world = const_cast<flecs::world_t*>(world);
+        return result;
     }
 
     static
     flecs::entity null() {
-        return flecs::entity(static_cast<entity_t>(0));
+        return flecs::entity();
     }
 };
 
@@ -17976,6 +18605,10 @@ struct cpp_type_impl {
         entity_t entity, 
         bool allow_tag = true) 
     {
+        if (s_reset_count != ecs_cpp_reset_count_get()) {
+            reset();
+        }
+
         // If an identifier was already set, check for consistency
         if (s_id) {
             ecs_assert(s_name.c_str() != nullptr, ECS_INTERNAL_ERROR, NULL);
@@ -18179,7 +18812,7 @@ struct untyped_component : entity {
 #   ifdef FLECS_META
 
 /** Add member. */
-untyped_component& member(const char *name, flecs::entity_t type_id, int32_t count = 0) {
+untyped_component& member(flecs::entity_t type_id, const char *name, int32_t count = 0) {
     ecs_entity_desc_t desc = {};
     desc.name = name;
     desc.add[0] = ecs_pair(flecs::ChildOf, m_id);
@@ -18187,7 +18820,30 @@ untyped_component& member(const char *name, flecs::entity_t type_id, int32_t cou
     ecs_assert(eid != 0, ECS_INTERNAL_ERROR, NULL);
 
     flecs::entity e(m_world, eid);
-    e.set(flecs::Member{type_id, count});
+
+    Member m = {};
+    m.type = type_id;
+    m.count = count;
+    e.set<Member>(m);
+
+    return *this;
+}
+
+/** Add member with unit. */
+untyped_component& member(flecs::entity_t type_id, flecs::entity_t unit, const char *name, int32_t count = 0) {
+    ecs_entity_desc_t desc = {};
+    desc.name = name;
+    desc.add[0] = ecs_pair(flecs::ChildOf, m_id);
+    ecs_entity_t eid = ecs_entity_init(m_world, &desc);
+    ecs_assert(eid != 0, ECS_INTERNAL_ERROR, NULL);
+
+    flecs::entity e(m_world, eid);
+
+    Member m = {};
+    m.type = type_id;
+    m.unit = unit;
+    m.count = count;
+    e.set<Member>(m);
 
     return *this;
 }
@@ -18196,7 +18852,22 @@ untyped_component& member(const char *name, flecs::entity_t type_id, int32_t cou
 template <typename MemberType>
 untyped_component& member(const char *name, int32_t count = 0) {
     flecs::entity_t type_id = _::cpp_type<MemberType>::id(m_world);
-    return member(name, type_id, count);
+    return member(type_id, name, count);
+}
+
+/** Add member with unit. */
+template <typename MemberType>
+untyped_component& member(flecs::entity_t unit, const char *name, int32_t count = 0) {
+    flecs::entity_t type_id = _::cpp_type<MemberType>::id(m_world);
+    return member(type_id, unit, name, count);
+}
+
+/** Add member with unit. */
+template <typename MemberType, typename UnitType>
+untyped_component& member(const char *name, int32_t count = 0) {
+    flecs::entity_t type_id = _::cpp_type<MemberType>::id(m_world);
+    flecs::entity_t unit_id = _::cpp_type<UnitType>::id(m_world);
+    return member(type_id, unit_id, name, count);
 }
 
 /** Add constant. */
@@ -18369,8 +19040,9 @@ struct type_base {
     }
 
     explicit type_base(world_t *world, table_t *t)
-        : m_entity( world, static_cast<flecs::id_t>(0) )
-        , m_table( t ) { }
+        : m_entity( flecs::entity::null(world) )
+        , m_table( t )
+    { }
 
     type_base(table_t *t)
         : m_table( t ) { }
@@ -21417,7 +22089,6 @@ FLECS_ENUM_LAST(flecs::type_kind_t, EcsTypeKindLast)
 FLECS_ENUM_LAST(flecs::primitive_kind_t, EcsPrimitiveKindLast)
 
 namespace flecs {
-
 namespace meta {
 namespace _ {
 
@@ -21450,11 +22121,231 @@ inline void init(flecs::world& world) {
     world.component<Struct>("flecs::meta::Struct");
     world.component<Array>("flecs::meta::Array");
     world.component<Vector>("flecs::meta::Vector");
+
+    world.component<Unit>("flecs::meta::Unit");
+
+    // To support member<uintptr_t> and member<intptr_t> register components
+    // (that do not have conflicting symbols with builtin ones) for platform
+    // specific types.
+
+    if (!flecs::is_same<i32_t, iptr_t>() && !flecs::is_same<i64_t, iptr_t>()) {
+        flecs::_::cpp_type<iptr_t>::init(world, flecs::Iptr, true);
+        ecs_assert(flecs::type_id<iptr_t>() == flecs::Iptr, 
+            ECS_INTERNAL_ERROR, NULL);
+    }
+
+    if (!flecs::is_same<u32_t, uptr_t>() && !flecs::is_same<u64_t, uptr_t>()) {
+        flecs::_::cpp_type<uptr_t>::init(world, flecs::Uptr, true);
+        ecs_assert(flecs::type_id<uptr_t>() == flecs::Uptr, 
+            ECS_INTERNAL_ERROR, NULL);
+    }
 }
 
 } // namespace _
+
+inline flecs::entity cursor::get_type() const {
+    return flecs::entity(m_cursor.world, ecs_meta_get_type(&m_cursor));
+}
+
+inline flecs::entity cursor::get_unit() const {
+    return flecs::entity(m_cursor.world, ecs_meta_get_unit(&m_cursor));
+}
+
+inline flecs::entity cursor::get_entity() const {
+    return flecs::entity(m_cursor.world, ecs_meta_get_entity(&m_cursor));
+}
+
 } // namespace meta
 } // namespace flecs
+
+#endif
+#ifdef FLECS_UNITS
+#pragma once
+
+namespace flecs {
+
+inline units::units(flecs::world& world) {
+    /* Import C module  */
+    FlecsUnitsImport(world);
+
+    /* Bridge between C++ types and flecs.units entities */
+    world.module<units>();
+
+    // Initialize world.entity(prefixes) scope
+    world.entity<Prefixes>("::flecs::units::prefixes");
+
+    // Initialize prefixes
+    world.entity<Yocto>("::flecs::units::prefixes::Yocto");
+    world.entity<Zepto>("::flecs::units::prefixes::Zepto");
+    world.entity<Atto>("::flecs::units::prefixes::Atto");
+    world.entity<Femto>("::flecs::units::prefixes::Femto");
+    world.entity<Pico>("::flecs::units::prefixes::Pico");
+    world.entity<Nano>("::flecs::units::prefixes::Nano");
+    world.entity<Micro>("::flecs::units::prefixes::Micro");
+    world.entity<Milli>("::flecs::units::prefixes::Milli");
+    world.entity<Centi>("::flecs::units::prefixes::Centi");
+    world.entity<Deci>("::flecs::units::prefixes::Deci");
+    world.entity<Deca>("::flecs::units::prefixes::Deca");
+    world.entity<Hecto>("::flecs::units::prefixes::Hecto");
+    world.entity<Kilo>("::flecs::units::prefixes::Kilo");
+    world.entity<Mega>("::flecs::units::prefixes::Mega");
+    world.entity<Giga>("::flecs::units::prefixes::Giga");
+    world.entity<Tera>("::flecs::units::prefixes::Tera");
+    world.entity<Peta>("::flecs::units::prefixes::Peta");
+    world.entity<Exa>("::flecs::units::prefixes::Exa");
+    world.entity<Zetta>("::flecs::units::prefixes::Zetta");
+    world.entity<Yotta>("::flecs::units::prefixes::Yotta");
+    world.entity<Kibi>("::flecs::units::prefixes::Kibi");
+    world.entity<Mebi>("::flecs::units::prefixes::Mebi");
+    world.entity<Gibi>("::flecs::units::prefixes::Gibi");
+    world.entity<Tebi>("::flecs::units::prefixes::Tebi");
+    world.entity<Pebi>("::flecs::units::prefixes::Pebi");
+    world.entity<Exbi>("::flecs::units::prefixes::Exbi");
+    world.entity<Zebi>("::flecs::units::prefixes::Zebi");
+    world.entity<Yobi>("::flecs::units::prefixes::Yobi");
+
+    // Initialize quantities
+    world.entity<Duration>("::flecs::units::Duration");
+    world.entity<Time>("::flecs::units::Time");
+    world.entity<Mass>("::flecs::units::Mass");
+    world.entity<Force>("::flecs::units::Force");
+    world.entity<ElectricCurrent>("::flecs::units::ElectricCurrent");
+    world.entity<Amount>("::flecs::units::Amount");
+    world.entity<LuminousIntensity>("::flecs::units::LuminousIntensity");
+    world.entity<Length>("::flecs::units::Length");
+    world.entity<Pressure>("::flecs::units::Pressure");
+    world.entity<Speed>("::flecs::units::Speed");
+    world.entity<Temperature>("::flecs::units::Temperature");
+    world.entity<Data>("::flecs::units::Data");
+    world.entity<DataRate>("::flecs::units::DataRate");
+    world.entity<Angle>("::flecs::units::Angle");
+
+    // Initialize duration units
+    world.entity<duration::PicoSeconds>(
+        "::flecs::units::Duration::PicoSeconds");
+    world.entity<duration::NanoSeconds>(
+        "::flecs::units::Duration::NanoSeconds");
+    world.entity<duration::MicroSeconds>(
+        "::flecs::units::Duration::MicroSeconds");
+    world.entity<duration::MilliSeconds>(
+        "::flecs::units::Duration::MilliSeconds");
+    world.entity<duration::Seconds>(
+        "::flecs::units::Duration::Seconds");
+    world.entity<duration::Minutes>(
+        "::flecs::units::Duration::Minutes");
+    world.entity<duration::Hours>(
+        "::flecs::units::Duration::Hours");
+    world.entity<duration::Days>(
+        "::flecs::units::Duration::Days");
+
+    // Initialize time units
+    world.entity<time::Date>("::flecs::units::Time::Date");
+
+    // Initialize mass units
+    world.entity<mass::Grams>("::flecs::units::Mass::Grams");
+    world.entity<mass::KiloGrams>("::flecs::units::Mass::KiloGrams");
+
+    // Initialize current units
+    world.entity<electric_current::Ampere>
+    ("::flecs::units::ElectricCurrent::Ampere");  
+
+    // Initialize amount units
+    world.entity<amount::Mole>("::flecs::units::Amount::Mole");
+
+    // Initialize luminous intensity units
+    world.entity<luminous_intensity::Candela>(
+        "::flecs::units::LuminousIntensity::Candela");
+
+    // Initialize force units
+    world.entity<force::Newton>("::flecs::units::Force::Newton");
+
+    // Initialize length units
+    world.entity<length::Meters>("::flecs::units::Length::Meters");
+    world.entity<length::PicoMeters>("::flecs::units::Length::PicoMeters");
+    world.entity<length::NanoMeters>("::flecs::units::Length::NanoMeters");
+    world.entity<length::MicroMeters>("::flecs::units::Length::MicroMeters");
+    world.entity<length::MilliMeters>("::flecs::units::Length::MilliMeters");
+    world.entity<length::CentiMeters>("::flecs::units::Length::CentiMeters");
+    world.entity<length::KiloMeters>("::flecs::units::Length::KiloMeters");
+    world.entity<length::Miles>("::flecs::units::Length::Miles");
+
+    // Initialize pressure units
+    world.entity<pressure::Pascal>("::flecs::units::Pressure::Pascal");
+    world.entity<pressure::Bar>("::flecs::units::Pressure::Bar");
+
+    // Initialize speed units
+    world.entity<speed::MetersPerSecond>(
+        "::flecs::units::Speed::MetersPerSecond");
+    world.entity<speed::KiloMetersPerHour>(
+        "::flecs::units::Speed::KiloMetersPerHour");
+    world.entity<speed::MilesPerHour>(
+        "::flecs::units::Speed::MilesPerHour");
+
+    // Initialize temperature units
+    world.entity<temperature::Kelvin>(
+        "::flecs::units::Temperature::Kelvin");
+    world.entity<temperature::Celsius>(
+        "::flecs::units::Temperature::Celsius");
+    world.entity<temperature::Fahrenheit>(
+        "::flecs::units::Temperature::Fahrenheit");
+
+    // Initialize data units
+    world.entity<data::Bits>(
+        "::flecs::units::Data::Bits");
+    world.entity<data::KiloBits>(
+        "::flecs::units::Data::KiloBits");
+    world.entity<data::MegaBits>(
+        "::flecs::units::Data::MegaBits");
+    world.entity<data::GigaBits>(
+        "::flecs::units::Data::GigaBits");
+    world.entity<data::Bytes>(
+        "::flecs::units::Data::Bytes");
+    world.entity<data::KiloBytes>(
+        "::flecs::units::Data::KiloBytes");
+    world.entity<data::MegaBytes>(
+        "::flecs::units::Data::MegaBytes");
+    world.entity<data::GigaBytes>(
+        "::flecs::units::Data::GigaBytes");
+    world.entity<data::KibiBytes>(
+        "::flecs::units::Data::KibiBytes");
+    world.entity<data::MebiBytes>(
+        "::flecs::units::Data::MebiBytes");
+    world.entity<data::GibiBytes>(
+        "::flecs::units::Data::GibiBytes");
+
+    // Initialize datarate units
+    world.entity<datarate::BitsPerSecond>(
+        "::flecs::units::DataRate::BitsPerSecond");
+    world.entity<datarate::KiloBitsPerSecond>(
+        "::flecs::units::DataRate::KiloBitsPerSecond");
+    world.entity<datarate::MegaBitsPerSecond>(
+        "::flecs::units::DataRate::MegaBitsPerSecond");
+    world.entity<datarate::GigaBitsPerSecond>(
+        "::flecs::units::DataRate::GigaBitsPerSecond");
+    world.entity<datarate::BytesPerSecond>(
+        "::flecs::units::DataRate::BytesPerSecond");
+    world.entity<datarate::KiloBytesPerSecond>(
+        "::flecs::units::DataRate::KiloBytesPerSecond");
+    world.entity<datarate::MegaBytesPerSecond>(
+        "::flecs::units::DataRate::MegaBytesPerSecond");
+    world.entity<datarate::GigaBytesPerSecond>(
+        "::flecs::units::DataRate::GigaBytesPerSecond");
+
+    // Initialize angles
+    world.entity<angle::Radians>(
+        "::flecs::units::Angle::Radians");
+    world.entity<angle::Degrees>(
+        "::flecs::units::Angle::Degrees");
+
+    // Initialize percentage
+    world.entity<Percentage>("::flecs::units::Percentage");
+
+    // Initialize Bel
+    world.entity<Bel>("::flecs::units::Bel");
+    world.entity<DeciBel>("::flecs::units::DeciBel");
+}
+
+}
 
 #endif
 
