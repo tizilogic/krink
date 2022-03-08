@@ -1,6 +1,8 @@
 # krink - custom G2 lib on top of Kinc
 
-[![Android](https://github.com/tizilogic/krink/actions/workflows/android.yml/badge.svg?branch=master)](https://github.com/tizilogic/krink/actions/workflows/android.yml) [![iOS (Metal)](https://github.com/tizilogic/krink/actions/workflows/ios-metal.yml/badge.svg?branch=master)](https://github.com/tizilogic/krink/actions/workflows/ios-metal.yml)
+[![Android](https://github.com/tizilogic/krink/actions/workflows/android.yml/badge.svg?branch=master)](https://github.com/tizilogic/krink/actions/workflows/android.yml)
+[![iOS (Metal)](https://github.com/tizilogic/krink/actions/workflows/ios-metal.yml/badge.svg?branch=master)](https://github.com/tizilogic/krink/actions/workflows/ios-metal.yml)
+[![Documentation](https://img.shields.io/badge/docs-docsforge-blue)](http://krink.docsforge.com/)
 
 ECS driven library that provides G2 functionality similar to the one
 [Kha](https://github.com/Kode/Kha) provides, to render textures, fonts and SDF shapes using
