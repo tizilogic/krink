@@ -19,8 +19,12 @@ static kinc_g4_vertex_buffer_t circle_vertex_buffer;
 static kinc_g4_index_buffer_t circle_index_buffer;
 static kinc_g4_vertex_buffer_t line_vertex_buffer;
 static kinc_g4_index_buffer_t line_index_buffer;
-static kinc_g4_shader_t vert_shader;
-static kinc_g4_shader_t frag_shader;
+static kinc_g4_shader_t rect_vert_shader;
+static kinc_g4_shader_t rect_frag_shader;
+static kinc_g4_shader_t circle_vert_shader;
+static kinc_g4_shader_t circle_frag_shader;
+static kinc_g4_shader_t line_vert_shader;
+static kinc_g4_shader_t line_frag_shader;
 static kinc_g4_pipeline_t rect_pipeline;
 static kinc_g4_pipeline_t circle_pipeline;
 static kinc_g4_pipeline_t line_pipeline;
@@ -55,7 +59,7 @@ static void build_rect_pipeline(void) {
 		kinc_file_reader_read(&reader, data, size);
 		kinc_file_reader_close(&reader);
 
-		kinc_g4_shader_init(&vert_shader, data, size, KINC_G4_SHADER_TYPE_VERTEX);
+		kinc_g4_shader_init(&rect_vert_shader, data, size, KINC_G4_SHADER_TYPE_VERTEX);
 		kr_free(data);
 	}
 
@@ -67,7 +71,8 @@ static void build_rect_pipeline(void) {
 		kinc_file_reader_read(&reader, data, size);
 		kinc_file_reader_close(&reader);
 
-		kinc_g4_shader_init(&frag_shader, data, size, KINC_G4_SHADER_TYPE_FRAGMENT);
+		kinc_g4_shader_init(&rect_frag_shader, data, size, KINC_G4_SHADER_TYPE_FRAGMENT);
+		kr_free(data);
 	}
 	kinc_g4_vertex_structure_t structure;
 	kinc_g4_vertex_structure_init(&structure);
@@ -82,8 +87,8 @@ static void build_rect_pipeline(void) {
 	kinc_g4_pipeline_init(&rect_pipeline);
 	rect_pipeline.input_layout[0] = &structure;
 	rect_pipeline.input_layout[1] = NULL;
-	rect_pipeline.vertex_shader = &vert_shader;
-	rect_pipeline.fragment_shader = &frag_shader;
+	rect_pipeline.vertex_shader = &rect_vert_shader;
+	rect_pipeline.fragment_shader = &rect_frag_shader;
 	rect_pipeline.blend_source = KINC_G4_BLEND_SOURCE_ALPHA;
 	rect_pipeline.blend_destination = KINC_G4_BLEND_INV_SOURCE_ALPHA;
 	rect_pipeline.alpha_blend_source = KINC_G4_BLEND_SOURCE_ALPHA;
@@ -119,7 +124,7 @@ static void build_circle_pipeline(void) {
 		kinc_file_reader_read(&reader, data, size);
 		kinc_file_reader_close(&reader);
 
-		kinc_g4_shader_init(&vert_shader, data, size, KINC_G4_SHADER_TYPE_VERTEX);
+		kinc_g4_shader_init(&circle_vert_shader, data, size, KINC_G4_SHADER_TYPE_VERTEX);
 		kr_free(data);
 	}
 
@@ -131,7 +136,8 @@ static void build_circle_pipeline(void) {
 		kinc_file_reader_read(&reader, data, size);
 		kinc_file_reader_close(&reader);
 
-		kinc_g4_shader_init(&frag_shader, data, size, KINC_G4_SHADER_TYPE_FRAGMENT);
+		kinc_g4_shader_init(&circle_frag_shader, data, size, KINC_G4_SHADER_TYPE_FRAGMENT);
+		kr_free(data);
 	}
 	kinc_g4_vertex_structure_t structure;
 	kinc_g4_vertex_structure_init(&structure);
@@ -144,8 +150,8 @@ static void build_circle_pipeline(void) {
 	kinc_g4_pipeline_init(&circle_pipeline);
 	circle_pipeline.input_layout[0] = &structure;
 	circle_pipeline.input_layout[1] = NULL;
-	circle_pipeline.vertex_shader = &vert_shader;
-	circle_pipeline.fragment_shader = &frag_shader;
+	circle_pipeline.vertex_shader = &circle_vert_shader;
+	circle_pipeline.fragment_shader = &circle_frag_shader;
 	circle_pipeline.blend_source = KINC_G4_BLEND_SOURCE_ALPHA;
 	circle_pipeline.blend_destination = KINC_G4_BLEND_INV_SOURCE_ALPHA;
 	circle_pipeline.alpha_blend_source = KINC_G4_BLEND_SOURCE_ALPHA;
@@ -182,7 +188,7 @@ static void build_line_pipeline(void) {
 		kinc_file_reader_read(&reader, data, size);
 		kinc_file_reader_close(&reader);
 
-		kinc_g4_shader_init(&vert_shader, data, size, KINC_G4_SHADER_TYPE_VERTEX);
+		kinc_g4_shader_init(&line_vert_shader, data, size, KINC_G4_SHADER_TYPE_VERTEX);
 		kr_free(data);
 	}
 
@@ -194,7 +200,8 @@ static void build_line_pipeline(void) {
 		kinc_file_reader_read(&reader, data, size);
 		kinc_file_reader_close(&reader);
 
-		kinc_g4_shader_init(&frag_shader, data, size, KINC_G4_SHADER_TYPE_FRAGMENT);
+		kinc_g4_shader_init(&line_frag_shader, data, size, KINC_G4_SHADER_TYPE_FRAGMENT);
+		kr_free(data);
 	}
 	kinc_g4_vertex_structure_t structure;
 	kinc_g4_vertex_structure_init(&structure);
@@ -206,8 +213,8 @@ static void build_line_pipeline(void) {
 	kinc_g4_pipeline_init(&line_pipeline);
 	line_pipeline.input_layout[0] = &structure;
 	line_pipeline.input_layout[1] = NULL;
-	line_pipeline.vertex_shader = &vert_shader;
-	line_pipeline.fragment_shader = &frag_shader;
+	line_pipeline.vertex_shader = &line_vert_shader;
+	line_pipeline.fragment_shader = &line_frag_shader;
 	line_pipeline.blend_source = KINC_G4_BLEND_SOURCE_ALPHA;
 	line_pipeline.blend_destination = KINC_G4_BLEND_INV_SOURCE_ALPHA;
 	line_pipeline.alpha_blend_source = KINC_G4_BLEND_SOURCE_ALPHA;
@@ -303,24 +310,16 @@ static void sdf_rect_set_rect_colors(float opacity, uint32_t color, uint32_t bor
 	border_color = kr_color_set_channel(border_color, 'A', a);
 
 	rect_rect_verts[base_idx + 7] = *(float *)&color;
-	;
 	rect_rect_verts[base_idx + 8] = *(float *)&border_color;
-	;
 
 	rect_rect_verts[base_idx + 22] = *(float *)&color;
-	;
 	rect_rect_verts[base_idx + 23] = *(float *)&border_color;
-	;
 
 	rect_rect_verts[base_idx + 37] = *(float *)&color;
-	;
 	rect_rect_verts[base_idx + 38] = *(float *)&border_color;
-	;
 
 	rect_rect_verts[base_idx + 52] = *(float *)&color;
-	;
 	rect_rect_verts[base_idx + 53] = *(float *)&border_color;
-	;
 }
 
 static void sdf_rect_set_rect_corner(kr_sdf_corner_radius_t c) {
@@ -478,24 +477,16 @@ static void sdf_circle_set_rect_colors(float opacity, uint32_t color, uint32_t b
 	border_color = kr_color_set_channel(border_color, 'A', a);
 
 	circle_rect_verts[base_idx + 5] = *(float *)&color;
-	;
 	circle_rect_verts[base_idx + 6] = *(float *)&border_color;
-	;
 
 	circle_rect_verts[base_idx + 14] = *(float *)&color;
-	;
 	circle_rect_verts[base_idx + 15] = *(float *)&border_color;
-	;
 
 	circle_rect_verts[base_idx + 23] = *(float *)&color;
-	;
 	circle_rect_verts[base_idx + 24] = *(float *)&border_color;
-	;
 
 	circle_rect_verts[base_idx + 32] = *(float *)&color;
-	;
 	circle_rect_verts[base_idx + 33] = *(float *)&border_color;
-	;
 }
 
 static void sdf_circle_set_border_smooth(float b, float s) {
@@ -611,13 +602,9 @@ static void sdf_line_set_rect_colors(float opacity, uint32_t color) {
 	color = kr_color_set_channel(color, 'A', a);
 
 	line_rect_verts[base_idx + 5] = *(float *)&color;
-	;
 	line_rect_verts[base_idx + 14] = *(float *)&color;
-	;
 	line_rect_verts[base_idx + 23] = *(float *)&color;
-	;
 	line_rect_verts[base_idx + 32] = *(float *)&color;
-	;
 }
 
 static void sdf_line_set_dim(float u, float v) {
