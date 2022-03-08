@@ -59,6 +59,15 @@ int kickstart(int argc, char **argv) {
 	                                                .pos = {.x = 100, .y = 700},
 	                                                .text = "Empty Project Test"});
 
+	e = kr_flecs_create_sdf_asymm_rect_wborder(
+	    kr_world, (kr_init_sdf_asymm_rect_wborder_t){
+	                  .sdf_asymm_rect = {.color = 0xff008800,
+	                                     .rect = {.x = 0, .y = 0, .w = 100, .h = 60},
+	                                     .corner = {.top_left = 30, .top_right = 10, .bottom_left = 10, .bottom_right = 30},
+	                                     .smooth = 2.2f}, .border = 8, .border_color = 0xffffffff});
+	ecs_set(kr_world, e, KrTranslation, {20, 20});
+	kr_flecs_set_depth(kr_world, e, 5);
+	
 	kinc_start();
 	kr_flecs_destroy();
 	return 0;
