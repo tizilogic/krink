@@ -7,10 +7,11 @@
 #include <stdbool.h>
 
 #include <kinc/graphics4/graphics.h>
+#include <kinc/log.h>
 #include <kinc/math/core.h>
+#include <kinc/window.h>
 #include <krink/math/matrix.h>
 #include <krink/math/vector.h>
-#include <kinc/log.h>
 
 static bool begin = false;
 static uint32_t g2_color = 0;
@@ -19,11 +20,12 @@ static kr_matrix3x3_t g2_transformation;
 static kr_ttf_font_t *g2_font = NULL;
 static kinc_matrix4x4_t g2_projection_matrix;
 static int g2_font_size;
-static float g2_width[KR_G2_MAX_WIN], g2_height[KR_G2_MAX_WIN];
 static bool g2_painters_initialized = false;
 static int g2_active_window = -1;
+static int g2_last_width = -1;
+static int g2_last_height = -1;
 
-void kr_g2_init(int window, int window_width, int window_height) {
+void kr_g2_init(void) {
 	if (!g2_painters_initialized) {
 		kr_isp_init();
 		kr_csp_init();
@@ -31,41 +33,35 @@ void kr_g2_init(int window, int window_width, int window_height) {
 		kr_sdf_init();
 		g2_transformation = kr_matrix3x3_identity();
 	}
-	kr_g2_set_window_size(window, window_width, window_height);
 }
 
-void kr_g2_set_window_size(int window, int window_width, int window_height) {
-	assert(window >= 0 && window < KR_G2_MAX_WIN);
-	g2_width[window] = (float)window_width;
-	g2_height[window] = (float)window_height;
+static void internal_update_projection_matrix(int window) {
+	int num_windows = kinc_count_windows();
+	assert(window >= 0 && window < num_windows);
+
+	int iwidth = kinc_window_width(window);
+	int iheight = kinc_window_height(window);
+	if (iwidth == g2_last_width && iheight == g2_last_height) return;
+	g2_last_width = iwidth;
+	g2_last_height = iheight;
+	float width = (float)iwidth;
+	float height = (float)iheight;
 
 	// TODO: Verify on all platforms
 	kr_matrix4x4_t proj;
 	if (!kinc_g4_render_targets_inverted_y()) {
 		kinc_log(KINC_LOG_LEVEL_INFO, "Non-Inverted Y render target");
-		proj = kr_matrix4x4_orthogonal_projection(0.0f, g2_width[window], g2_height[window], 0.0f,
-		                                          0.1f, 1000.0f);
+		proj = kr_matrix4x4_orthogonal_projection(0.0f, width, height, 0.0f, 0.1f, 1000.0f);
 	}
 	else {
 		kinc_log(KINC_LOG_LEVEL_INFO, "Inverted Y render target");
-		proj = kr_matrix4x4_orthogonal_projection(0.0f, g2_width[window], g2_height[window], 0.0f,
-		                                          0.1f, 1000.0f);
+		proj = kr_matrix4x4_orthogonal_projection(0.0f, width, height, 0.0f, 0.1f, 1000.0f);
 	}
 	g2_projection_matrix = kr_matrix4x4_to_kinc(&proj);
 	kr_isp_set_projection_matrix(g2_projection_matrix);
 	kr_tsp_set_projection_matrix(g2_projection_matrix);
 	kr_csp_set_projection_matrix(g2_projection_matrix);
 	kr_sdf_set_projection_matrix(g2_projection_matrix);
-}
-
-float kr_g2_get_width(int window) {
-	assert(window >= 0 && window < KR_G2_MAX_WIN);
-	return g2_width[window];
-}
-
-float kr_g2_get_height(int window) {
-	assert(window >= 0 && window < KR_G2_MAX_WIN);
-	return g2_height[window];
 }
 
 void kr_g2_destroy(void) {
@@ -75,6 +71,7 @@ void kr_g2_destroy(void) {
 void kr_g2_begin(int window) {
 	assert(!begin && g2_active_window == -1);
 	g2_active_window = window;
+	internal_update_projection_matrix(window);
 	begin = true;
 }
 

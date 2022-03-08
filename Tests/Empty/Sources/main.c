@@ -41,7 +41,7 @@ int kickstart(int argc, char **argv) {
 	kr_init(heap, 20 * 1024 * 1024, NULL, 0);
 	kr_flecs_init(false);
 	kr_evt_init();
-	kr_g2_init(0, 1080, 1920);
+	kr_g2_init();
 	kr_ttf_font_t font;
 	kr_ttf_font_init(&font, "SpaceMono.ttf", 0);
 

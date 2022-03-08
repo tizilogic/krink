@@ -21,32 +21,9 @@ extern "C" {
 #endif
 
 /// <summary>
-/// Initialize a framebuffer for kr_g2.
+/// Initialize graphics2.
 /// </summary>
-/// <param name="window"></param>
-/// <param name="window_width"></param>
-/// <param name="window_height"></param>
-void kr_g2_init(int window, int window_width, int window_height);
-
-/// <summary>
-/// Change window size.
-/// </summary>
-/// <param name="window"></param>
-/// <param name="window_width"></param>
-/// <param name="window_height"></param>
-void kr_g2_set_window_size(int window, int window_width, int window_height);
-
-/// <summary>
-/// Width of a given window.
-/// </summary>
-/// <param name="window"></param>
-float kr_g2_get_width(int window);
-
-/// <summary>
-/// Height of a given window.
-/// </summary>
-/// <param name="window"></param>
-float kr_g2_get_height(int window);
+void kr_g2_init(void);
 
 /// <summary>
 /// Destroy kr_g2. Currently does nothing!
