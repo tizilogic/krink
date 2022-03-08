@@ -1,4 +1,5 @@
 #include <kinc/graphics4/graphics.h>
+#include <kinc/display.h>
 #include <kinc/log.h>
 #include <kinc/system.h>
 #include <krink/eventhandler.h>
@@ -21,7 +22,19 @@ static void update(void) {
 }
 
 int kickstart(int argc, char **argv) {
-	kinc_init("Empty", 1080, 1920, NULL, NULL);
+	kinc_display_init();
+	int w, h;
+	{ 
+		kinc_display_mode_t dm = kinc_display_current_mode(kinc_primary_display());
+#if defined(KORE_ANDROID) || defined(KORE_IOS)
+		w = dm.width;
+		h = dm.height;
+#else
+		h = (int)((float)dm.height * 0.9f);
+		w = (int)((float)dm.height * 0.9f / 16.0f * 9.0f);
+#endif
+	}
+	kinc_init("Empty", w, h, NULL, NULL);
 	kinc_set_update_callback(update);
 	heap = malloc(20 * 1024 * 1024);
 	assert(heap != NULL);
