@@ -1,5 +1,5 @@
-#include <kinc/graphics4/graphics.h>
 #include <kinc/display.h>
+#include <kinc/graphics4/graphics.h>
 #include <kinc/log.h>
 #include <kinc/system.h>
 #include <krink/eventhandler.h>
@@ -24,7 +24,7 @@ static void update(void) {
 int kickstart(int argc, char **argv) {
 	kinc_display_init();
 	int w, h;
-	{ 
+	{
 		kinc_display_mode_t dm = kinc_display_current_mode(kinc_primary_display());
 #if defined(KORE_ANDROID) || defined(KORE_IOS)
 		w = dm.width;
@@ -48,26 +48,30 @@ int kickstart(int argc, char **argv) {
 	kr_nk_init(&font, 15, kr_malloc(5 * 1024 * 1024), 5 * 1024 * 1024);
 	struct nk_context *kos_nkctx = kr_nk_get_ctx();
 	ecs_entity_t e = kr_flecs_create_filled_rect(
-	    kr_world,
-	    (kr_init_filled_rect_t){.color = 0xff0000ff, .rect = {.x = 0, .y = 0, .w = 200, .h = 100}});
+	    kr_world, &(kr_init_filled_rect_t){.color = 0xff0000ff,
+	                                             .rect = {.x = 0, .y = 0, .w = 200, .h = 100}});
 	ecs_set(kr_world, e, KrTranslation, {10, 10});
 	kr_flecs_set_depth(kr_world, e, -5);
 
-	kr_flecs_create_text(kr_world, (kr_init_text_t){.color = 0xffffffff,
-	                                                .font = &font,
-	                                                .size = 30,
-	                                                .pos = {.x = 100, .y = 700},
-	                                                .text = "Empty Project Test"});
+	kr_flecs_create_text(kr_world, &(kr_init_text_t){.color = 0xffffffff,
+	                                                       .font = &font,
+	                                                       .size = 30,
+	                                                       .pos = {.x = 100, .y = 700},
+	                                                       .text = "Empty Project Test"});
 
 	e = kr_flecs_create_sdf_asymm_rect_wborder(
-	    kr_world, (kr_init_sdf_asymm_rect_wborder_t){
-	                  .sdf_asymm_rect = {.color = 0xff008800,
-	                                     .rect = {.x = 0, .y = 0, .w = 100, .h = 60},
-	                                     .corner = {.top_left = 30, .top_right = 10, .bottom_left = 10, .bottom_right = 30},
-	                                     .smooth = 2.2f}, .border = 8, .border_color = 0xffffffff});
+	    kr_world,
+	    &(kr_init_sdf_asymm_rect_wborder_t){
+	        .sdf_asymm_rect =
+	            {.color = 0xff008800,
+	             .rect = {.x = 0, .y = 0, .w = 100, .h = 60},
+	             .corner = {.top_left = 30, .top_right = 10, .bottom_left = 10, .bottom_right = 30},
+	             .smooth = 2.2f},
+	        .border = 8,
+	        .border_color = 0xffffffff});
 	ecs_set(kr_world, e, KrTranslation, {20, 20});
 	kr_flecs_set_depth(kr_world, e, 5);
-	
+
 	kinc_start();
 	kr_flecs_destroy();
 	return 0;
