@@ -26,11 +26,13 @@ typedef struct kr_ttf_image {
 
 void kr_ttf_load_font_blob_internal(kr_ttf_font_t *font, const char *fontpath) {
 	kinc_file_reader_t fh;
-	assert(kinc_file_reader_open(&fh, fontpath, KINC_FILE_TYPE_ASSET));
+	bool res = kinc_file_reader_open(&fh, fontpath, KINC_FILE_TYPE_ASSET);
+	assert(res);
 	size_t sz = kinc_file_reader_size(&fh);
 	font->blob = kr_malloc(sz);
 	assert(font->blob != NULL);
-	assert(kinc_file_reader_read(&fh, font->blob, sz) == sz);
+	int read_sz = kinc_file_reader_read(&fh, font->blob, sz);
+	assert(read_sz == sz);
 	kinc_file_reader_close(&fh);
 }
 
