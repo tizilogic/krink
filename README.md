@@ -15,6 +15,8 @@
 [![Windows (Direct3D 12)](https://github.com/tizilogic/krink/actions/workflows/windows-direct3d12.yml/badge.svg?branch=master)](https://github.com/tizilogic/krink/actions/workflows/windows-direct3d12.yml)
 [![Windows (OpenGL)](https://github.com/tizilogic/krink/actions/workflows/windows-opengl.yml/badge.svg?branch=master)](https://github.com/tizilogic/krink/actions/workflows/windows-opengl.yml)
 [![Windows (Vulkan)](https://github.com/tizilogic/krink/actions/workflows/windows-vulkan.yml/badge.svg?branch=master)](https://github.com/tizilogic/krink/actions/workflows/windows-vulkan.yml)
+[![HTML5 (WebGL)](https://github.com/tizilogic/krink/actions/workflows/html5-webgl.yml/badge.svg?branch=master)](https://github.com/tizilogic/krink/actions/workflows/html5-webgl.yml)
+[![HTML5 (WebGPU)](https://github.com/tizilogic/krink/actions/workflows/html5-webgpu.yml/badge.svg?branch=master)](https://github.com/tizilogic/krink/actions/workflows/html5-webgpu.yml)
 [![Documentation](https://img.shields.io/badge/docs-docsforge-blue)](http://krink.docsforge.com/)
 
 ECS driven library that provides G2 functionality similar to the one
