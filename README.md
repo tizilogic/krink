@@ -4,7 +4,7 @@
 [![Android (Vulkan)](https://github.com/tizilogic/krink/actions/workflows/android-vulkan.yml/badge.svg?branch=master)](https://github.com/tizilogic/krink/actions/workflows/android-vulkan.yml)
 [![iOS (Metal)](https://github.com/tizilogic/krink/actions/workflows/ios-metal.yml/badge.svg?branch=master)](https://github.com/tizilogic/krink/actions/workflows/ios-metal.yml)
 [![iOS (OpenGL)](https://github.com/tizilogic/krink/actions/workflows/ios-opengl.yml/badge.svg?branch=master)](https://github.com/tizilogic/krink/actions/workflows/ios-opengl.yml)
-[![Linux on ARM (OpenGL)](https://github.com/tizilogic/krink/actions/workflows/linux-arm.yml/badge.svg?branch=master)](https://github.com/tizilogic/krink/actions/workflows/linux-arm.yml)
+[![Linux on ARM (OpenGL)](https://github.com/tizilogic/krink/actions/workflows/linux-arm-opengl.yml/badge.svg?branch=master)](https://github.com/tizilogic/krink/actions/workflows/linux-arm-opengl.yml)
 [![Linux x64 (OpenGL)](https://github.com/tizilogic/krink/actions/workflows/linux-opengl.yml/badge.svg?branch=master)](https://github.com/tizilogic/krink/actions/workflows/linux-opengl.yml)
 [![Linux x64 (Vulkan)](https://github.com/tizilogic/krink/actions/workflows/linux-vulkan.yml/badge.svg?branch=master)](https://github.com/tizilogic/krink/actions/workflows/linux-vulkan.yml)
 [![macOS (Metal)](https://github.com/tizilogic/krink/actions/workflows/macos-metal.yml/badge.svg?branch=master)](https://github.com/tizilogic/krink/actions/workflows/macos-metal.yml)
