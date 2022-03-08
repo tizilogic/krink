@@ -1,0 +1,40 @@
+name: Linux x64 (OpenGL)
+
+on:
+  push:
+    branches:
+    - master
+  pull_request:
+    branches:
+    - master
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Apt Update
+      run: sudo apt update
+    - name: Apt Install
+      run: sudo apt-get install libasound2-dev libxinerama-dev libxrandr-dev libgl1-mesa-dev libxi-dev libxcursor-dev libudev-dev libwayland-dev wayland-protocols libxkbcommon-dev --yes --quiet
+    - name: Get Submodules
+      run: git submodule update --init --recursive
+    - name: Compile
+      run: Kinc/make -g opengl --kinc Kinc --from Tests/Empty --compile
+
+    # TODO: make comparison test
+    # - name: Clean
+    #   run: rm -r build
+    # - name: Get ImageMagick and xvfb
+    #   run: sudo apt install imagemagick xvfb
+    # - name: Compile Test 1
+    #   run: Tools/kmake/kmake-linux64 -g opengl --kinc Kinc --from Tests/Shader --compile
+    # - name: Copy Test 1
+    #   run: cp build/Release/ShaderTest Tests/Shader/Deployment/ShaderTest
+    # - name: Run Test 1
+    #   working-directory: ./Tests/Shader/Deployment
+    #   run: xvfb-run ./ShaderTest
+    # - name: Check Test 1
+    #   run: compare-im6 -metric mae Tests/Shader/reference.png Tests/Shader/Deployment/test.png difference.png

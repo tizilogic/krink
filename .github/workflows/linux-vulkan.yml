@@ -1,0 +1,29 @@
+name: Linux x64 (Vulkan)
+
+on:
+  push:
+    branches:
+    - master
+  pull_request:
+    branches:
+    - master
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Get LunarG key
+      run: wget -qO - http://packages.lunarg.com/lunarg-signing-key-pub.asc | sudo apt-key add -
+    - name: Get LunarG apt sources
+      run: sudo wget -qO /etc/apt/sources.list.d/lunarg-vulkan-bionic.list http://packages.lunarg.com/vulkan/lunarg-vulkan-bionic.list
+    - name: Apt Update
+      run: sudo apt update
+    - name: Apt Install
+      run: sudo apt install libasound2-dev libxinerama-dev libxrandr-dev libgl1-mesa-dev libxi-dev libxcursor-dev libudev-dev vulkan-sdk libwayland-dev wayland-protocols libxkbcommon-dev --yes --quiet
+    - name: Get Submodules
+      run: git submodule update --init --recursive
+    - name: Compile
+      run: Kinc/make -g vulkan --kinc Kinc --from Tests/Empty --noshaders --compile

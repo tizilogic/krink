@@ -1,4 +1,4 @@
-name: iOS (Metal)
+name: Windows (Direct3D 12)
 
 on:
   push:
@@ -11,11 +11,11 @@ on:
 jobs:
   build:
 
-    runs-on: macOS-latest
+    runs-on: windows-latest
 
     steps:
     - uses: actions/checkout@v2
     - name: Get Submodules
       run: git submodule update --init --recursive
     - name: Compile
-      run: Kinc/make ios -g metal --kinc Kinc --from Tests/Empty --noshaders --nosigning --compile
+      run: .\Kinc\make.bat -v vs2022 -g direct3d12 --kinc Kinc --from Tests/Empty --noshaders --compile

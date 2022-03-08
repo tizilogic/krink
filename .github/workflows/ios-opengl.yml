@@ -1,4 +1,4 @@
-name: iOS (Metal)
+name: iOS (OpenGL)
 
 on:
   push:
@@ -18,4 +18,4 @@ jobs:
     - name: Get Submodules
       run: git submodule update --init --recursive
     - name: Compile
-      run: Kinc/make ios -g metal --kinc Kinc --from Tests/Empty --noshaders --nosigning --compile
+      run: Kinc/make ios -g opengl --kinc Kinc --from Tests/Empty --noshaders --nosigning --compile
