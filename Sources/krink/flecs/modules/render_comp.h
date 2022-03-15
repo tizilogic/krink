@@ -132,6 +132,9 @@ ECS_STRUCT(KrTranslation, {
 	float x;
 	float y;
 });
+ECS_STRUCT(KrAnchor, {
+	ecs_entity_t parent;
+});
 
 ECS_STRUCT(KrFrameTime, { double time; });
 

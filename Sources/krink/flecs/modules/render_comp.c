@@ -44,6 +44,7 @@ void ComponentsRenderImport(ecs_world_t *world) {
 	ECS_META_COMPONENT(world, KrScaleX);
 	ECS_META_COMPONENT(world, KrScaleY);
 	ECS_META_COMPONENT(world, KrTranslation);
+	ECS_META_COMPONENT(world, KrAnchor);
 
 	ECS_META_COMPONENT(world, KrFrameTime);
 

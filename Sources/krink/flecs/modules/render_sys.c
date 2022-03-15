@@ -1,6 +1,7 @@
 #define SYSTEMS_RENDER_IMPL
 #include "render_sys.h"
 #include "render_comp.h"
+#include <kinc/log.h>
 #include <kinc/math/core.h>
 #include <kinc/math/matrix.h>
 #include <kinc/system.h>
@@ -105,8 +106,8 @@ static void Render(ecs_iter_t *it) {
 					    kinc_min(triangle[i].x1, kinc_min(triangle[i].x2, triangle[i].x3));
 					h = kinc_max(triangle[i].y1, kinc_max(triangle[i].y2, triangle[i].y3)) -
 					    kinc_min(triangle[i].y1, kinc_min(triangle[i].y2, triangle[i].y3));
-					//w *= sx;
-					//h *= sy;
+					// w *= sx;
+					// h *= sy;
 				} break;
 				case KR_COMP_PP_COLOR_QUAD_STROKE:
 				case KR_COMP_PP_COLOR_QUAD_FILL:
@@ -251,6 +252,75 @@ static int compare_render_order(ecs_entity_t e1, const void *ptr1, ecs_entity_t 
 	        ((((d2->sort_extra >> (32 - PSHIFT)) & EMASK) + (d2->sort_extra & EMASK)) & EMASK));
 }
 
+typedef struct {
+	KrTranslation offset;
+	KrTranslation parent_prev_trans;
+	KrTranslation prev_trans;
+} KrInternalAnchor;
+ECS_COMPONENT_DECLARE(KrInternalAnchor);
+
+static inline void update_offset(KrTranslation *offset, const KrTranslation *parent, const KrTranslation *child) {
+	offset->x = child->x - parent->x;
+	offset->y = child->y - parent->y;
+}
+
+static void OnAnchorSet(ecs_iter_t *it) {
+	KrAnchor *anchor = ecs_term(it, KrAnchor, 1);
+	for (int i = 0; i < it->count; ++i) {
+		if (!ecs_has(it->world, anchor[i].parent, KrTranslation)) {
+			ecs_set(it->world, anchor[i].parent, KrTranslation, {.x = 0.0f, .y = 0.0f});
+		}
+		if (!ecs_has(it->world, it->entities[i], KrTranslation)) {
+			ecs_set(it->world, it->entities[i], KrTranslation, {.x = 0.0f, .y = 0.0f});
+		}
+		const KrTranslation *ptrans = ecs_get(it->world, anchor[i].parent, KrTranslation);
+		const KrTranslation *ctrans = ecs_get(it->world, it->entities[i], KrTranslation);
+		bool unused;
+		KrInternalAnchor *ianchor =
+		    ecs_get_mut(it->world, it->entities[i], KrInternalAnchor, &unused);
+		update_offset(&ianchor->offset, ptrans, ctrans);
+		ianchor->parent_prev_trans.x = ptrans->x;
+		ianchor->parent_prev_trans.y = ptrans->y;
+		ianchor->prev_trans.x = ctrans->x;
+		ianchor->prev_trans.y = ctrans->y;
+		ecs_modified(it->world, it->entities[i], KrInternalAnchor);
+	}
+}
+
+static void OnAnchorRemove(ecs_iter_t *it) {
+	KrAnchor *anchor = ecs_term(it, KrAnchor, 1);
+	for (int i = 0; i < it->count; ++i) {
+		ecs_remove(it->world, it->entities[i], KrInternalAnchor);
+	}
+}
+
+static inline bool comptrans(const KrTranslation *a, const KrTranslation *b) {
+	return a->x == b->x && a->y == b->y;
+}
+
+static void UpdateAnchored(ecs_iter_t *it) {
+	KrTranslation *ctrans = ecs_term(it, KrTranslation, 1);
+	KrAnchor *anchor = ecs_term(it, KrAnchor, 2);
+	KrInternalAnchor *ianchor = ecs_term(it, KrInternalAnchor, 3);
+
+	for (int i = 0; i < it->count; ++i) {
+		const KrTranslation *ptrans = ecs_get(it->world, anchor[i].parent, KrTranslation);
+		if (!comptrans(&ctrans[i], &ianchor[i].prev_trans)) {
+			update_offset(&ianchor[i].offset, &ianchor[i].parent_prev_trans, ctrans);
+			ianchor[i].prev_trans = ctrans[i];
+		}
+		if (!comptrans(&ianchor[i].parent_prev_trans, ptrans)) {
+			ctrans[i].x = ptrans->x + ianchor[i].offset.x;
+			ctrans[i].y = ptrans->y + ianchor[i].offset.y;
+			ianchor[i].parent_prev_trans.x = ptrans->x;
+			ianchor[i].parent_prev_trans.y = ptrans->y;
+			ianchor[i].prev_trans.x = ctrans[i].x;
+			ianchor[i].prev_trans.y = ctrans[i].y;
+			kinc_log(KINC_LOG_LEVEL_INFO, "here");
+		}
+	}
+}
+
 void SystemsRenderImport(ecs_world_t *world) {
 	/* Define module */
 	ECS_MODULE(world, SystemsRender);
@@ -258,9 +328,16 @@ void SystemsRenderImport(ecs_world_t *world) {
 	/* Register components */
 	ECS_IMPORT(world, ComponentsRender);
 
+	ECS_COMPONENT_DEFINE(world, KrInternalAnchor);
+
+	ECS_TRIGGER(world, OnAnchorSet, EcsOnSet, KrAnchor);
+	ECS_TRIGGER(world, OnAnchorRemove, EcsOnRemove, KrAnchor);
+	ECS_SYSTEM(world, UpdateAnchored, EcsPostUpdate, [inout] components.render.KrTranslation,
+	           [in] components.render.KrAnchor, [inout] KrInternalAnchor);
+
 	ECS_SYSTEM(world, FrameTime, EcsOnLoad, $KrFrameTime);
 
-	ecs_singleton_set(world, KrFrameTime, { kinc_time() });
+	ecs_singleton_set(world, KrFrameTime, {kinc_time()});
 
 	ECS_SYSTEM(world, Clear, EcsPreStore);
 
