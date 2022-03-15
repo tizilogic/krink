@@ -316,7 +316,6 @@ static void UpdateAnchored(ecs_iter_t *it) {
 			ianchor[i].parent_prev_trans.y = ptrans->y;
 			ianchor[i].prev_trans.x = ctrans[i].x;
 			ianchor[i].prev_trans.y = ctrans[i].y;
-			kinc_log(KINC_LOG_LEVEL_INFO, "here");
 		}
 	}
 }
