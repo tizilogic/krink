@@ -47,7 +47,7 @@ static void SystemAnimateAngle(ecs_iter_t *it) {
 		for (int i = 0; i < rit.count; ++i) {
 			float start_angle =
 			    anim_has_angle_from ? angle_from[i].radians : (has_angle ? angle[i].radians : 0.0f);
-			if (mod[i].v < 1.0 && mod[i].v >= 0.0) {
+			if (mod[i].v <= 1.0f && mod[i].v >= 0.0f) {
 				if (!active) {
 					ecs_add(it->world, anim_e, KrInternalAnimationActive);
 					if (!ecs_has_pair(it->world, anim_e, ecs_id(KrAngle),
@@ -107,7 +107,7 @@ static void SystemAnimatePos(ecs_iter_t *it) {
 			float end_x = anim_has_to_x ? to_x[i].v : (has_translation ? translation[i].x : 0.0f);
 			float end_y = anim_has_to_y ? to_y[i].v : (has_translation ? translation[i].y : 0.0f);
 
-			if (mod[i].v < 1.0 && mod[i].v >= 0.0) {
+			if (mod[i].v <= 1.0f && mod[i].v >= 0.0f) {
 				if (!active) {
 					ecs_add(it->world, anim_e, KrInternalAnimationActive);
 
@@ -161,7 +161,7 @@ static void SystemAnimateScaleX(ecs_iter_t *it) {
 			    anim_has_from_x ? from_scale_x[i].value : (has_scale_x ? scale_x[i].value : 1.0f);
 			float end_x = to_scale_x[i].value;
 
-			if (mod[i].v < 1.0 && mod[i].v >= 0.0) {
+			if (mod[i].v <= 1.0f && mod[i].v >= 0.0f) {
 				if (!active) {
 					ecs_add(it->world, anim_e, KrInternalAnimationActive);
 					if (!ecs_has_pair(it->world, anim_e, ecs_id(KrScaleX),
@@ -208,7 +208,7 @@ static void SystemAnimateScaleY(ecs_iter_t *it) {
 			    anim_has_from_y ? from_scale_x[i].value : (has_scale_y ? scale_y[i].value : 1.0f);
 			float end_y = to_scale_y[i].value;
 
-			if (mod[i].v < 1.0 && mod[i].v >= 0.0) {
+			if (mod[i].v <= 1.0f && mod[i].v >= 0.0f) {
 				if (!active) {
 					ecs_add(it->world, anim_e, KrInternalAnimationActive);
 					if (!ecs_has_pair(it->world, anim_e, ecs_id(KrScaleY),
@@ -256,7 +256,7 @@ static void SystemAnimateOpacity(ecs_iter_t *it) {
 			                                    : (has_opacity ? opacity[i].alpha : 1.0f);
 			float end = to_opacity[i].alpha;
 
-			if (mod[i].v < 1.0 && mod[i].v >= 0.0) {
+			if (mod[i].v <= 1.0f && mod[i].v >= 0.0f) {
 				if (!active) {
 					ecs_add(it->world, anim_e, KrInternalAnimationActive);
 					if (ecs_has_pair(it->world, anim_e, ecs_id(KrOpacity),
@@ -316,6 +316,7 @@ void UpdateProgress(ecs_iter_t *it) {
 			mod[i].v = 1.0f;
 			if (ecs_term_is_set(it, 3)) {
 				ecs_add(it->world, it->entities[i], KrInternalAnimationReset);
+				// Make sure correct progress is saved when looping animations
 				if (t->time >= animation[i].start + offset[i].t &&
 				    t->time <= animation[i].start + offset[i].t + animation[i].duration) {
 					mod[i].v =
