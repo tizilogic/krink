@@ -41,6 +41,15 @@ ECS_STRUCT(KrModifier, { float v; });
 
 ECS_STRUCT(KrOffset, { double t; });
 
+ECS_STRUCT(KrCallback, {
+	void *before;
+	void *before_param;
+	void *after;
+	void *after_param;
+});
+
+typedef void (*kr_anim_callback)(ecs_world_t *, void *);
+
 /* Prefabs */
 
 void ComponentsAnimationImport(ecs_world_t *world);

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "flecs.h"
+#include "modules/animation_comp.h"
 #include <krink/graphics2/sdfpainter.h>
 #include <krink/graphics2/ttf.h>
 #include <krink/image.h>
@@ -282,7 +283,10 @@ typedef struct kr_init_sequence {
 /// <param name="world">The world</param>
 /// <param name="e">The entity</param>
 /// <param name="anim">Initializer</param>
-void kr_flecs_create_animation(ecs_world_t *world, ecs_entity_t e, const kr_init_animation_t *anim);
+/// <param name="callback">Optional before and after callback functions that take a single
+/// `ecs_world_t *` parameter</param>
+void kr_flecs_create_animation(ecs_world_t *world, ecs_entity_t e, const kr_init_animation_t *anim,
+                               const KrCallback *callback);
 
 /// <summary>
 /// Factrory function to create a sequence of animations for an entity.

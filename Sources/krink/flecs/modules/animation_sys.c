@@ -308,6 +308,7 @@ void UpdateProgress(ecs_iter_t *it) {
 	KrAnimation *animation = ecs_term(it, KrAnimation, 1);
 	KrModifier *mod = ecs_term(it, KrModifier, 2);
 	KrOffset *offset = ecs_term(it, KrOffset, 3);
+	KrCallback *callback = ecs_term(it, KrCallback, 4);
 	const KrFrameTime *t = ecs_singleton_get(it->world, KrFrameTime);
 
 	for (int i = 0; i < it->count; ++i) {
@@ -326,6 +327,16 @@ void UpdateProgress(ecs_iter_t *it) {
 			else {
 				ecs_add(it->world, it->entities[i], KrInternalAnimationDelete);
 			}
+		}
+		// Handle callbacks
+		if (ecs_term_is_set(it, 4)) {
+			if (mod[i].v > 0.0f &&
+			    !ecs_has(it->world, it->entities[i], KrInternalAnimationActive)) {
+				if (callback[i].before)
+					((kr_anim_callback)callback[i].before)(it->world, callback[i].before_param);
+			}
+			else if (mod[i].v >= 1.0f && callback[i].after)
+				((kr_anim_callback)callback[i].after)(it->world, callback[i].after_param);
 		}
 	}
 }
@@ -362,6 +373,7 @@ void SystemsAnimationImport(ecs_world_t *world) {
 	                            {ecs_id(KrAnimation)},
 	                            {ecs_pair(ecs_id(KrModifier), KrInternalAnimationProgress)},
 	                            {ecs_pair(ecs_id(KrOffset), KrAnimateLoop), .oper = EcsOptional},
+	                            {ecs_id(KrCallback), .oper = EcsOptional},
 	                        },
 	                    .callback = UpdateProgress});
 

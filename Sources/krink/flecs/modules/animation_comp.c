@@ -27,4 +27,5 @@ void ComponentsAnimationImport(ecs_world_t *world) {
 	ECS_META_COMPONENT(world, KrAnimation);
 	ECS_META_COMPONENT(world, KrModifier);
 	ECS_META_COMPONENT(world, KrOffset);
+	ECS_META_COMPONENT(world, KrCallback);
 }

@@ -1,6 +1,5 @@
 #include "krink_flecs.h"
 #include "internal/os_api.h"
-#include "modules/animation_comp.h"
 #include "modules/animation_sys.h"
 #include "modules/drag_comp.h"
 #include "modules/drag_sys.h"
@@ -354,12 +353,19 @@ static void add_animation(ecs_world_t *world, ecs_entity_t e, ecs_entity_t anim_
 	ecs_add_pair(world, e, KrAnimate, anim_e);
 }
 
-void kr_flecs_create_animation(ecs_world_t *world, ecs_entity_t e,
-                               const kr_init_animation_t *anim) {
+void kr_flecs_create_animation(ecs_world_t *world, ecs_entity_t e, const kr_init_animation_t *anim,
+                               const KrCallback *callback) {
 	fill_entity_buffer(world);
 	ecs_entity_t anim_e = entity_buffer[--entity_buffer_top];
 	if (anim->loop) {
 		ecs_set_pair(world, anim_e, KrOffset, KrAnimateLoop, {anim->duration});
+	}
+	if (callback != NULL) {
+		ecs_set(world, anim_e, KrCallback,
+		        {.before = callback->before,
+		         .before_param = callback->before_param,
+		         .after = callback->after,
+		         .after_param = callback->after_param});
 	}
 	add_animation(world, e, anim_e, anim);
 }
