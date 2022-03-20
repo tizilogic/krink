@@ -233,6 +233,7 @@ static inline bool point_in_aabb(float px, float py, const KrDragAABB *aabb) {
 
 static void CheckDrag(ecs_iter_t *it) {
 	if (drag_active) return;
+	if (!ecs_exists(it->world, ecs_id(KrInternalCanDrag))) return;
 	const KrSingletonInput *inp = ecs_singleton_get(it->world, KrSingletonInput);
 	if (!(inp->mouse.primary.down && inp->mouse.primary.triggered)) return;
 
@@ -340,7 +341,7 @@ void SystemsDragImport(ecs_world_t *world) {
 	               .query.filter.expr =
 	                   "[in] components.render.KrDrawable, [in] components.drag.KrDragAABB, "
 	                   "[in] components.render.KrTranslation, [in] components.render.KrVisible, "
-	                   "[in] components.drag.KrDragable, KrInternalCanDrag(KrInternalCanDrag)",
+	                   "[in] components.drag.KrDragable",
 	               .callback = CheckDrag});
 
 	ecs_system_init(
