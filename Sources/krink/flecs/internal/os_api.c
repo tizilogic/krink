@@ -1,3 +1,5 @@
+#if !defined(__EMSCRIPTEN__)
+
 #include "os_api.h"
 
 #include "../flecs.h"
@@ -241,5 +243,7 @@ void kr_set_flecs_os_api(void) {
 
 	ecs_os_set_api(&api);
 }
+
+#endif
 
 #endif

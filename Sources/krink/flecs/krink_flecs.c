@@ -393,7 +393,9 @@ void kr_flecs_create_sequence(ecs_world_t *world, ecs_entity_t e,
 /* Init/Destroy/Tick */
 
 void kr_flecs_init(bool with_flecs_rest) {
+#if !defined(__EMSCRIPTEN__)
 	kr_set_flecs_os_api();
+#endif
 	kr_world = ecs_init();
 #ifndef NDEBUG
 	if (with_flecs_rest) ecs_singleton_set(kr_world, EcsRest, {0});
