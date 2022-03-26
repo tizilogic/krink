@@ -378,7 +378,7 @@ void SystemsAnimationImport(ecs_world_t *world) {
 	                    .callback = UpdateProgress});
 
 	const char *expr =
-	    "components.render.KrDrawable"
+	    "[in] components.render.KrDrawable"
 	    ",?components.render.KrAngle"
 	    ",?components.render.KrRotationCenter"
 	    ",(components.animation.KrAnimate, _A)"
@@ -395,7 +395,7 @@ void SystemsAnimationImport(ecs_world_t *world) {
 	                                .ctx = anim_angle_rule,
 	                                .callback = SystemAnimateAngle});
 
-	expr = "components.render.KrDrawable"
+	expr = "[in] components.render.KrDrawable"
 	       ",?components.render.KrTranslation"
 	       ",(components.animation.KrAnimate, _A)"
 	       ",components.animation.KrAnimation(_A)"
@@ -412,7 +412,7 @@ void SystemsAnimationImport(ecs_world_t *world) {
 	                                .ctx = anim_pos_rule,
 	                                .callback = SystemAnimatePos});
 
-	expr = "components.render.KrDrawable"
+	expr = "[in] components.render.KrDrawable"
 	       ",?components.render.KrScaleX"
 	       ",(components.animation.KrAnimate, _A)"
 	       ",components.animation.KrAnimation(_A)"
@@ -427,7 +427,7 @@ void SystemsAnimationImport(ecs_world_t *world) {
 	                                .ctx = anim_scale_x_rule,
 	                                .callback = SystemAnimateScaleX});
 
-	expr = "components.render.KrDrawable"
+	expr = "[in] components.render.KrDrawable"
 	       ",?components.render.KrScaleY"
 	       ",(components.animation.KrAnimate, _A)"
 	       ",components.animation.KrAnimation(_A)"
@@ -442,7 +442,7 @@ void SystemsAnimationImport(ecs_world_t *world) {
 	                                .ctx = anim_scale_y_rule,
 	                                .callback = SystemAnimateScaleY});
 
-	expr = "components.render.KrDrawable"
+	expr = "[in] components.render.KrDrawable"
 	       ",?components.render.KrOpacity"
 	       ",(components.animation.KrAnimate, _A)"
 	       ",components.animation.KrAnimation(_A)"

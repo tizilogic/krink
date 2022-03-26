@@ -341,7 +341,7 @@ void SystemsRenderImport(ecs_world_t *world) {
 	ECS_SYSTEM(world, Clear, EcsPreStore);
 
 	ecs_term_t termbuff[22] = {
-	    {ecs_id(KrDrawable)},
+	    {ecs_id(KrDrawable), .inout = EcsIn},
 	    {ecs_id(KrPos2), .oper = EcsOptional},
 	    {ecs_id(KrColor)},
 	    {ecs_id(KrImage), .oper = EcsOptional},
