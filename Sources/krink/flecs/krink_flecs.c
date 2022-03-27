@@ -371,7 +371,7 @@ void kr_flecs_create_animation(ecs_world_t *world, ecs_entity_t e, const kr_init
 }
 
 void kr_flecs_create_sequence(ecs_world_t *world, ecs_entity_t e,
-                              const kr_init_sequence_t *sequence) {
+                              const kr_init_sequence_t *sequence, const KrCallback *callback) {
 	assert(sequence->count > 0 && sequence->count <= 16);
 	fill_entity_buffer(world);
 	double offset = 0.0;
@@ -385,6 +385,20 @@ void kr_flecs_create_sequence(ecs_world_t *world, ecs_entity_t e,
 		a.loop = sequence->loop;
 		if (a.loop) {
 			ecs_set_pair(world, anim_e, KrOffset, KrAnimateLoop, {offset});
+		}
+		if (callback != NULL && i == 0 && callback->before != NULL) {
+			ecs_set(world, anim_e, KrCallback,
+			        {.before = callback->before,
+			         .before_param = callback->before_param,
+			         .after = NULL,
+			         .after_param = NULL});
+		}
+		if (callback != NULL && i == sequence->count - 1 && callback->after != NULL) {
+			ecs_set(world, anim_e, KrCallback,
+			        {.before = NULL,
+			         .before_param = NULL,
+			         .after = callback->after,
+			         .after_param = callback->after_param});
 		}
 		add_animation(world, e, anim_e, &a);
 	}
