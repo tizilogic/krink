@@ -25,7 +25,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-      - uses: uraimo/run-on-arch-action@v2.0.9
+      - uses: uraimo/run-on-arch-action@v2.2.0
         name: Run Tests in ${{ matrix.distro }} ${{ matrix.arch }}
         id: build
         with:
@@ -52,6 +52,7 @@ jobs:
           # Produce a binary artifact and place it in the mounted volume
           run: |
             echo " * Get Submodules"
+            git config --global --add safe.directory /home/runner/work/krink/krink
             git submodule update --init --recursive
             echo " * Compile"
             Kinc/make -g opengl --kinc Kinc --from Tests/Empty --compile
