@@ -37,6 +37,19 @@ void kr_g2_destroy(void);
 void kr_g2_begin(int window);
 
 /// <summary>
+/// Needs to be called after `kr_g2_begin` and before rendering to a render-target that was
+/// activated in kinc using `kinc_g4_set_render_targets`.
+/// </summary>
+/// <param name="width"></param>
+/// <param name="height"></param>
+void kr_g2_set_render_target_dim(int width, int height);
+
+/// <summary>
+/// Needs to be called to restore rendering to a framebuffer.
+/// </summary>
+void kr_g2_reset_render_target_dim(void);
+
+/// <summary>
 /// Needs to be called after rendering to a window. Typically called at the end of each frame.
 /// </summary>
 void kr_g2_end(void);

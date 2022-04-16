@@ -35,13 +35,7 @@ void kr_g2_init(void) {
 	}
 }
 
-static void internal_update_projection_matrix(int window) {
-	int num_windows = kinc_count_windows();
-	assert(window >= 0 && window < num_windows);
-
-	int iwidth = kinc_window_width(window);
-	int iheight = kinc_window_height(window);
-	if (iwidth == g2_last_width && iheight == g2_last_height) return;
+static inline void internal_set_projection_matrix(int iwidth, int iheight) {
 	g2_last_width = iwidth;
 	g2_last_height = iheight;
 	float width = (float)iwidth;
@@ -64,6 +58,16 @@ static void internal_update_projection_matrix(int window) {
 	kr_sdf_set_projection_matrix(g2_projection_matrix);
 }
 
+static void internal_update_projection_matrix(int window) {
+	int num_windows = kinc_count_windows();
+	assert(window >= 0 && window < num_windows);
+
+	int iwidth = kinc_window_width(window);
+	int iheight = kinc_window_height(window);
+	if (iwidth == g2_last_width && iheight == g2_last_height) return;
+	internal_set_projection_matrix(iwidth, iheight);
+}
+
 void kr_g2_destroy(void) {
 	// Maybe not needed?
 }
@@ -83,6 +87,18 @@ void kr_g2_end(void) {
 	kr_sdf_end();
 	begin = false;
 	g2_active_window = -1;
+}
+
+void kr_g2_set_render_target_dim(int width, int height) {
+	assert(begin && g2_active_window != -1);
+	internal_set_projection_matrix(width, height);
+}
+
+void kr_g2_reset_render_target_dim(void) {
+	assert(begin && g2_active_window != -1);
+	int window = g2_active_window;
+	kr_g2_end();
+	kr_g2_begin(window);
 }
 
 void kr_g2_clear(uint32_t color) {
