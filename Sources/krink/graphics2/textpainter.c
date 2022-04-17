@@ -1,3 +1,4 @@
+#ifndef KR_FULL_RGBA_FONTS
 #include "textpainter.h"
 
 #include <assert.h>
@@ -255,3 +256,5 @@ void kr_tsp_end(void) {
 	if (buffer_index > 0) kr_tsp_draw_buffer(true);
 	last_texture = NULL;
 }
+
+#endif

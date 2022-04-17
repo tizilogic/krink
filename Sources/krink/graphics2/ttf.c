@@ -5,23 +5,31 @@
 #include <assert.h>
 #include <kinc/image.h>
 #include <kinc/io/filereader.h>
+#include <kinc/memory.h>
 #include <krink/memory.h>
+
+#ifdef KR_FULL_RGBA_FONTS
+#define KR_FONT_IMAGE_FORMAT KINC_IMAGE_FORMAT_RGBA32
+#else
+#define KR_FONT_IMAGE_FORMAT KINC_IMAGE_FORMAT_GREY8
+#endif
 
 static int *kr_ttf_glyph_blocks = NULL;
 static int *kr_ttf_glyphs = NULL;
 static int kr_ttf_num_glyph_blocks = -1;
 static int kr_ttf_num_glyphs = -1;
 
-static float myround(float v) {
+static inline float myround(float v) {
 	return (float)((int)(v + 0.5f));
 }
 
 typedef struct kr_ttf_image {
 	float m_size;
 	stbtt_bakedchar *chars;
-	kinc_g4_texture_t tex;
-	int width, height;
+	kinc_g4_texture_t *tex;
+	int width, height, first_unused_y;
 	float baseline, descent, line_gap;
+	bool owns_tex;
 } kr_ttf_image_t;
 
 void kr_ttf_load_font_blob_internal(kr_ttf_font_t *font, const char *fontpath) {
@@ -132,7 +140,6 @@ void kr_ttf_font_init(kr_ttf_font_t *font, const char *fontpath, int font_index)
 	font->images = NULL;
 	font->m_images_len = 0;
 	font->m_capacity = 0;
-	font_index = font_index;
 	kr_ttf_load_font_blob_internal(font, fontpath);
 	font->offset = stbtt_GetFontOffsetForIndex(font->blob, font_index);
 	if (font->offset == -1) {
@@ -140,8 +147,15 @@ void kr_ttf_font_init(kr_ttf_font_t *font, const char *fontpath, int font_index)
 	}
 }
 
-void kr_ttf_load(kr_ttf_font_t *font, int size) {
-	if (kr_ttf_get_image_internal(font, size) != NULL) return; // nothing to do
+void kr_ttf_font_init_empty(kr_ttf_font_t *font) {
+	font->blob = NULL;
+	font->images = NULL;
+	font->m_images_len = 0;
+	font->m_capacity = 0;
+}
+
+static inline bool prepare_font_load(kr_ttf_font_t *font, int size) {
+	if (kr_ttf_get_image_internal(font, size) != NULL) return false; // nothing to do
 
 	// resize images array if necessary
 	if (font->m_capacity <= font->m_images_len) {
@@ -157,6 +171,12 @@ void kr_ttf_load(kr_ttf_font_t *font, int size) {
 		assert(font->images != NULL);
 		font->m_capacity = new_capacity;
 	}
+
+	return true;
+}
+
+void kr_ttf_load(kr_ttf_font_t *font, int size) {
+	if (!prepare_font_load(font, size)) return;
 
 	// create image
 	kr_ttf_image_t *img = &(font->images[font->m_images_len]);
@@ -185,6 +205,21 @@ void kr_ttf_load(kr_ttf_font_t *font, int size) {
 
 	// TODO: Scale pixels down if they exceed the supported texture size
 
+#ifdef KR_FULL_RGBA_FONTS
+	unsigned char *color_pixels =
+	    (unsigned char *)kr_malloc(width * height * 4 * sizeof(unsigned char));
+	assert(color_pixels != NULL);
+	for (int y = 0; y < height; ++y)
+		for (int x = 0; x < width; ++x) {
+			color_pixels[(y * width + x) * 4 + 0] = 255;
+			color_pixels[(y * width + x) * 4 + 1] = 255;
+			color_pixels[(y * width + x) * 4 + 2] = 255;
+			color_pixels[(y * width + x) * 4 + 3] = pixels[y * width + x];
+		}
+	kr_free(pixels);
+	pixels = color_pixels;
+#endif
+
 	stbtt_fontinfo info;
 	int ascent, descent, line_gap;
 	stbtt_InitFont(&info, font->blob, font->offset);
@@ -197,11 +232,48 @@ void kr_ttf_load(kr_ttf_font_t *font, int size) {
 	img->width = (float)width;
 	img->height = (float)height;
 	img->chars = baked;
+	img->owns_tex = true;
+	img->first_unused_y = status;
 	kinc_image_t fontimg;
-	kinc_image_init_from_bytes(&fontimg, pixels, width, height, KINC_IMAGE_FORMAT_GREY8);
-	kinc_g4_texture_init_from_image(&(img->tex), &fontimg);
+	kinc_image_init_from_bytes(&fontimg, pixels, width, height, KR_FONT_IMAGE_FORMAT);
+	img->tex = (kinc_g4_texture_t *)kr_malloc(sizeof(kinc_g4_texture_t));
+	kinc_g4_texture_init_from_image(img->tex, &fontimg);
 	kinc_image_destroy(&fontimg);
 	kr_free(pixels);
+}
+
+void kr_ttf_load_baked_font(kr_ttf_font_t *font, kr_ttf_font_t *origin, int size,
+                            kinc_g4_texture_t *tex, float xoff, float yoff) {
+
+	if (!prepare_font_load(font, size)) return;
+
+	kr_ttf_image_t *origin_img = kr_ttf_get_image_internal(origin, size);
+	kr_ttf_image_t *img = &(font->images[font->m_images_len]);
+	font->m_images_len += 1;
+	img->m_size = (float)size;
+	img->baseline = origin_img->baseline;
+	img->descent = origin_img->descent;
+	img->line_gap = origin_img->line_gap;
+	img->width = tex->tex_width;
+	img->height = tex->tex_height;
+	img->chars = (stbtt_bakedchar *)kr_malloc(kr_ttf_num_glyphs * sizeof(stbtt_bakedchar));
+	if (xoff == 0.0f && yoff == 0.0f) {
+		kinc_memcpy(img->chars, origin_img->chars, kr_ttf_num_glyphs * sizeof(stbtt_bakedchar));
+		img->first_unused_y = origin_img->first_unused_y;
+	}
+	else {
+		for (int i = 0; i < kr_ttf_num_glyphs; ++i) {
+			img->chars[i].x0 = origin_img->chars[i].x0 + xoff;
+			img->chars[i].x1 = origin_img->chars[i].x1 + xoff;
+			img->chars[i].y0 = origin_img->chars[i].y0 + yoff;
+			img->chars[i].y1 = origin_img->chars[i].y1 + yoff;
+			img->chars[i].xoff = origin_img->chars[i].xoff + xoff;
+			img->chars[i].yoff = origin_img->chars[i].yoff + yoff;
+		}
+		img->first_unused_y = origin_img->first_unused_y + (int)(yoff + 0.5f);
+	}
+	img->owns_tex = true;
+	img->tex = tex;
 }
 
 float kr_ttf_height(kr_ttf_font_t *font, int size) {
@@ -276,12 +348,18 @@ bool kr_ttf_get_baked_quad(kr_ttf_font_t *font, int size, kr_ttf_aligned_quad_t 
 kinc_g4_texture_t *kr_ttf_get_texture(kr_ttf_font_t *font, int size) {
 	kr_ttf_image_t *img = kr_ttf_get_image_internal(font, size);
 	assert(img != NULL);
-	return &(img->tex);
+	return img->tex;
+}
+
+int kr_ttf_get_first_unused_y(kr_ttf_font_t *font, int size) {
+	kr_ttf_image_t *img = kr_ttf_get_image_internal(font, size);
+	return img->first_unused_y;
 }
 
 void kr_ttf_font_destroy(kr_ttf_font_t *font) {
 	for (int i = 0; i < font->m_images_len; ++i) {
-		kinc_g4_texture_destroy(&(font->images[i].tex));
+		// Only destroy textures we own
+		if (font->images[i].owns_tex) kinc_g4_texture_destroy(font->images[i].tex);
 		kr_free(font->images[i].chars);
 	}
 	kr_free(font->blob);

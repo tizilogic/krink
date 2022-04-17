@@ -40,11 +40,29 @@ void kr_ttf_init(int *glyphs, int num_glyphs);
 void kr_ttf_font_init(kr_ttf_font_t *font, const char *fontpath, int font_index);
 
 /// <summary>
+/// Initializes an empty font object to be used for manual baked font loading.
+/// </summary>
+/// <param name="font">Pointer to your font object</param>
+void kr_ttf_font_init_empty(kr_ttf_font_t *font);
+
+/// <summary>
 /// Load a font with a given size.
 /// </summary>
 /// <param name="font">Pointer to your font object</param>
 /// <param name="size">Font height in pixel</param>
 void kr_ttf_load(kr_ttf_font_t *font, int size);
+
+/// <summary>
+/// Load a baked font from an existing, regular font.
+/// </summary>
+/// <param name="font">Pointer to your baked font object</param>
+/// <param name="origin">Pointer to the regular font object being used as a template</param>
+/// <param name="size">Font height in pixel</param>
+/// <param name="tex">The texture that contains the font</param>
+/// <param name="xoff">Offset of the baked font in the texture</param>
+/// <param name="yoff">Offset of the baked font in the texture</param>
+void kr_ttf_load_baked_font(kr_ttf_font_t *font, kr_ttf_font_t *origin, int size,
+                            kinc_g4_texture_t *tex, float xoff, float yoff);
 
 /// <summary>
 /// Returns the normalized font height in pixel.
@@ -111,6 +129,13 @@ bool kr_ttf_get_baked_quad(kr_ttf_font_t *font, int size, kr_ttf_aligned_quad_t 
 /// <param name="font">Pointer to your font object</param>
 /// <param name="size">Font height in pixel</param>
 kinc_g4_texture_t *kr_ttf_get_texture(kr_ttf_font_t *font, int size);
+
+/// <summary>
+/// Get the first unused row (y coordinate) from the baked texture.
+/// </summary>
+/// <param name="font">Pointer to your font object</param>
+/// <param name="size">Font height in pixel</param>
+int kr_ttf_get_first_unused_y(kr_ttf_font_t *font, int size);
 
 /// <summary>
 /// Destroys a font with all loaded font sizes.

@@ -2,7 +2,15 @@
 #include "coloredpainter.h"
 #include "imagepainter.h"
 #include "sdfpainter.h"
+
+#ifdef KR_FULL_RGBA_FONTS
+#define kr_tsp_init()
+#define kr_tsp_set_projection_matrix(m)
+#define kr_tsp_end()
+#else
 #include "textpainter.h"
+#endif
+
 #include <assert.h>
 #include <stdbool.h>
 
@@ -200,7 +208,9 @@ void kr_g2_fill_triangle(float x1, float y1, float x2, float y2, float x3, float
 
 void kr_g2_draw_string(const char *text, float x, float y) {
 	assert(begin);
+#ifndef KR_FULL_RGBA_FONTS
 	kr_isp_end();
+#endif
 	kr_csp_end();
 	kr_sdf_end();
 
@@ -209,7 +219,9 @@ void kr_g2_draw_string(const char *text, float x, float y) {
 
 void kr_g2_draw_characters(int *text, int start, int length, float x, float y) {
 	assert(begin);
+#ifndef KR_FULL_RGBA_FONTS
 	kr_isp_end();
+#endif
 	kr_csp_end();
 	kr_sdf_end();
 

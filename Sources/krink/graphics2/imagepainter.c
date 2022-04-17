@@ -29,6 +29,12 @@ static int buffer_start = 0;
 
 static bool bilinear_filter = false;
 
+#ifdef KR_FULL_RGBA_FONTS
+#include <assert.h>
+static kr_ttf_font_t *active_font = NULL;
+static int font_size = 0;
+#endif
+
 void kr_isp_init(void) {
 	{
 		kinc_file_reader_t reader;
@@ -126,18 +132,15 @@ void kr_isp_set_rect_tex_coords(float left, float top, float right, float bottom
 
 void kr_isp_set_rect_colors(float opacity, uint32_t color) {
 	int base_idx = (buffer_index - buffer_start) * 6 * 4;
+
 	uint32_t a = kr_color_get_channel(color, 'A');
 	a = (uint32_t)((float)a * opacity);
 	color = kr_color_set_channel(color, 'A', a);
 
 	rect_verts[base_idx + 5] = *(float *)&color;
-	;
 	rect_verts[base_idx + 11] = *(float *)&color;
-	;
 	rect_verts[base_idx + 17] = *(float *)&color;
-	;
 	rect_verts[base_idx + 23] = *(float *)&color;
-	;
 }
 
 void kr_isp_draw_buffer(bool end) {
@@ -184,7 +187,7 @@ void kr_isp_set_projection_matrix(kinc_matrix4x4_t mat) {
 void kr_isp_draw_scaled_sub_image(kr_image_t *img, float sx, float sy, float sw, float sh, float dx,
                                   float dy, float dw, float dh, float opacity, uint32_t color,
                                   kr_matrix3x3_t transformation) {
-	kinc_g4_texture_t *tex = &(img->tex);
+	kinc_g4_texture_t *tex = img->tex;
 	if (buffer_start + buffer_index + 1 >= KR_G2_ISP_BUFFER_SIZE ||
 	    (last_texture != NULL && tex != last_texture))
 		kr_isp_draw_buffer(false);
@@ -199,6 +202,75 @@ void kr_isp_draw_scaled_sub_image(kr_image_t *img, float sx, float sy, float sw,
 	++buffer_index;
 	last_texture = tex;
 }
+
+#ifdef KR_FULL_RGBA_FONTS
+void kr_tsp_set_font(kr_ttf_font_t *font) {
+	active_font = font;
+}
+
+void kr_tsp_set_font_size(int size) {
+	assert(active_font != NULL);
+	kr_ttf_load(active_font, size);
+	font_size = size;
+}
+
+void kr_tsp_draw_string(const char *text, float opacity, uint32_t color, float x, float y,
+                        kr_matrix3x3_t transformation) {
+	kinc_g4_texture_t *tex = kr_ttf_get_texture(active_font, font_size);
+
+	if (last_texture != NULL && tex != last_texture) kr_isp_draw_buffer(false);
+	last_texture = tex;
+
+	float xpos = x;
+	float ypos = y;
+	kr_ttf_aligned_quad_t q;
+	for (int i = 0; text[i] != 0; ++i) {
+		int char_code = (unsigned int)text[i];
+		if (kr_ttf_get_baked_quad(active_font, font_size, &q, char_code, xpos, ypos)) {
+			if (buffer_index + 1 >= KR_G2_ISP_BUFFER_SIZE) kr_isp_draw_buffer(false);
+			kr_isp_set_rect_colors(opacity, color);
+			kr_isp_set_rect_tex_coords(q.s0, q.t0, q.s1, q.t1);
+
+			kr_vec2_t p[4];
+			kr_matrix3x3_multquad(&transformation,
+			                      (kr_quad_t){q.x0, q.y0, q.x1 - q.x0, q.y1 - q.y0}, p);
+			kr_isp_set_rect_verts(p[0].x, p[0].y, p[1].x, p[1].y, p[2].x, p[2].y, p[3].x, p[3].y);
+			xpos += q.xadvance;
+			++buffer_index;
+		}
+	}
+}
+
+void kr_tsp_draw_characters(int *text, int start, int length, float opacity, uint32_t color,
+                            float x, float y, kr_matrix3x3_t transformation) {
+	kinc_g4_texture_t *tex = kr_ttf_get_texture(active_font, font_size);
+
+	if (last_texture != NULL && tex != last_texture) kr_isp_draw_buffer(false);
+	last_texture = tex;
+
+	float xpos = x;
+	float ypos = y;
+	kr_ttf_aligned_quad_t q;
+	for (int i = start; i < start + length; ++i) {
+		if (kr_ttf_get_baked_quad(active_font, font_size, &q, text[i], xpos, ypos)) {
+			if (buffer_index + 1 >= KR_G2_ISP_BUFFER_SIZE) kr_isp_draw_buffer(false);
+			kr_isp_set_rect_colors(opacity, color);
+			kr_isp_set_rect_tex_coords(q.s0, q.t0, q.s1, q.t1);
+			kr_vec2_t p0 =
+			    kr_matrix3x3_multvec(&transformation, (kr_vec2_t){q.x0, q.y1}); // bottom-left
+			kr_vec2_t p1 =
+			    kr_matrix3x3_multvec(&transformation, (kr_vec2_t){q.x0, q.y0}); // top-left
+			kr_vec2_t p2 =
+			    kr_matrix3x3_multvec(&transformation, (kr_vec2_t){q.x1, q.y0}); // top-right
+			kr_vec2_t p3 =
+			    kr_matrix3x3_multvec(&transformation, (kr_vec2_t){q.x1, q.y1}); // bottom-right
+			kr_isp_set_rect_verts(p0.x, p0.y, p1.x, p1.y, p2.x, p2.y, p3.x, p3.y);
+			xpos += q.xadvance;
+			++buffer_index;
+		}
+	}
+}
+#endif
 
 void kr_isp_end(void) {
 	if (buffer_index > 0) kr_isp_draw_buffer(true);

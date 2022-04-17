@@ -14,6 +14,11 @@
     \brief Provides a 2D drawing API.
     \note Calling `kinc_g4_begin` and `kinc_g4_end` of the windows to be rendered to is the users
    responsibility.
+    \brief If KR_FULL_RGBA_FONTS is defined, krink will generate all ttf fonts as full RGBA textures
+   and use the same pipeline for text that is also used for images.
+    \note This is meant to be used in cases where all assets, including fonts are stored in a single
+   texture atlas and thus further optimizes batching of draw calls by not having to switch pipeline,
+   at the cost of more VRAM being used.
 */
 
 #ifdef __cplusplus
