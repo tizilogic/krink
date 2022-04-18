@@ -12,11 +12,20 @@
 
 /*! \file graphics.h
     \brief Provides a 2D drawing API.
-    \note Calling `kinc_g4_begin` and `kinc_g4_end` of the windows to be rendered to is the users
-   responsibility.
-    \brief If KR_FULL_RGBA_FONTS is defined, krink will generate all ttf fonts as full RGBA textures
-   and use the same pipeline for text that is also used for images.
-    \note This is meant to be used in cases where all assets, including fonts are stored in a single
+
+    INFO: The entire `graphics2` API is more or less a direct port of the same API in Kha
+   https://github.com/Kode/Kha using the code available in Haxe and translating it to the best of my
+   abilities to C. IANAL, but I suppose copyright of the original software goes to the Kha
+   Development Team that wrote the original code upon which this is based and I hereby state that
+   this is altered source based upon source from the afforementioned Kha Development Team.
+
+   \note Calling `kinc_g4_begin` and `kinc_g4_end` of the windows to be rendered to
+   is the users responsibility.
+
+   \brief If KR_FULL_RGBA_FONTS is defined, krink will generate all ttf
+   fonts as full RGBA textures and use the same pipeline for text that is also used for images.
+
+   \note This is meant to be used in cases where all assets, including fonts are stored in a single
    texture atlas and thus further optimizes batching of draw calls by not having to switch pipeline,
    at the cost of more VRAM being used.
 */
