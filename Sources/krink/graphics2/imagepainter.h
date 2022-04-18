@@ -23,7 +23,7 @@ void kr_tsp_set_font(kr_ttf_font_t *font);
 void kr_tsp_set_font_size(int size);
 void kr_tsp_draw_string(const char *text, float opacity, uint32_t color, float x, float y,
                         kr_matrix3x3_t transformation);
-void kr_tsp_draw_characters(int *text, int start, int length, float opacity, uint32_t color,
+void kr_tsp_draw_characters(const int *text, int start, int length, float opacity, uint32_t color,
                             float x, float y, kr_matrix3x3_t transformation);
 #endif
 
