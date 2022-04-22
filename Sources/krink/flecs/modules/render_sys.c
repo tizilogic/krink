@@ -334,7 +334,7 @@ void SystemsRenderImport(ecs_world_t *world) {
 	ECS_SYSTEM(world, UpdateAnchored, EcsPostUpdate, [inout] components.render.KrTranslation,
 	           [in] components.render.KrAnchor, [inout] KrInternalAnchor);
 
-	ECS_SYSTEM(world, FrameTime, EcsOnLoad, $KrFrameTime);
+	ECS_SYSTEM(world, FrameTime, EcsOnLoad, KrFrameTime($));
 
 	ecs_singleton_set(world, KrFrameTime, {kinc_time()});
 

@@ -381,14 +381,14 @@ void SystemsAnimationImport(ecs_world_t *world) {
 	    "[in] components.render.KrDrawable"
 	    ",?components.render.KrAngle"
 	    ",?components.render.KrRotationCenter"
-	    ",(components.animation.KrAnimate, _A)"
-	    ",components.animation.KrAnimation(_A)"
-	    ",?(_A, systems.animation.KrInternalAnimationActive)"
-	    ",components.render.KrAngle(_A, components.animation.KrAnimateToAngle)"
-	    ",?components.render.KrAngle(_A, systems.animation.KrInternalAnimateFromAngle)"
-	    ",?components.render.KrRotationCenter(_A, components.animation.KrAnimateRotationCenter)"
-	    ",?components.animation.KrOffset(_A, components.animation.KrAnimateLoop)"
-	    ",components.animation.KrModifier(_A, systems.animation.KrInternalAnimationProgress)";
+	    ",(components.animation.KrAnimate, $A)"
+	    ",components.animation.KrAnimation($A)"
+	    ",?($A, systems.animation.KrInternalAnimationActive)"
+	    ",components.render.KrAngle($A, components.animation.KrAnimateToAngle)"
+	    ",?components.render.KrAngle($A, systems.animation.KrInternalAnimateFromAngle)"
+	    ",?components.render.KrRotationCenter($A, components.animation.KrAnimateRotationCenter)"
+	    ",?components.animation.KrOffset($A, components.animation.KrAnimateLoop)"
+	    ",components.animation.KrModifier($A, systems.animation.KrInternalAnimationProgress)";
 	anim_angle_rule = ecs_rule_init(world, &(ecs_filter_desc_t){.expr = expr});
 	ecs_system_init(
 	    world, &(ecs_system_desc_t){.entity = {.name = "SystemAnimationAngle", .add = EcsOnUpdate},
@@ -397,15 +397,15 @@ void SystemsAnimationImport(ecs_world_t *world) {
 
 	expr = "[in] components.render.KrDrawable"
 	       ",?components.render.KrTranslation"
-	       ",(components.animation.KrAnimate, _A)"
-	       ",components.animation.KrAnimation(_A)"
-	       ",?(_A, systems.animation.KrInternalAnimationActive)"
-	       ",?components.animation.KrModifier(_A, components.animation.KrAnimateToX)"
-	       ",?components.animation.KrModifier(_A, components.animation.KrAnimateToY)"
-	       ",?components.animation.KrModifier(_A, systems.animation.KrInternalAnimateFromX)"
-	       ",?components.animation.KrModifier(_A, systems.animation.KrInternalAnimateFromY)"
-	       ",?components.animation.KrOffset(_A, components.animation.KrAnimateLoop)"
-	       ",components.animation.KrModifier(_A, systems.animation.KrInternalAnimationProgress)";
+	       ",(components.animation.KrAnimate, $A)"
+	       ",components.animation.KrAnimation($A)"
+	       ",?($A, systems.animation.KrInternalAnimationActive)"
+	       ",?components.animation.KrModifier($A, components.animation.KrAnimateToX)"
+	       ",?components.animation.KrModifier($A, components.animation.KrAnimateToY)"
+	       ",?components.animation.KrModifier($A, systems.animation.KrInternalAnimateFromX)"
+	       ",?components.animation.KrModifier($A, systems.animation.KrInternalAnimateFromY)"
+	       ",?components.animation.KrOffset($A, components.animation.KrAnimateLoop)"
+	       ",components.animation.KrModifier($A, systems.animation.KrInternalAnimationProgress)";
 	anim_pos_rule = ecs_rule_init(world, &(ecs_filter_desc_t){.expr = expr});
 	ecs_system_init(
 	    world, &(ecs_system_desc_t){.entity = {.name = "SystemAnimationPos", .add = EcsOnUpdate},
@@ -414,13 +414,13 @@ void SystemsAnimationImport(ecs_world_t *world) {
 
 	expr = "[in] components.render.KrDrawable"
 	       ",?components.render.KrScaleX"
-	       ",(components.animation.KrAnimate, _A)"
-	       ",components.animation.KrAnimation(_A)"
-	       ",?(_A, systems.animation.KrInternalAnimationActive)"
-	       ",components.render.KrScaleX(_A, components.animation.KrAnimateToScaleX)"
-	       ",?components.render.KrScaleX(_A, systems.animation.KrInternalAnimateFromScaleX)"
-	       ",?components.animation.KrOffset(_A, components.animation.KrAnimateLoop)"
-	       ",components.animation.KrModifier(_A, systems.animation.KrInternalAnimationProgress)";
+	       ",(components.animation.KrAnimate, $A)"
+	       ",components.animation.KrAnimation($A)"
+	       ",?($A, systems.animation.KrInternalAnimationActive)"
+	       ",components.render.KrScaleX($A, components.animation.KrAnimateToScaleX)"
+	       ",?components.render.KrScaleX($A, systems.animation.KrInternalAnimateFromScaleX)"
+	       ",?components.animation.KrOffset($A, components.animation.KrAnimateLoop)"
+	       ",components.animation.KrModifier($A, systems.animation.KrInternalAnimationProgress)";
 	anim_scale_x_rule = ecs_rule_init(world, &(ecs_filter_desc_t){.expr = expr});
 	ecs_system_init(
 	    world, &(ecs_system_desc_t){.entity = {.name = "SystemAnimationScaleX", .add = EcsOnUpdate},
@@ -429,13 +429,13 @@ void SystemsAnimationImport(ecs_world_t *world) {
 
 	expr = "[in] components.render.KrDrawable"
 	       ",?components.render.KrScaleY"
-	       ",(components.animation.KrAnimate, _A)"
-	       ",components.animation.KrAnimation(_A)"
-	       ",?(_A, systems.animation.KrInternalAnimationActive)"
-	       ",components.render.KrScaleY(_A, components.animation.KrAnimateToScaleY)"
-	       ",?components.render.KrScaleY(_A, systems.animation.KrInternalAnimateFromScaleY)"
-	       ",?components.animation.KrOffset(_A, components.animation.KrAnimateLoop)"
-	       ",components.animation.KrModifier(_A, systems.animation.KrInternalAnimationProgress)";
+	       ",(components.animation.KrAnimate, $A)"
+	       ",components.animation.KrAnimation($A)"
+	       ",?($A, systems.animation.KrInternalAnimationActive)"
+	       ",components.render.KrScaleY($A, components.animation.KrAnimateToScaleY)"
+	       ",?components.render.KrScaleY($A, systems.animation.KrInternalAnimateFromScaleY)"
+	       ",?components.animation.KrOffset($A, components.animation.KrAnimateLoop)"
+	       ",components.animation.KrModifier($A, systems.animation.KrInternalAnimationProgress)";
 	anim_scale_y_rule = ecs_rule_init(world, &(ecs_filter_desc_t){.expr = expr});
 	ecs_system_init(
 	    world, &(ecs_system_desc_t){.entity = {.name = "SystemAnimationScaleY", .add = EcsOnUpdate},
@@ -444,13 +444,13 @@ void SystemsAnimationImport(ecs_world_t *world) {
 
 	expr = "[in] components.render.KrDrawable"
 	       ",?components.render.KrOpacity"
-	       ",(components.animation.KrAnimate, _A)"
-	       ",components.animation.KrAnimation(_A)"
-	       ",?(_A, systems.animation.KrInternalAnimationActive)"
-	       ",components.render.KrOpacity(_A, components.animation.KrAnimateToOpacity)"
-	       ",?components.render.KrOpacity(_A, systems.animation.KrInternalAnimateFromOpacity)"
-	       ",?components.animation.KrOffset(_A, components.animation.KrAnimateLoop)"
-	       ",components.animation.KrModifier(_A, systems.animation.KrInternalAnimationProgress)";
+	       ",(components.animation.KrAnimate, $A)"
+	       ",components.animation.KrAnimation($A)"
+	       ",?($A, systems.animation.KrInternalAnimationActive)"
+	       ",components.render.KrOpacity($A, components.animation.KrAnimateToOpacity)"
+	       ",?components.render.KrOpacity($A, systems.animation.KrInternalAnimateFromOpacity)"
+	       ",?components.animation.KrOffset($A, components.animation.KrAnimateLoop)"
+	       ",components.animation.KrModifier($A, systems.animation.KrInternalAnimationProgress)";
 	anim_opacity_rule = ecs_rule_init(world, &(ecs_filter_desc_t){.expr = expr});
 	ecs_system_init(world, &(ecs_system_desc_t){
 	                           .entity = {.name = "SystemAnimationOpacity", .add = EcsOnUpdate},
