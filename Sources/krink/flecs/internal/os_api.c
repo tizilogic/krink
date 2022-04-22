@@ -25,7 +25,9 @@
 // Memory
 
 static void *kr_flecs_malloc(ecs_size_t size) {
-	return kr_malloc((size_t)size);
+	void *ptr = kr_malloc((size_t)size);
+	assert(ptr != NULL);
+	return ptr;
 }
 
 static void *kr_flecs_calloc(ecs_size_t size) {
@@ -36,7 +38,9 @@ static void *kr_flecs_calloc(ecs_size_t size) {
 }
 
 static void *kr_flecs_realloc(void *ptr, ecs_size_t size) {
-	return kr_realloc(ptr, (size_t)size);
+	void *rptr = kr_realloc(ptr, (size_t)size);
+	assert(rptr != NULL);
+	return rptr;
 }
 
 static void kr_flecs_free(void *ptr) {
