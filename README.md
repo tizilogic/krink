@@ -1,4 +1,4 @@
-# krink - a custom 2D rendering library built on top of Kinc
+# krink
 
 [![Android (OpenGL)](https://github.com/tizilogic/krink/actions/workflows/android-opengl.yml/badge.svg?branch=main)](https://github.com/tizilogic/krink/actions/workflows/android-opengl.yml)
 [![Android (Vulkan)](https://github.com/tizilogic/krink/actions/workflows/android-vulkan.yml/badge.svg?branch=main)](https://github.com/tizilogic/krink/actions/workflows/android-vulkan.yml)
