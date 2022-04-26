@@ -32,6 +32,7 @@ typedef struct kr_init_sprite {
 	kr_image_t *image;
 	kr_rect_t src, dest;
 	uint32_t color;
+	int16_t depth;
 	bool bilinear;
 } kr_init_sprite_t;
 
@@ -41,38 +42,45 @@ typedef struct kr_init_text {
 	kr_ttf_font_t *font;
 	int32_t size;
 	uint32_t color;
+	int16_t depth;
 } kr_init_text_t;
 
 typedef struct kr_init_stroked_rect {
 	kr_rect_t rect;
 	float stroke;
 	uint32_t color;
+	int16_t depth;
 } kr_init_stroked_rect_t;
 
 typedef struct kr_init_filled_rect {
 	kr_rect_t rect;
 	uint32_t color;
+	int16_t depth;
 } kr_init_filled_rect_t;
 
 typedef struct kr_init_stroked_triangle {
 	float x1, y1, x2, y2, x3, y3, stroke;
 	uint32_t color;
+	int16_t depth;
 } kr_init_stroked_triangle_t;
 
 typedef struct kr_init_filled_triangle {
 	float x1, y1, x2, y2, x3, y3;
 	uint32_t color;
+	int16_t depth;
 } kr_init_filled_triangle_t;
 
 typedef struct kr_init_line {
 	float x1, y1, x2, y2, stroke;
 	uint32_t color;
+	int16_t depth;
 } kr_init_line_t;
 
 typedef struct kr_init_sdf_rect {
 	kr_rect_t rect;
 	float corner, smooth;
 	uint32_t color;
+	int16_t depth;
 } kr_init_sdf_rect_t;
 
 typedef struct kr_init_sdf_asymm_rect {
@@ -80,30 +88,35 @@ typedef struct kr_init_sdf_asymm_rect {
 	kr_sdf_corner_radius_t corner;
 	float smooth;
 	uint32_t color;
+	int16_t depth;
 } kr_init_sdf_asymm_rect_t;
 
 typedef struct kr_init_sdf_rect_wborder {
 	kr_init_sdf_rect_t sdf_rect;
 	float border;
 	uint32_t border_color;
+	int16_t depth;
 } kr_init_sdf_rect_wborder_t;
 
 typedef struct kr_init_sdf_asymm_rect_wborder {
 	kr_init_sdf_asymm_rect_t sdf_asymm_rect;
 	float border;
 	uint32_t border_color;
+	int16_t depth;
 } kr_init_sdf_asymm_rect_wborder_t;
 
 typedef struct kr_init_sdf_circle {
 	kr_pos2_t pos;
 	float radius, smooth;
 	uint32_t color;
+	int16_t depth;
 } kr_init_sdf_circle_t;
 
 typedef struct kr_init_sdf_circle_wborder {
 	kr_init_sdf_circle_t sdf_circle;
 	float border;
 	uint32_t border_color;
+	int16_t depth;
 } kr_init_sdf_circle_wborder_t;
 
 /*! \var ecs_world_t *kr_world
