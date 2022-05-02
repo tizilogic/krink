@@ -257,18 +257,14 @@ void kr_ttf_load_baked_font(kr_ttf_font_t *font, kr_ttf_font_t *origin, int size
 	img->width = tex->tex_width;
 	img->height = tex->tex_height;
 	img->chars = (stbtt_bakedchar *)kr_malloc(kr_ttf_num_glyphs * sizeof(stbtt_bakedchar));
-	if (xoff == 0.0f && yoff == 0.0f) {
-		kinc_memcpy(img->chars, origin_img->chars, kr_ttf_num_glyphs * sizeof(stbtt_bakedchar));
-		img->first_unused_y = origin_img->first_unused_y;
-	}
-	else {
+	kinc_memcpy(img->chars, origin_img->chars, kr_ttf_num_glyphs * sizeof(stbtt_bakedchar));
+	img->first_unused_y = origin_img->first_unused_y;
+	if (xoff != 0.0f || yoff != 0.0f) {
 		for (int i = 0; i < kr_ttf_num_glyphs; ++i) {
-			img->chars[i].x0 = origin_img->chars[i].x0 + xoff;
-			img->chars[i].x1 = origin_img->chars[i].x1 + xoff;
-			img->chars[i].y0 = origin_img->chars[i].y0 + yoff;
-			img->chars[i].y1 = origin_img->chars[i].y1 + yoff;
-			img->chars[i].xoff = origin_img->chars[i].xoff + xoff;
-			img->chars[i].yoff = origin_img->chars[i].yoff + yoff;
+			img->chars[i].x0 += xoff;
+			img->chars[i].x1 += xoff;
+			img->chars[i].y0 += yoff;
+			img->chars[i].y1 += yoff;
 		}
 		img->first_unused_y = origin_img->first_unused_y + (int)(yoff + 0.5f);
 	}
