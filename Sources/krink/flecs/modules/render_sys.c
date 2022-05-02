@@ -256,12 +256,20 @@ typedef struct {
 	KrTranslation offset;
 	KrTranslation parent_prev_trans;
 	KrTranslation prev_trans;
+	float angle_offset;
+	float parent_prev_angle;
+	float prev_angle;
 } KrInternalAnchor;
 ECS_COMPONENT_DECLARE(KrInternalAnchor);
 
-static inline void update_offset(KrTranslation *offset, const KrTranslation *parent, const KrTranslation *child) {
+static inline void update_offset(KrTranslation *offset, const KrTranslation *parent,
+                                 const KrTranslation *child) {
 	offset->x = child->x - parent->x;
 	offset->y = child->y - parent->y;
+}
+
+static inline void update_angle(float *offset, const float parent, const float child) {
+	*offset = child - parent;
 }
 
 static void OnAnchorSet(ecs_iter_t *it) {
@@ -275,6 +283,21 @@ static void OnAnchorSet(ecs_iter_t *it) {
 		}
 		const KrTranslation *ptrans = ecs_get(it->world, anchor[i].parent, KrTranslation);
 		const KrTranslation *ctrans = ecs_get(it->world, it->entities[i], KrTranslation);
+
+		if (!ecs_has(it->world, anchor[i].parent, KrAngle)) {
+			ecs_set(it->world, anchor[i].parent, KrAngle, {0.0f});
+		}
+		if (!ecs_has(it->world, it->entities[i], KrAngle)) {
+			ecs_set(it->world, it->entities[i], KrAngle, {0.0f});
+		}
+
+		KrAngle dummy = (KrAngle){0.0f};
+		const KrAngle *pangle = ecs_get(it->world, anchor[i].parent, KrAngle);
+		const KrAngle *cangle = ecs_get(it->world, it->entities[i], KrAngle);
+
+		if (pangle == NULL) pangle = &dummy;
+		if (cangle == NULL) cangle = &dummy;
+
 		bool unused;
 		KrInternalAnchor *ianchor =
 		    ecs_get_mut(it->world, it->entities[i], KrInternalAnchor, &unused);
@@ -283,6 +306,10 @@ static void OnAnchorSet(ecs_iter_t *it) {
 		ianchor->parent_prev_trans.y = ptrans->y;
 		ianchor->prev_trans.x = ctrans->x;
 		ianchor->prev_trans.y = ctrans->y;
+		ianchor->angle_offset = cangle->radians - pangle->radians;
+		ianchor->prev_angle = cangle->radians;
+		ianchor->parent_prev_angle = pangle->radians;
+		update_angle(&ianchor->angle_offset, pangle->radians, cangle->radians);
 		ecs_modified(it->world, it->entities[i], KrInternalAnchor);
 	}
 }
@@ -302,6 +329,7 @@ static void UpdateAnchored(ecs_iter_t *it) {
 	KrTranslation *ctrans = ecs_term(it, KrTranslation, 1);
 	KrAnchor *anchor = ecs_term(it, KrAnchor, 2);
 	KrInternalAnchor *ianchor = ecs_term(it, KrInternalAnchor, 3);
+	KrAngle *cangle = ecs_term(it, KrAngle, 4);
 
 	for (int i = 0; i < it->count; ++i) {
 		const KrTranslation *ptrans = ecs_get(it->world, anchor[i].parent, KrTranslation);
@@ -317,6 +345,16 @@ static void UpdateAnchored(ecs_iter_t *it) {
 			ianchor[i].prev_trans.x = ctrans[i].x;
 			ianchor[i].prev_trans.y = ctrans[i].y;
 		}
+		const KrAngle *pangle = ecs_get(it->world, anchor[i].parent, KrAngle);
+		if (cangle[i].radians != ianchor[i].prev_angle) {
+			update_angle(&ianchor[i].angle_offset, ianchor[i].parent_prev_angle, cangle[i].radians);
+			ianchor[i].prev_angle = cangle[i].radians;
+		}
+		if (pangle->radians != ianchor[i].parent_prev_angle) {
+			cangle[i].radians = pangle->radians + ianchor[i].angle_offset;
+			ianchor[i].parent_prev_angle = pangle->radians;
+			ianchor[i].prev_angle = cangle[i].radians;
+		}
 	}
 }
 
@@ -331,8 +369,10 @@ void SystemsRenderImport(ecs_world_t *world) {
 
 	ECS_TRIGGER(world, OnAnchorSet, EcsOnSet, KrAnchor);
 	ECS_TRIGGER(world, OnAnchorRemove, EcsOnRemove, KrAnchor);
-	ECS_SYSTEM(world, UpdateAnchored, EcsPostUpdate, [inout] components.render.KrTranslation,
-	           [in] components.render.KrAnchor, [inout] KrInternalAnchor);
+	ECS_SYSTEM(
+	    world, UpdateAnchored,
+	    EcsPostUpdate, [inout] components.render.KrTranslation, [in] components.render.KrAnchor,
+	    [inout] KrInternalAnchor, [inout] components.render.KrAngle);
 
 	ECS_SYSTEM(world, FrameTime, EcsOnLoad, KrFrameTime($));
 
