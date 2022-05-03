@@ -332,6 +332,11 @@ static void UpdateAnchored(ecs_iter_t *it) {
 	KrAngle *cangle = ecs_term(it, KrAngle, 4);
 
 	for (int i = 0; i < it->count; ++i) {
+		if (!ecs_is_valid(it->world, anchor[i].parent)) {
+			ecs_remove(it->world, it->entities[i], KrAnchor);
+			kinc_log(KINC_LOG_LEVEL_WARNING, "Unable to find parent, removing Anchor!");
+			continue;
+		}
 		const KrTranslation *ptrans = ecs_get(it->world, anchor[i].parent, KrTranslation);
 		if (!comptrans(&ctrans[i], &ianchor[i].prev_trans)) {
 			update_offset(&ianchor[i].offset, &ianchor[i].parent_prev_trans, ctrans);
