@@ -38,7 +38,7 @@ typedef struct kr_init_sprite {
 
 typedef struct kr_init_text {
 	kr_pos2_t pos;
-	const char *text;
+	char *text;
 	kr_ttf_font_t *font;
 	int32_t size;
 	uint32_t color;

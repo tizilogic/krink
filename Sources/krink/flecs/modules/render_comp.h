@@ -68,7 +68,7 @@ ECS_STRUCT(KrImage, {
 });
 
 ECS_STRUCT(KrText, {
-	const char *text;
+	char *text;
 	kr_ttf_font_t *font;
 	int32_t size;
 });
