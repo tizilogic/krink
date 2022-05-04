@@ -15,7 +15,9 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    - name: Get Submodules
-      run: Kinc/get_dlc
+    - name: Get krink Submodules
+      run: git submodule update --init
+    - name: Get Kinc DLC
+      run: ./Kinc/get_dlc
     - name: Compile
       run: Kinc/make ios -g opengl --kinc Kinc --from Tests/Empty --noshaders --nosigning --compile

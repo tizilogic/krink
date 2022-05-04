@@ -20,8 +20,10 @@ jobs:
           Invoke-WebRequest -Uri "https://sdk.lunarg.com/sdk/download/1.2.189.2/windows/VulkanSDK-1.2.189.2-Installer.exe" -OutFile VulkanSDK.exe
           $installer = Start-Process -FilePath VulkanSDK.exe -Wait -PassThru -ArgumentList @("--da", "--al", "-c", "in");
           $installer.WaitForExit();
-    - name: Get Submodules
-      run: Kinc/get_dlc.bat
+    - name: Get krink Submodules
+      run: git submodule update --init
+    - name: Get Kinc DLC
+      run: .\Kinc\get_dlc.bat
     - name: Compile
       run: .\Kinc\make.bat -v vs2022 -g vulkan --kinc Kinc --from Tests/Empty --noshaders --compile
       env:

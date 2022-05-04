@@ -54,14 +54,13 @@ jobs:
             echo " * Get Submodules"
             git config --global --add safe.directory /home/runner/work/krink/krink
             git config --global --add safe.directory /home/runner/work/krink/krink/Kinc
-            git config --global --add safe.directory /home/runner/work/krink/krink/Kinc/Tools/kincmake
-            git config --global --add safe.directory /home/runner/work/krink/krink/Kinc/Tools/kmake
-            git config --global --add safe.directory /home/runner/work/krink/krink/Kinc/Tools/kraffiti
-            git config --global --add safe.directory /home/runner/work/krink/krink/Kinc/Tools/krafix
+            git config --global --add safe.directory /home/runner/work/krink/krink/Kinc/Tools/linux_arm
+            git config --global --add safe.directory /home/runner/work/krink/krink/Kinc/Tools/linux_arm64
             git config --global --add safe.directory /home/runner/work/krink/krink/Libraries/Nuklear
             git config --global --add safe.directory /home/runner/work/krink/krink/Libraries/flecs
             git config --global --add safe.directory /home/runner/work/krink/krink/Libraries/tlsf
-            Kinc/get_dlc
+            git submodule update --init
+            ./Kinc/get_dlc
             echo " * Compile"
             Kinc/make -g opengl --kinc Kinc --from Tests/Empty --compile
 

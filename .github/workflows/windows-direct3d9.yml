@@ -15,7 +15,9 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    - name: Get Submodules
-      run: Kinc/get_dlc.bat
+    - name: Get krink Submodules
+      run: git submodule update --init
+    - name: Get Kinc DLC
+      run: .\Kinc\get_dlc.bat
     - name: Compile
       run: .\Kinc\make.bat -v vs2022 -g direct3d9 -a directsound --kinc Kinc --from Tests/Empty --noshaders --compile
