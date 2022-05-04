@@ -23,6 +23,7 @@
 
 #ifdef __FreeBSD__
 #include <netinet/in.h>
+#include <alloca.h>
 #endif
 #include <stdlib.h>
 #include <limits.h>
