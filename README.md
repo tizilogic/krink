@@ -2,6 +2,7 @@
 
 [![Android (OpenGL)](https://github.com/tizilogic/krink/actions/workflows/android-opengl.yml/badge.svg?branch=main)](https://github.com/tizilogic/krink/actions/workflows/android-opengl.yml)
 [![Android (Vulkan)](https://github.com/tizilogic/krink/actions/workflows/android-vulkan.yml/badge.svg?branch=main)](https://github.com/tizilogic/krink/actions/workflows/android-vulkan.yml)
+[![FreeBSD (OpenGL)](https://github.com/tizilogic/krink/actions/workflows/freebsd-opengl.yml/badge.svg?branch=main)](https://github.com/tizilogic/krink/actions/workflows/freebsd-opengl.yml)
 [![iOS (Metal)](https://github.com/tizilogic/krink/actions/workflows/ios-metal.yml/badge.svg?branch=main)](https://github.com/tizilogic/krink/actions/workflows/ios-metal.yml)
 [![iOS (OpenGL)](https://github.com/tizilogic/krink/actions/workflows/ios-opengl.yml/badge.svg?branch=main)](https://github.com/tizilogic/krink/actions/workflows/ios-opengl.yml)
 [![Linux on ARM (OpenGL)](https://github.com/tizilogic/krink/actions/workflows/linux-arm-opengl.yml/badge.svg?branch=main)](https://github.com/tizilogic/krink/actions/workflows/linux-arm-opengl.yml)

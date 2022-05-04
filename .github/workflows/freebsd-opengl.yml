@@ -1,0 +1,33 @@
+name: FreeBSD (OpenGL)
+
+on:
+  push:
+    branches:
+    - main
+  pull_request:
+    branches:
+    - main
+
+jobs:
+  build:
+
+    runs-on: macos-10.15
+    name: FreeBSD build
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Get Submodules
+      run: git submodule update --init
+    - name: Get Kinc DLC
+      run: git -C Kinc submodule update --init Tools/freebsd_x64
+    - name: Compile in FreeBSD VM
+      id: build
+      uses: vmactions/freebsd-vm@v0.1.6
+      with:
+        usesh: true
+        copyback: false
+        mem: 2048
+        prepare: pkg install -y bash alsa-lib libXinerama mesa-libs libXi xorg-vfbserver libXrandr libXi libXcursor evdev-proto libinotify libxkbcommon # ImageMagick7-nox11
+        run: |
+          echo " * Compile"
+          Kinc/make -g opengl --kinc . --from Tests/Empty --compile
