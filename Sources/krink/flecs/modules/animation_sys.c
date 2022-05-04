@@ -16,12 +16,18 @@ ECS_DECLARE(KrInternalAnimateFromAngle);
 ECS_DECLARE(KrInternalAnimateFromScaleX);
 ECS_DECLARE(KrInternalAnimateFromScaleY);
 ECS_DECLARE(KrInternalAnimateFromOpacity);
+ECS_DECLARE(KrInternalSetDuringDepth);
+ECS_DECLARE(KrInternalDuringDepthTriggered);
+ECS_DECLARE(KrInternalSetAfterDepth);
+ECS_DECLARE(KrInternalAfterDepthTriggered);
 
 static ecs_rule_t *anim_angle_rule;
 static ecs_rule_t *anim_pos_rule;
 static ecs_rule_t *anim_scale_x_rule;
 static ecs_rule_t *anim_scale_y_rule;
 static ecs_rule_t *anim_opacity_rule;
+static ecs_rule_t *anim_after_depth_rule;
+static ecs_rule_t *anim_during_depth_rule;
 
 static void SystemAnimateAngle(ecs_iter_t *it) {
 	ecs_iter_t rit = ecs_rule_iter(it->world, it->ctx);
@@ -299,6 +305,11 @@ static void ResetAnimation(ecs_iter_t *it) {
 	KrAnimation *anim = ecs_term(it, KrAnimation, 1);
 	for (int i = 0; i < it->count; ++i) {
 		ecs_remove(it->world, it->entities[i], KrInternalAnimationReset);
+		ecs_remove(it->world, it->entities[i], KrInternalAnimationActive);
+		if (ecs_has(it->world, it->entities[i], KrInternalDuringDepthTriggered))
+			ecs_remove(it->world, it->entities[i], KrInternalDuringDepthTriggered);
+		if (ecs_has(it->world, it->entities[i], KrInternalAfterDepthTriggered))
+			ecs_remove(it->world, it->entities[i], KrInternalAfterDepthTriggered);
 		const KrOffset *offset = ecs_get_pair(it->world, it->entities[i], KrOffset, KrAnimateLoop);
 		anim[i].start += offset->t;
 	}
@@ -335,8 +346,53 @@ void UpdateProgress(ecs_iter_t *it) {
 				if (callback[i].before)
 					((kr_anim_callback)callback[i].before)(it->world, callback[i].before_param);
 			}
-			else if (mod[i].v >= 1.0f && callback[i].after)
-				((kr_anim_callback)callback[i].after)(it->world, callback[i].after_param);
+			else if (mod[i].v >= 1.0f) {
+				if (callback[i].after)
+					((kr_anim_callback)callback[i].after)(it->world, callback[i].after_param);
+			}
+		}
+		// Handle Depth setting
+		if (mod[i].v >= 0.0f && mod[i].v < 1.0f && animation[i].set_depth &&
+		    !ecs_has(it->world, it->entities[i], KrInternalDuringDepthTriggered)) {
+			ecs_add(it->world, it->entities[i], KrInternalSetDuringDepth);
+			ecs_add(it->world, it->entities[i], KrInternalDuringDepthTriggered);
+		}
+		else if (mod[i].v >= 1.0f && animation[i].set_depth &&
+		         !ecs_has(it->world, it->entities[i], KrInternalAfterDepthTriggered)) {
+			ecs_add(it->world, it->entities[i], KrInternalSetAfterDepth);
+			ecs_add(it->world, it->entities[i], KrInternalAfterDepthTriggered);
+		}
+	}
+}
+
+static void UpdateAfterDepth(ecs_iter_t *it) {
+	ecs_iter_t rit = ecs_rule_iter(it->world, it->ctx);
+	int32_t a_var = ecs_rule_find_var(it->ctx, "A");
+
+	while (ecs_iter_next(&rit)) {
+		KrAnimation *animation = ecs_term(&rit, KrAnimation, 3);
+
+		ecs_entity_t a = ecs_iter_get_var(&rit, a_var);
+
+		for (int i = 0; i < rit.count; ++i) {
+			ecs_set(rit.world, rit.entities[i], KrSetDepth, {animation[i].depth_after});
+			ecs_remove(it->world, a, KrInternalSetAfterDepth);
+		}
+	}
+}
+
+static void UpdateDuringDepth(ecs_iter_t *it) {
+	ecs_iter_t rit = ecs_rule_iter(it->world, it->ctx);
+	int32_t a_var = ecs_rule_find_var(it->ctx, "A");
+
+	while (ecs_iter_next(&rit)) {
+		KrAnimation *animation = ecs_term(&rit, KrAnimation, 3);
+
+		ecs_entity_t a = ecs_iter_get_var(&rit, a_var);
+
+		for (int i = 0; i < rit.count; ++i) {
+			ecs_set(rit.world, rit.entities[i], KrSetDepth, {animation[i].depth_during});
+			ecs_remove(rit.world, a, KrInternalSetDuringDepth);
 		}
 	}
 }
@@ -358,6 +414,10 @@ void SystemsAnimationImport(ecs_world_t *world) {
 	ECS_TAG_DEFINE(world, KrInternalAnimateFromScaleX);
 	ECS_TAG_DEFINE(world, KrInternalAnimateFromScaleY);
 	ECS_TAG_DEFINE(world, KrInternalAnimateFromOpacity);
+	ECS_TAG_DEFINE(world, KrInternalSetDuringDepth);
+	ECS_TAG_DEFINE(world, KrInternalDuringDepthTriggered);
+	ECS_TAG_DEFINE(world, KrInternalSetAfterDepth);
+	ECS_TAG_DEFINE(world, KrInternalAfterDepthTriggered);
 
 	/* Register systems */
 	ECS_TRIGGER(world, AddAnimation, EcsOnSet, components.animation.KrAnimation);
@@ -456,4 +516,24 @@ void SystemsAnimationImport(ecs_world_t *world) {
 	                           .entity = {.name = "SystemAnimationOpacity", .add = EcsOnUpdate},
 	                           .ctx = anim_opacity_rule,
 	                           .callback = SystemAnimateOpacity});
+
+	expr = "[out] components.render.KrDrawable"
+	       ",(components.animation.KrAnimate, $A)"
+	       ",components.animation.KrAnimation($A)"
+	       ",systems.animation.KrInternalSetAfterDepth($A)";
+	anim_after_depth_rule = ecs_rule_init(world, &(ecs_filter_desc_t){.expr = expr});
+	ecs_system_init(world,
+	                &(ecs_system_desc_t){.entity = {.name = "UpdateAfterDepth", .add = EcsOnUpdate},
+	                                     .ctx = anim_after_depth_rule,
+	                                     .callback = UpdateAfterDepth});
+
+	expr = "[out] components.render.KrDrawable"
+	       ",(components.animation.KrAnimate, $A)"
+	       ",components.animation.KrAnimation($A)"
+	       ",systems.animation.KrInternalSetDuringDepth($A)";
+	anim_during_depth_rule = ecs_rule_init(world, &(ecs_filter_desc_t){.expr = expr});
+	ecs_system_init(
+	    world, &(ecs_system_desc_t){.entity = {.name = "UpdateDuringDepth", .add = EcsOnUpdate},
+	                                .ctx = anim_during_depth_rule,
+	                                .callback = UpdateDuringDepth});
 }

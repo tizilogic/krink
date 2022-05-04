@@ -280,8 +280,10 @@ typedef struct kr_modifier {
 typedef struct kr_init_animation {
 	double start, duration;
 	kr_tween_ease_t ease;
-	bool loop;
+	int depth_during, depth_after;
 	kr_modifier_t modifiers[8];
+	bool set_depth;
+	bool loop;
 } kr_init_animation_t;
 
 typedef struct kr_init_sequence {

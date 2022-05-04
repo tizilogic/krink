@@ -135,6 +135,7 @@ ECS_STRUCT(KrTranslation, {
 ECS_STRUCT(KrAnchor, {
 	ecs_entity_t parent;
 });
+ECS_STRUCT(KrSetDepth, { int32_t depth; });
 
 ECS_STRUCT(KrFrameTime, { double time; });
 

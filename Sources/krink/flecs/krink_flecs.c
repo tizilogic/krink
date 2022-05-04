@@ -107,9 +107,10 @@ ecs_entity_t kr_flecs_create_sprite(ecs_world_t *world, const kr_init_sprite_t *
 	ecs_entity_t e = ecs_new_w_pair(world, EcsIsA, KrPrefabSprite);
 	ecs_add(world, e, KrVisible);
 
-	ecs_set(
-	    world, e, KrDrawable,
-	    {.depth = args->depth, .sort_extra = ptr2sort((void *)args->image), .pipeline = KR_COMP_PP_IMAGE});
+	ecs_set(world, e, KrDrawable,
+	        {.depth = args->depth,
+	         .sort_extra = ptr2sort((void *)args->image),
+	         .pipeline = KR_COMP_PP_IMAGE});
 	ecs_set(world, e, KrPos2, {.x = args->dest.x, .y = args->dest.y});
 	ecs_set(world, e, KrColor, {.color = args->color});
 	ecs_set(world, e, KrImage,
@@ -129,7 +130,9 @@ ecs_entity_t kr_flecs_create_text(ecs_world_t *world, const kr_init_text_t *args
 	ecs_add(world, e, KrVisible);
 
 	ecs_set(world, e, KrDrawable,
-	        {.depth = args->depth, .sort_extra = ptr2sort((void *)args->font), .pipeline = KR_COMP_PP_TEXT});
+	        {.depth = args->depth,
+	         .sort_extra = ptr2sort((void *)args->font),
+	         .pipeline = KR_COMP_PP_TEXT});
 	ecs_set(world, e, KrPos2, {.x = args->pos.x, .y = args->pos.y});
 	ecs_set(world, e, KrColor, {.color = args->color});
 	ecs_set(world, e, KrText, {.font = args->font, .text = args->text, .size = args->size});
@@ -202,7 +205,8 @@ ecs_entity_t kr_flecs_create_line(ecs_world_t *world, const kr_init_line_t *args
 	ecs_entity_t e = ecs_new_w_pair(world, EcsIsA, KrPrefabLine);
 	ecs_add(world, e, KrVisible);
 
-	ecs_set(world, e, KrDrawable, {.depth = args->depth, .sort_extra = 0, .pipeline = KR_COMP_PP_LINE});
+	ecs_set(world, e, KrDrawable,
+	        {.depth = args->depth, .sort_extra = 0, .pipeline = KR_COMP_PP_LINE});
 	ecs_set(world, e, KrColor, {.color = args->color});
 	ecs_set(world, e, KrPos2, {.x = args->x1, .y = args->y1});
 	ecs_set(world, e, KrLine, {.x_to = args->x2, .y_to = args->y2});
@@ -214,7 +218,8 @@ ecs_entity_t kr_flecs_create_sdf_rect(ecs_world_t *world, const kr_init_sdf_rect
 	ecs_entity_t e = ecs_new_w_pair(world, EcsIsA, KrPrefabSdfRect);
 	ecs_add(world, e, KrVisible);
 
-	ecs_set(world, e, KrDrawable, {.depth = args->depth, .sort_extra = 0, .pipeline = KR_COMP_PP_SDF_RECT});
+	ecs_set(world, e, KrDrawable,
+	        {.depth = args->depth, .sort_extra = 0, .pipeline = KR_COMP_PP_SDF_RECT});
 	ecs_set(world, e, KrPos2, {.x = args->rect.x, .y = args->rect.y});
 	ecs_set(world, e, KrColor, {.color = args->color});
 	ecs_set(world, e, KrRect, {.w = args->rect.w, .h = args->rect.h});
@@ -268,7 +273,8 @@ ecs_entity_t kr_flecs_create_sdf_circle(ecs_world_t *world, const kr_init_sdf_ci
 	ecs_entity_t e = ecs_new_w_pair(world, EcsIsA, KrPrefabSdfCircle);
 	ecs_add(world, e, KrVisible);
 
-	ecs_set(world, e, KrDrawable, {.depth = args->depth, .sort_extra = 0, .pipeline = KR_COMP_PP_SDF_CIRCLE});
+	ecs_set(world, e, KrDrawable,
+	        {.depth = args->depth, .sort_extra = 0, .pipeline = KR_COMP_PP_SDF_CIRCLE});
 	ecs_set(world, e, KrPos2, {.x = args->pos.x, .y = args->pos.y});
 	ecs_set(world, e, KrColor, {.color = args->color});
 	ecs_set(world, e, KrCircle, {.radius = args->radius});
@@ -319,7 +325,13 @@ static void fill_entity_buffer(ecs_world_t *world) {
 static void add_animation(ecs_world_t *world, ecs_entity_t e, ecs_entity_t anim_e,
                           const kr_init_animation_t *anim) {
 	int i = 0;
-	ecs_set(world, anim_e, KrAnimation, {anim->start, anim->duration, anim->ease});
+	ecs_set(world, anim_e, KrAnimation,
+	        {.start = anim->start,
+	         .duration = anim->duration,
+	         .ease = anim->ease,
+	         .set_depth = anim->set_depth,
+	         .depth_during = anim->depth_during,
+	         .depth_after = anim->depth_after});
 
 	for (int i = 0; i < 8; ++i) {
 		switch (anim->modifiers[i].modifier) {

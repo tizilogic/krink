@@ -35,6 +35,9 @@ ECS_STRUCT(KrAnimation, {
 	double start;
 	double duration;
 	int32_t ease;
+	bool set_depth;
+	int32_t depth_during;
+	int32_t depth_after;
 });
 
 ECS_STRUCT(KrModifier, { float v; });

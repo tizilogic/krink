@@ -363,6 +363,16 @@ static void UpdateAnchored(ecs_iter_t *it) {
 	}
 }
 
+static void UpdateDepth(ecs_iter_t *it) {
+	KrDrawable *drawable = ecs_term(it, KrDrawable, 1);
+	KrSetDepth *set_depth = ecs_term(it, KrSetDepth, 2);
+
+	for (int i = 0; i < it->count; ++i) {
+		drawable[i].depth = set_depth[i].depth;
+		ecs_remove(it->world, it->entities[i], KrSetDepth);
+	}
+}
+
 void SystemsRenderImport(ecs_world_t *world) {
 	/* Define module */
 	ECS_MODULE(world, SystemsRender);
@@ -383,6 +393,9 @@ void SystemsRenderImport(ecs_world_t *world) {
 
 	ecs_singleton_set(world, KrFrameTime, {kinc_time()});
 
+	ECS_SYSTEM(
+	    world, UpdateDepth,
+	    EcsPreStore, [inout] components.render.KrDrawable, [in] components.render.KrSetDepth);
 	ECS_SYSTEM(world, Clear, EcsPreStore);
 
 	ecs_term_t termbuff[22] = {
