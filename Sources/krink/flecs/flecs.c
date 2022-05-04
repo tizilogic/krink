@@ -21,7 +21,9 @@
 #endif
 #endif
 
+#ifdef __FreeBSD__
 #include <netinet/in.h>
+#endif
 #include <stdlib.h>
 #include <limits.h>
 #ifndef FLECS_NDEBUG
