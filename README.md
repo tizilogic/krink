@@ -1,24 +1,4 @@
-# krink
-
-[![Android (OpenGL)](https://github.com/tizilogic/krink/actions/workflows/android-opengl.yml/badge.svg?branch=main)](https://github.com/tizilogic/krink/actions/workflows/android-opengl.yml)
-[![Android (Vulkan)](https://github.com/tizilogic/krink/actions/workflows/android-vulkan.yml/badge.svg?branch=main)](https://github.com/tizilogic/krink/actions/workflows/android-vulkan.yml)
-[![FreeBSD (OpenGL)](https://github.com/tizilogic/krink/actions/workflows/freebsd-opengl.yml/badge.svg?branch=main)](https://github.com/tizilogic/krink/actions/workflows/freebsd-opengl.yml)
-[![iOS (Metal)](https://github.com/tizilogic/krink/actions/workflows/ios-metal.yml/badge.svg?branch=main)](https://github.com/tizilogic/krink/actions/workflows/ios-metal.yml)
-[![iOS (OpenGL)](https://github.com/tizilogic/krink/actions/workflows/ios-opengl.yml/badge.svg?branch=main)](https://github.com/tizilogic/krink/actions/workflows/ios-opengl.yml)
-[![Linux on ARM (OpenGL)](https://github.com/tizilogic/krink/actions/workflows/linux-arm-opengl.yml/badge.svg?branch=main)](https://github.com/tizilogic/krink/actions/workflows/linux-arm-opengl.yml)
-[![Linux x64 (OpenGL)](https://github.com/tizilogic/krink/actions/workflows/linux-opengl.yml/badge.svg?branch=main)](https://github.com/tizilogic/krink/actions/workflows/linux-opengl.yml)
-[![Linux x64 (Vulkan)](https://github.com/tizilogic/krink/actions/workflows/linux-vulkan.yml/badge.svg?branch=main)](https://github.com/tizilogic/krink/actions/workflows/linux-vulkan.yml)
-[![macOS (Metal)](https://github.com/tizilogic/krink/actions/workflows/macos-metal.yml/badge.svg?branch=main)](https://github.com/tizilogic/krink/actions/workflows/macos-metal.yml)
-[![macOS (OpenGL)](https://github.com/tizilogic/krink/actions/workflows/macos-opengl.yml/badge.svg?branch=main)](https://github.com/tizilogic/krink/actions/workflows/macos-opengl.yml)
-[![UWP](https://github.com/tizilogic/krink/actions/workflows/uwp.yml/badge.svg?branch=main)](https://github.com/tizilogic/krink/actions/workflows/uwp.yml)
-[![Windows (Direct3D 9)](https://github.com/tizilogic/krink/actions/workflows/windows-direct3d9.yml/badge.svg?branch=main)](https://github.com/tizilogic/krink/actions/workflows/windows-direct3d9.yml)
-[![Windows (Direct3D 11)](https://github.com/tizilogic/krink/actions/workflows/windows-direct3d11.yml/badge.svg?branch=main)](https://github.com/tizilogic/krink/actions/workflows/windows-direct3d11.yml)
-[![Windows (Direct3D 12)](https://github.com/tizilogic/krink/actions/workflows/windows-direct3d12.yml/badge.svg?branch=main)](https://github.com/tizilogic/krink/actions/workflows/windows-direct3d12.yml)
-[![Windows (OpenGL)](https://github.com/tizilogic/krink/actions/workflows/windows-opengl.yml/badge.svg?branch=main)](https://github.com/tizilogic/krink/actions/workflows/windows-opengl.yml)
-[![Windows (Vulkan)](https://github.com/tizilogic/krink/actions/workflows/windows-vulkan.yml/badge.svg?branch=main)](https://github.com/tizilogic/krink/actions/workflows/windows-vulkan.yml)
-[![HTML5 (WebGL)](https://github.com/tizilogic/krink/actions/workflows/html5-webgl.yml/badge.svg?branch=main)](https://github.com/tizilogic/krink/actions/workflows/html5-webgl.yml)
-[![HTML5 (WebGPU)](https://github.com/tizilogic/krink/actions/workflows/html5-webgpu.yml/badge.svg?branch=main)](https://github.com/tizilogic/krink/actions/workflows/html5-webgpu.yml)
-[![Documentation](https://img.shields.io/badge/docs-docsforge-blue)](http://krink.docsforge.com/)
+# krink [![Documentation](https://img.shields.io/badge/docs-docsforge-blue)](http://krink.docsforge.com/)
 
 ## About
 
@@ -33,8 +13,20 @@ It adds:
 
 **krink** is being developed with a focus to target mobile devices primarily but is none the less
 extremely portable, successfully running on a wide range of devices, operating systems, CPU
-architectures and graphics APIs *(see the workflow badges above for an almost complete list of
-supported platforms where krink apps can be deployed)*
+architectures and graphics APIs:
+
+### where krink runs
+
+|  | OpenGL | Vulkan | Metal | Direct3D | Other |
+| :-: | :-: | :-: | :-: | :-: | :-: |
+| Android | [![Android (OpenGL)](https://github.com/tizilogic/krink/actions/workflows/android-opengl.yml/badge.svg?branch=main)](https://github.com/tizilogic/krink/actions/workflows/android-opengl.yml) | [![Android (Vulkan)](https://github.com/tizilogic/krink/actions/workflows/android-vulkan.yml/badge.svg?branch=main)](https://github.com/tizilogic/krink/actions/workflows/android-vulkan.yml) | X | X | X |
+| FreeBSD | [![FreeBSD (OpenGL)](https://github.com/tizilogic/krink/actions/workflows/freebsd-opengl.yml/badge.svg?branch=main)](https://github.com/tizilogic/krink/actions/workflows/freebsd-opengl.yml) | (?) | X | X | X |
+| iOS | [![iOS (OpenGL)](https://github.com/tizilogic/krink/actions/workflows/ios-opengl.yml/badge.svg?branch=main)](https://github.com/tizilogic/krink/actions/workflows/ios-opengl.yml) | X | [![iOS (Metal)](https://github.com/tizilogic/krink/actions/workflows/ios-metal.yml/badge.svg?branch=main)](https://github.com/tizilogic/krink/actions/workflows/ios-metal.yml) | X | X |
+| Linux on ARM | [![Linux on ARM (OpenGL)](https://github.com/tizilogic/krink/actions/workflows/linux-arm-opengl.yml/badge.svg?branch=main)](https://github.com/tizilogic/krink/actions/workflows/linux-arm-opengl.yml) | (?) | X | X | X |
+| Linux on x64 | [![Linux x64 (OpenGL)](https://github.com/tizilogic/krink/actions/workflows/linux-opengl.yml/badge.svg?branch=main)](https://github.com/tizilogic/krink/actions/workflows/linux-opengl.yml) | [![Linux x64 (Vulkan)](https://github.com/tizilogic/krink/actions/workflows/linux-vulkan.yml/badge.svg?branch=main)](https://github.com/tizilogic/krink/actions/workflows/linux-vulkan.yml) | X | X | X |
+| macOS | [![macOS (OpenGL)](https://github.com/tizilogic/krink/actions/workflows/macos-opengl.yml/badge.svg?branch=main)](https://github.com/tizilogic/krink/actions/workflows/macos-opengl.yml) | X | [![macOS (Metal)](https://github.com/tizilogic/krink/actions/workflows/macos-metal.yml/badge.svg?branch=main)](https://github.com/tizilogic/krink/actions/workflows/macos-metal.yml) | X | X |
+| Windows | [![Windows (OpenGL)](https://github.com/tizilogic/krink/actions/workflows/windows-opengl.yml/badge.svg?branch=main)](https://github.com/tizilogic/krink/actions/workflows/windows-opengl.yml) | [![Windows (Vulkan)](https://github.com/tizilogic/krink/actions/workflows/windows-vulkan.yml/badge.svg?branch=main)](https://github.com/tizilogic/krink/actions/workflows/windows-vulkan.yml) | X | [![Windows (Direct3D 9)](https://github.com/tizilogic/krink/actions/workflows/windows-direct3d9.yml/badge.svg?branch=main)](https://github.com/tizilogic/krink/actions/workflows/windows-direct3d9.yml) <br> [![Windows (Direct3D 11)](https://github.com/tizilogic/krink/actions/workflows/windows-direct3d11.yml/badge.svg?branch=main)](https://github.com/tizilogic/krink/actions/workflows/windows-direct3d11.yml) <br> [![Windows (Direct3D 12)](https://github.com/tizilogic/krink/actions/workflows/windows-direct3d12.yml/badge.svg?branch=main)](https://github.com/tizilogic/krink/actions/workflows/windows-direct3d12.yml) | [![UWP](https://github.com/tizilogic/krink/actions/workflows/uwp.yml/badge.svg?branch=main)](https://github.com/tizilogic/krink/actions/workflows/uwp.yml) |
+| HTML5 | X | X | X | X | [![HTML5 (WebGL)](https://github.com/tizilogic/krink/actions/workflows/html5-webgl.yml/badge.svg?branch=main)](https://github.com/tizilogic/krink/actions/workflows/html5-webgl.yml) <br> [![HTML5 (WebGPU)](https://github.com/tizilogic/krink/actions/workflows/html5-webgpu.yml/badge.svg?branch=main)](https://github.com/tizilogic/krink/actions/workflows/html5-webgpu.yml) |
 
 ### Game Console support
 
