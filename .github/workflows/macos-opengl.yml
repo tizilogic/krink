@@ -16,6 +16,6 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Get Submodules
-      run: git submodule update --init --recursive
+      run: Kinc/get_dlc
     - name: Compile
       run: Kinc/make -g opengl --kinc Kinc --from Tests/Empty --noshaders --compile

@@ -61,7 +61,7 @@ jobs:
             git config --global --add safe.directory /home/runner/work/krink/krink/Libraries/Nuklear
             git config --global --add safe.directory /home/runner/work/krink/krink/Libraries/flecs
             git config --global --add safe.directory /home/runner/work/krink/krink/Libraries/tlsf
-            git submodule update --init --recursive
+            Kinc/get_dlc
             echo " * Compile"
             Kinc/make -g opengl --kinc Kinc --from Tests/Empty --compile
 

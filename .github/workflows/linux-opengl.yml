@@ -20,7 +20,7 @@ jobs:
     - name: Apt Install
       run: sudo apt-get install libasound2-dev libxinerama-dev libxrandr-dev libgl1-mesa-dev libxi-dev libxcursor-dev libudev-dev libwayland-dev wayland-protocols libxkbcommon-dev --yes --quiet
     - name: Get Submodules
-      run: git submodule update --init --recursive
+      run: Kinc/get_dlc
     - name: Compile
       run: Kinc/make -g opengl --kinc Kinc --from Tests/Empty --compile
 
