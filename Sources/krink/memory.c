@@ -1,4 +1,7 @@
 #include "memory.h"
+
+#ifndef KR_NO_TLSF
+
 #include "util/tlsf.h"
 #include <assert.h>
 #include <kinc/threads/mutex.h>
@@ -42,3 +45,5 @@ void *kr_realloc(void *ptr, size_t size) {
 	kinc_mutex_unlock(&memlock);
 	return ptr;
 }
+
+#endif

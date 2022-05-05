@@ -59,10 +59,10 @@ optionally used for user interfaces, rendered directly using the `graphics2` API
 
 ### Integrated Memory Allocator
 
-**krink** currently uses a [TLSF](https://github.com/mattconte/tlsf) implementation to manage memory
-at runtime, since I prefer not to *beg* the OS for more memory too often. I do plan to make this an
-optional feature in the future, so users can decide whether to use the TLSF memory allocator or
-simply use the one provided by `<stdlib.h>`
+**krink** provides a [TLSF](https://github.com/mattconte/tlsf) implementation to manage memory which
+is enabled by default.
+This can be disabled by defining the macro `KR_NO_TLSF` to use the provided functions from
+`<stdlib.h>`.
 
 ### Documentation
 

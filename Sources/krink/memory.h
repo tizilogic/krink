@@ -9,6 +9,8 @@
 extern "C" {
 #endif
 
+#ifndef KR_NO_TLSF
+
 /// <summary>
 /// Initialize the TLSF memory allocator.
 /// </summary>
@@ -41,6 +43,17 @@ void *kr_calloc(size_t n, size_t size);
 /// <param name="ptr"></param>
 /// <param name="size"></param>
 void *kr_realloc(void *ptr, size_t size);
+
+#else
+#include <stdlib.h>
+
+#define kr_memory_init(A, B)
+#define kr_malloc(SIZE) malloc(SIZE)
+#define kr_free(PTR) free(PTR)
+#define kr_calloc(N, SIZE) calloc((N), (SIZE))
+#define kr_realloc(PTR, SIZE) realloc((PTR), (SIZE))
+
+#endif
 
 #ifdef __cplusplus
 }
