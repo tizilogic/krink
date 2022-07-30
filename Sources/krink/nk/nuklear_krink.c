@@ -84,7 +84,7 @@ static inline void notify(kr_evt_event_t evt) {
 		nk_input_unicode(&nkctx, evt.data.key_press.character);
 	} break;
 	case KR_EVT_MOUSE_SCROLL: {
-		nk_input_scroll(&nkctx, (struct nk_vec2){0, evt.data.mouse_scroll.delta});
+		nk_input_scroll(&nkctx, (struct nk_vec2){0, -evt.data.mouse_scroll.delta});
 	} break;
 	case KR_EVT_PRIMARY_MOVE: {
 		nk_input_motion(&nkctx, evt.data.primary.x, evt.data.primary.y);
