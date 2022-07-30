@@ -20,6 +20,6 @@ jobs:
     - name: Get Kinc DLC
       run: ./Kinc/get_dlc
     - name: Compile (kmake)
-      run: Kinc/make html5 --kinc Kinc --from Tests/Empty --noshaders
+      run: Kinc/make emscripten --kinc Kinc --from Tests/Empty --noshaders
     - name: Compile (emscripten)
       run: git clone https://github.com/emscripten-core/emsdk.git && cd emsdk && ./emsdk install latest && ./emsdk activate latest && source ./emsdk_env.sh && cd ../build/Release && make
