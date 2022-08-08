@@ -184,7 +184,7 @@ void kr_evt_init(void) {
 	kinc_set_shutdown_callback(shutdown);
 
 	for (int i = 0; i < KR_EVT_MAX_OBSERVER; ++i) {
-		observers[0] = NULL;
+		observers[i] = NULL;
 	}
 }
 
