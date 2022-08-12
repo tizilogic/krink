@@ -20,6 +20,10 @@ static void notify(kr_evt_event_type_t event, kr_evt_data_t data) {
 	}
 }
 
+void kr_evt_internal_trigger_ext_evt(kr_evt_event_type_t event, kr_evt_data_t data) {
+	notify(event, data);
+}
+
 static void key_up(int keycode) {
 	kr_evt_data_t data;
 	data.key.keycode = keycode;

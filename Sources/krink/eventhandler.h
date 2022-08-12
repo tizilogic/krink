@@ -30,7 +30,8 @@ typedef enum kr_evt_event_type {
 	KR_EVT_BACKGROUND,
 	KR_EVT_PAUSE,
 	KR_EVT_RESUME,
-	KR_EVT_SHUTDOWN
+	KR_EVT_SHUTDOWN,
+	KR_EVT_WINDOW_SIZE_CHANGE
 } kr_evt_event_type_t;
 
 typedef struct kr_evt_key_event {
@@ -61,6 +62,10 @@ typedef struct kr_evt_primary_event {
 	int x, y;
 } kr_evt_primary_event_t;
 
+typedef struct kr_evt_window_size_change_event {
+	int window, width, height;
+} kr_evt_window_size_change_event_t;
+
 typedef union kr_evt_data {
 	kr_evt_key_event_t key;
 	kr_evt_key_event_press_t key_press;
@@ -69,6 +74,7 @@ typedef union kr_evt_data {
 	kr_evt_mouse_scroll_event_t mouse_scroll;
 	kr_evt_finger_touch_event_t touch;
 	kr_evt_primary_event_t primary;
+	kr_evt_window_size_change_event_t window;
 } kr_evt_data_t;
 
 typedef struct kr_evt_event {
@@ -102,3 +108,5 @@ void kr_evt_add_observer(void (*value)(kr_evt_event_t));
 /// <param name="value">Previously registered callback function that takes `kr_evt_event_t` as
 /// parameter</param>
 void kr_evt_remove_observer(void (*value)(kr_evt_event_t));
+
+void kr_evt_internal_trigger_ext_evt(kr_evt_event_type_t event, kr_evt_data_t data);

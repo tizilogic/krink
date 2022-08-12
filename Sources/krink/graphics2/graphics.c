@@ -18,6 +18,7 @@
 #include <kinc/log.h>
 #include <kinc/math/core.h>
 #include <kinc/window.h>
+#include <krink/eventhandler.h>
 #include <krink/math/matrix.h>
 #include <krink/math/vector.h>
 
@@ -73,6 +74,11 @@ static void internal_update_projection_matrix(int window) {
 	int iwidth = kinc_window_width(window);
 	int iheight = kinc_window_height(window);
 	if (iwidth == g2_last_width && iheight == g2_last_height) return;
+	kr_evt_data_t data;
+	data.window.window = window;
+	data.window.width = iwidth;
+	data.window.height = iheight;
+	kr_evt_internal_trigger_ext_evt(KR_EVT_WINDOW_SIZE_CHANGE, data);
 	internal_set_projection_matrix(iwidth, iheight);
 }
 
