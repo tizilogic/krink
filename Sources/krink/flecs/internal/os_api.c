@@ -4,14 +4,14 @@
 
 #include "../flecs.h"
 #include <assert.h>
-#include <kinc/memory.h>
+#include <kinc/system.h>
 #include <kinc/threads/atomic.h>
 #include <kinc/threads/event.h>
 #include <kinc/threads/mutex.h>
 #include <kinc/threads/semaphore.h>
 #include <kinc/threads/thread.h>
-#include <kinc/system.h>
 #include <krink/memory.h>
+#include <string.h>
 
 /**
  * This unit has two licenses:
@@ -33,7 +33,7 @@ static void *kr_flecs_malloc(ecs_size_t size) {
 static void *kr_flecs_calloc(ecs_size_t size) {
 	void *ptr = kr_malloc((size_t)size);
 	assert(ptr != NULL);
-	kinc_memset(ptr, 0, (size_t)size);
+	memset(ptr, 0, (size_t)size);
 	return ptr;
 }
 
@@ -49,15 +49,15 @@ static void kr_flecs_free(void *ptr) {
 
 // Threading
 static ecs_os_thread_t kr_new_thread(ecs_os_thread_callback_t callback, void *arg) {
-    kinc_thread_t *thread = (kinc_thread_t *)kr_malloc(sizeof(kinc_thread_t));
-    assert(thread != NULL);
-    kinc_thread_init(thread, (void (*)(void *))callback, arg);
+	kinc_thread_t *thread = (kinc_thread_t *)kr_malloc(sizeof(kinc_thread_t));
+	assert(thread != NULL);
+	kinc_thread_init(thread, (void (*)(void *))callback, arg);
 	return (ecs_os_thread_t)(uintptr_t)thread;
 }
 
 static void *kr_thread_join(ecs_os_thread_t thr) {
 	kinc_thread_t *thread = (kinc_thread_t *)(uintptr_t)thr;
-    kinc_thread_wait_and_destroy(thread);
+	kinc_thread_wait_and_destroy(thread);
 	kr_free(thread);
 	return NULL;
 }
@@ -71,35 +71,35 @@ static int32_t kr_adec(int32_t *count) {
 }
 
 static ecs_os_mutex_t kr_mutex_new(void) {
-    kinc_mutex_t *mutex = (kinc_mutex_t *)kr_malloc(sizeof(kinc_mutex_t));
-    assert(mutex != NULL);
-    kinc_mutex_init(mutex);
+	kinc_mutex_t *mutex = (kinc_mutex_t *)kr_malloc(sizeof(kinc_mutex_t));
+	assert(mutex != NULL);
+	kinc_mutex_init(mutex);
 	return (ecs_os_mutex_t)(uintptr_t)mutex;
 }
 
 static void kr_mutex_free(ecs_os_mutex_t m) {
 	kinc_mutex_t *mutex = (kinc_mutex_t *)(uintptr_t)m;
-    kinc_mutex_destroy(mutex);
+	kinc_mutex_destroy(mutex);
 	kr_free(mutex);
 }
 
 static void kr_mutex_lock(ecs_os_mutex_t m) {
 	kinc_mutex_t *mutex = (kinc_mutex_t *)(uintptr_t)m;
-    kinc_mutex_lock(mutex);
+	kinc_mutex_lock(mutex);
 }
 
 static void kr_mutex_unlock(ecs_os_mutex_t m) {
 	kinc_mutex_t *mutex = (kinc_mutex_t *)(uintptr_t)m;
-    kinc_mutex_unlock(mutex);
+	kinc_mutex_unlock(mutex);
 }
 
 // Time
 static inline void kr_sleep(int32_t seconds, int32_t nanoseconds) {
-    kinc_thread_sleep(seconds * 1000 + nanoseconds / 1000000);
+	kinc_thread_sleep(seconds * 1000 + nanoseconds / 1000000);
 }
 
 static inline uint64_t kr_now(void) {
-    return (uint64_t)(kinc_time() * 1000000000.0);
+	return (uint64_t)(kinc_time() * 1000000000.0);
 }
 
 static void kr_set_high_res_clock(bool enable) {}
@@ -137,16 +137,15 @@ static void win_cond_wait(ecs_os_cond_t c, ecs_os_mutex_t m) {
 	SleepConditionVariableCS(cond, mutex, INFINITE);
 }
 
-
 void kr_set_flecs_os_api(void) {
 	ecs_os_set_api_defaults();
 
 	ecs_os_api_t api = ecs_os_api;
 
-    api.malloc_ = kr_flecs_malloc;
-    api.realloc_ = kr_flecs_realloc;
-    api.calloc_ = kr_flecs_calloc;
-    api.free_ = kr_flecs_free;
+	api.malloc_ = kr_flecs_malloc;
+	api.realloc_ = kr_flecs_realloc;
+	api.calloc_ = kr_flecs_calloc;
+	api.free_ = kr_flecs_free;
 	api.thread_new_ = kr_new_thread;
 	api.thread_join_ = kr_thread_join;
 	api.ainc_ = kr_ainc;
@@ -163,7 +162,7 @@ void kr_set_flecs_os_api(void) {
 	api.sleep_ = kr_sleep;
 	api.now_ = kr_now;
 	api.enable_high_timer_resolution_ = kr_set_high_res_clock;
-    api.abort_ = kinc_stop;
+	api.abort_ = kinc_stop;
 
 	ecs_os_set_api(&api);
 }
@@ -223,10 +222,10 @@ void kr_set_flecs_os_api(void) {
 
 	ecs_os_api_t api = ecs_os_api;
 
-    api.malloc_ = kr_flecs_malloc;
-    api.realloc_ = kr_flecs_realloc;
-    api.calloc_ = kr_flecs_calloc;
-    api.free_ = kr_flecs_free;
+	api.malloc_ = kr_flecs_malloc;
+	api.realloc_ = kr_flecs_realloc;
+	api.calloc_ = kr_flecs_calloc;
+	api.free_ = kr_flecs_free;
 	api.thread_new_ = kr_new_thread;
 	api.thread_join_ = kr_thread_join;
 	api.ainc_ = kr_ainc;
@@ -243,7 +242,7 @@ void kr_set_flecs_os_api(void) {
 	api.sleep_ = kr_sleep;
 	api.now_ = kr_now;
 	api.enable_high_timer_resolution_ = kr_set_high_res_clock;
-    api.abort_ = kinc_stop;
+	api.abort_ = kinc_stop;
 
 	ecs_os_set_api(&api);
 }

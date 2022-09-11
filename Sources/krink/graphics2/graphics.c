@@ -16,11 +16,11 @@
 
 #include <kinc/graphics4/graphics.h>
 #include <kinc/log.h>
-#include <kinc/math/core.h>
 #include <kinc/window.h>
 #include <krink/eventhandler.h>
 #include <krink/math/matrix.h>
 #include <krink/math/vector.h>
+#include <math.h>
 
 static bool begin = false;
 static uint32_t g2_color = 0;
@@ -168,7 +168,7 @@ static center_radius_t barycenter(float x1, float y1, float x2, float y2, float 
 	c.y = (la * y1 + lb * y2 + lc * y3) / (la + lb + lc);
 
 	float s = (la + lb + lc) / 2.0f;
-	c.r = kinc_sqrt(((s - la) * (s - lb) * (s - lc)) / s);
+	c.r = sqrt(((s - la) * (s - lb) * (s - lc)) / s);
 	return c;
 }
 

@@ -1,6 +1,6 @@
 #include "matrix.h"
-#include <kinc/math/core.h>
 #include <kinc/simd/float32x4.h>
+#include <math.h>
 
 // kr_matrix3x3 impl
 
@@ -21,11 +21,11 @@ kr_matrix3x3_t kr_matrix3x3_scale(float x, float y) {
 }
 
 kr_matrix3x3_t kr_matrix3x3_rotation(float alpha) {
-	return (kr_matrix3x3_t){kinc_cos(alpha),
-	                        -kinc_sin(alpha),
+	return (kr_matrix3x3_t){cos(alpha),
+	                        -sin(alpha),
 	                        0.0f,
-	                        kinc_sin(alpha),
-	                        kinc_cos(alpha),
+	                        sin(alpha),
+	                        cos(alpha),
 	                        0.0f,
 	                        0.0f,
 	                        0.0f,
@@ -177,33 +177,33 @@ kr_matrix4x4_t kr_matrix4x4_scale(float x, float y, float z) {
 }
 
 kr_matrix4x4_t kr_matrix4x4_rotation_x(float alpha) {
-	float ca = kinc_cos(alpha);
-	float sa = kinc_sin(alpha);
+	float ca = cos(alpha);
+	float sa = sin(alpha);
 	return (kr_matrix4x4_t){1.0f, 0.0f, 0.0f, 0.0f, 0.0f, ca,   -sa,  0.0f,
 	                        0.0f, sa,   ca,   0.0f, 0.0f, 0.0f, 0.0f, 1.0f};
 }
 
 kr_matrix4x4_t kr_matrix4x4_rotation_y(float alpha) {
-	float ca = kinc_cos(alpha);
-	float sa = kinc_sin(alpha);
+	float ca = cos(alpha);
+	float sa = sin(alpha);
 	return (kr_matrix4x4_t){ca,  0.0f, sa, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,
 	                        -sa, 0.0f, ca, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f};
 }
 
 kr_matrix4x4_t kr_matrix4x4_rotation_z(float alpha) {
-	float ca = kinc_cos(alpha);
-	float sa = kinc_sin(alpha);
+	float ca = cos(alpha);
+	float sa = sin(alpha);
 	return (kr_matrix4x4_t){ca,   -sa,  0.0f, 0.0f, sa,   ca,   0.0f, 0.0f,
 	                        0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f};
 }
 
 kr_matrix4x4_t kr_matrix4x4_rotation(float yaw, float pitch, float roll) {
-	float sy = kinc_sin(yaw);
-	float cy = kinc_cos(yaw);
-	float sx = kinc_sin(pitch);
-	float cx = kinc_cos(pitch);
-	float sz = kinc_sin(roll);
-	float cz = kinc_cos(roll);
+	float sy = sin(yaw);
+	float cy = cos(yaw);
+	float sx = sin(pitch);
+	float cx = cos(pitch);
+	float sz = sin(roll);
+	float cz = cos(roll);
 	return (kr_matrix4x4_t){cx * cy,
 	                        cx * sy * sz - sx * cz,
 	                        cx * sy * cz + sx * sz,
@@ -246,7 +246,7 @@ kr_matrix4x4_t kr_matrix4x4_orthogonal_projection(float left, float right, float
 }
 
 kr_matrix4x4_t kr_matrix4x4_perspective_projection(float fov_y, float aspect, float zn, float zf) {
-	float uh = 1.0 / kinc_tan(fov_y / 2.0f);
+	float uh = 1.0 / tan(fov_y / 2.0f);
 	float uw = uh / aspect;
 	return (kr_matrix4x4_t){uw,
 	                        0.0f,

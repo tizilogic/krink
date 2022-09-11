@@ -1,5 +1,6 @@
 #include "tween.h"
 #include <kinc/math/core.h>
+#include <math.h>
 
 static inline float kr_tween_linear(float k) {
 	return k;
@@ -13,7 +14,7 @@ static inline float kr_tween_sine_in(float k) {
 		return 1.0f;
 	}
 	else {
-		return 1.0f - kinc_cos(k * KINC_PI / 2.0f);
+		return 1.0f - cos(k * KINC_PI / 2.0f);
 	}
 }
 
@@ -25,7 +26,7 @@ static inline float kr_tween_sine_out(float k) {
 		return 1.0f;
 	}
 	else {
-		return kinc_sin(k * (KINC_PI * 0.5f));
+		return sin(k * (KINC_PI * 0.5f));
 	}
 }
 
@@ -37,7 +38,7 @@ static inline float kr_tween_sine_in_out(float k) {
 		return 1.0f;
 	}
 	else {
-		return -0.5f * (kinc_cos(KINC_PI * k) - 1.0f);
+		return -0.5f * (cos(KINC_PI * k) - 1.0f);
 	}
 }
 
@@ -103,11 +104,11 @@ static inline float kr_tween_quint_in_out(float k) {
 }
 
 static inline float kr_tween_expo_in(float k) {
-	return k == 0.0f ? 0.0f : kinc_pow(2.0f, 10.0f * (k - 1.0f));
+	return k == 0.0f ? 0.0f : pow(2.0f, 10.0f * (k - 1.0f));
 }
 
 static inline float kr_tween_expo_out(float k) {
-	return k == 1.0f ? 1.0f : (1.0f - kinc_pow(2.0f, -10.0f * k));
+	return k == 1.0f ? 1.0f : (1.0f - pow(2.0f, -10.0f * k));
 }
 
 static inline float kr_tween_expo_in_out(float k) {
@@ -118,22 +119,22 @@ static inline float kr_tween_expo_in_out(float k) {
 		return 1.0f;
 	}
 	if ((k /= 1.0f / 2.0f) < 1.0f) {
-		return 0.5f * kinc_pow(2.0f, 10.0f * (k - 1.0f));
+		return 0.5f * pow(2.0f, 10.0f * (k - 1.0f));
 	}
-	return 0.5f * (2.0f - kinc_pow(2.0f, -10.0f * --k));
+	return 0.5f * (2.0f - pow(2.0f, -10.0f * --k));
 }
 
 static inline float kr_tween_circ_in(float k) {
-	return -(kinc_sqrt(1.0f - k * k) - 1.0f);
+	return -(sqrt(1.0f - k * k) - 1.0f);
 }
 
 static inline float kr_tween_circ_out(float k) {
-	return kinc_sqrt(1.0f - (k - 1.0f) * (k - 1.0f));
+	return sqrt(1.0f - (k - 1.0f) * (k - 1.0f));
 }
 
 static inline float kr_tween_circ_in_out(float k) {
-	return k <= 0.5f ? (kinc_sqrt(1.0f - k * k * 4.0f) - 1.0f) / -2.0f
-	                 : (kinc_sqrt(1.0f - (k * 2.0f - 2.0f) * (k * 2.0f - 2.0f)) + 1.0f) / 2.0f;
+	return k <= 0.5f ? (sqrt(1.0f - k * k * 4.0f) - 1.0f) / -2.0f
+	                 : (sqrt(1.0f - (k * 2.0f - 2.0f) * (k * 2.0f - 2.0f)) + 1.0f) / 2.0f;
 }
 
 static inline float kr_tween_back_in(float k) {
@@ -157,8 +158,7 @@ static inline float kr_tween_back_out(float k) {
 	}
 	else {
 		k = k - 1.0f;
-		return (k * k *
-		            ((KR_TWEEN_DEFAULT_OVERSHOOT + 1.0f) * k + KR_TWEEN_DEFAULT_OVERSHOOT) +
+		return (k * k * ((KR_TWEEN_DEFAULT_OVERSHOOT + 1.0f) * k + KR_TWEEN_DEFAULT_OVERSHOOT) +
 		        1.0f);
 	}
 }
@@ -223,10 +223,10 @@ static inline float kr_tween_elastic_in(float k) {
 		s = p / 4.0f;
 	}
 	else {
-		s = p * kinc_asin(1.0f / a) / (2.0f * KINC_PI);
+		s = p * asin(1.0f / a) / (2.0f * KINC_PI);
 	}
 	k -= 1.0f;
-	return -(a * kinc_pow(2.0f, 10.0f * k) * kinc_sin((k - s) * (2.0f * KINC_PI) / p));
+	return -(a * pow(2.0f, 10.0f * k) * sin((k - s) * (2.0f * KINC_PI) / p));
 }
 
 static inline float kr_tween_elastic_out(float k) {
@@ -243,9 +243,9 @@ static inline float kr_tween_elastic_out(float k) {
 		s = p / 4.0f;
 	}
 	else {
-		s = p * kinc_asin(1 / a) / (2.0f * KINC_PI);
+		s = p * asin(1 / a) / (2.0f * KINC_PI);
 	}
-	return (a * kinc_pow(2.0f, -10.0f * k) * kinc_sin((k - s) * (2.0f * KINC_PI) / p) + 1.0f);
+	return (a * pow(2.0f, -10.0f * k) * sin((k - s) * (2.0f * KINC_PI) / p) + 1.0f);
 }
 
 static inline float kr_tween_elastic_in_out(float k) {
@@ -262,15 +262,15 @@ static inline float kr_tween_elastic_in_out(float k) {
 		s = p / 4.0f;
 	}
 	else {
-		s = p * kinc_asin(1 / a) / (2.0f * KINC_PI);
+		s = p * asin(1 / a) / (2.0f * KINC_PI);
 	}
 	k *= 2.0f;
 	if (k < 1.0f) {
 		k -= 1.0f;
-		return -0.5f * (a * kinc_pow(2.0f, 10.0f * k) * kinc_sin((k - s) * (2.0f * KINC_PI) / p));
+		return -0.5f * (a * pow(2.0f, 10.0f * k) * sin((k - s) * (2.0f * KINC_PI) / p));
 	}
 	k -= 1.0f;
-	return a * kinc_pow(2.0f, -10.0f * k) * kinc_sin((k - s) * (2.0f * KINC_PI) / p) * 0.5f + 1.0f;
+	return a * pow(2.0f, -10.0f * k) * sin((k - s) * (2.0f * KINC_PI) / p) * 0.5f + 1.0f;
 }
 
 typedef float (*ease_func_t)(float);

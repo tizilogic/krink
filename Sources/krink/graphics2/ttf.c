@@ -5,8 +5,8 @@
 #include <assert.h>
 #include <kinc/image.h>
 #include <kinc/io/filereader.h>
-#include <kinc/memory.h>
 #include <krink/memory.h>
+#include <string.h>
 
 #ifdef KR_FULL_RGBA_FONTS
 #define KR_FONT_IMAGE_FORMAT KINC_IMAGE_FORMAT_RGBA32
@@ -257,7 +257,7 @@ void kr_ttf_load_baked_font(kr_ttf_font_t *font, kr_ttf_font_t *origin, int size
 	img->width = tex->tex_width;
 	img->height = tex->tex_height;
 	img->chars = (stbtt_bakedchar *)kr_malloc(kr_ttf_num_glyphs * sizeof(stbtt_bakedchar));
-	kinc_memcpy(img->chars, origin_img->chars, kr_ttf_num_glyphs * sizeof(stbtt_bakedchar));
+	memcpy(img->chars, origin_img->chars, kr_ttf_num_glyphs * sizeof(stbtt_bakedchar));
 	img->first_unused_y = origin_img->first_unused_y;
 	if (xoff != 0.0f || yoff != 0.0f) {
 		for (int i = 0; i < kr_ttf_num_glyphs; ++i) {
