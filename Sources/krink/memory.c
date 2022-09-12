@@ -74,14 +74,16 @@ static void kr_alloctrack_free(void *ptr) {
 	assert(0);
 }
 
-static void kr_alloctrack_realloc(void *ptr, size_t size) {
+static void kr_alloctrack_realloc(void *old, void *ptr, size_t size) {
 	for (int i = 0; i < kr_allocs_count; ++i) {
-		if (kr_allocs[i].ptr == ptr) {
+		if (kr_allocs[i].ptr == old) {
+			kr_allocs[i].ptr = ptr;
 			kr_pool_allocated += size - kr_allocs[i].size;
 			kr_allocs[i].size = size;
 			return;
 		}
 	}
+	assert(0);
 }
 
 #else
@@ -134,11 +136,11 @@ void *kr_calloc(size_t n, size_t size) {
 void *kr_realloc(void *ptr, size_t size) {
 	assert(kr_heap != NULL);
 	kinc_mutex_lock(&memlock);
-	ptr = tlsf_realloc(kr_tlsf, ptr, size);
+	void *nptr = tlsf_realloc(kr_tlsf, ptr, size);
 	kinc_mutex_unlock(&memlock);
-	assert(ptr);
-	kr_alloctrack_realloc(ptr, size);
-	return ptr;
+	assert(nptr);
+	kr_alloctrack_realloc(ptr, nptr, size);
+	return nptr;
 }
 
 #if !defined(NDEBUG) && !defined(KR_NO_ALLOCATION_TRACKER)
