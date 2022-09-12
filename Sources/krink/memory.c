@@ -91,7 +91,7 @@ static void kr_alloctrack_realloc(void *old, void *ptr, size_t size) {
 #define kr_alloctrack_set_total(A)
 #define kr_alloctrack_malloc(A, B)
 #define kr_alloctrack_free(A)
-#define kr_alloctrack_realloc(A, B)
+#define kr_alloctrack_realloc(A, B, C)
 
 #endif
 
