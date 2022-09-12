@@ -64,6 +64,10 @@ is enabled by default.
 This can be disabled by defining the macro `KR_NO_TLSF` to use the provided functions from
 `<stdlib.h>`.
 
+In addition it comes with a minimal allocation tracking API that is only enabled with DEBUG builds,
+which comes with additional overhead. This can be disabled by defining the macro
+`KR_NO_ALLOCATION_TRACKER` at compile time.
+
 ### Documentation
 
 A large part of the API of **krink** is documentented using Doxygen style comments and the

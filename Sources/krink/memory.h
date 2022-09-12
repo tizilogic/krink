@@ -44,6 +44,32 @@ void *kr_calloc(size_t n, size_t size);
 /// <param name="size"></param>
 void *kr_realloc(void *ptr, size_t size);
 
+/// <summary>
+/// When compiled in debug mode, tracks the number of allocations.
+/// </summary>
+/// <returns>Number of total allocations</returns>
+int kr_allocation_count(void);
+
+/// <summary>
+/// When compiled in debug mode, tracks the amount of theoretically used memory.
+/// Note: Only tracks requested size!
+/// </summary>
+/// <returns>Size of all allocated memory</returns>
+int kr_allocation_size(void);
+
+/// <summary>
+/// When compiled in debug mode, tracks the amount of theoretically available memory.
+/// Note: Only tracks requested size!
+/// </summary>
+/// <returns>Size of theoretically free memory</returns>
+int kr_allocation_available(void);
+
+/// <summary>
+/// Returns the total pool size
+/// </summary>
+/// <returns>The size the pool was initially allocated</returns>
+int kr_allocation_total(void);
+
 #else
 #include <stdlib.h>
 
@@ -52,6 +78,11 @@ void *kr_realloc(void *ptr, size_t size);
 #define kr_free(PTR) free(PTR)
 #define kr_calloc(N, SIZE) calloc((N), (SIZE))
 #define kr_realloc(PTR, SIZE) realloc((PTR), (SIZE))
+
+#define kr_allocation_count() -1
+#define kr_allocation_size() -1
+#define kr_allocation_available() -1
+#define kr_allocation_total() -1
 
 #endif
 
