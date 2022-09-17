@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+echo -e
+git -C `dirname "$0"` submodule update --init
+`dirname "$0"`/Kinc/get_dlc
