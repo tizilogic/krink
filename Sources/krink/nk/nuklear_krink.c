@@ -5,6 +5,10 @@
 #include <krink/memory.h>
 
 #define NK_IMPLEMENTATION
+#ifdef NK_MAX_FLOAT_PRECISION
+#undef NK_MAX_FLOAT_PRECISION
+#endif
+#define NK_MAX_FLOAT_PRECISION 6
 #include <krink/nk/nuklear.h>
 
 static struct nk_context nkctx;
