@@ -1,2 +1,2 @@
 # Yes github, it's really C
-Sources/**.h linguist-language=c
+*.h linguist-language=c
