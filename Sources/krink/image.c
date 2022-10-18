@@ -14,6 +14,25 @@ void kr_image_init(kr_image_t *img) {
 	img->owns_tex = false;
 }
 
+void kr_image_init_empty(kr_image_t *img, int width, int height) {
+	kr_image_init(img);
+	img->tex = (kinc_g4_texture_t *)kr_malloc(sizeof(kinc_g4_texture_t));
+	kinc_g4_texture_init(img->tex, width, height, KINC_IMAGE_FORMAT_RGBA32);
+	img->owns_tex = true;
+	uint32_t *data = (uint32_t *)kinc_g4_texture_lock(img->tex);
+	int stride = kinc_g4_texture_stride(img->tex) / 4;
+	for (int y = 0; y < img->tex->tex_height; ++y) {
+		for (int x = 0; x < img->tex->tex_width; ++x) {
+			data[y * stride + x] = 0;
+		}
+	}
+	kinc_g4_texture_unlock(img->tex);
+	img->real_width = (float)width;
+	img->real_height = (float)height;
+	img->loaded = true;
+	img->path = "";
+}
+
 void kr_image_load(kr_image_t *img, const char *path, bool keep_in_memory) {
 	kr_image_init(img);
 	img->path = path;

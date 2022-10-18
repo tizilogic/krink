@@ -24,6 +24,14 @@ typedef struct kr_image {
 void kr_image_init(kr_image_t *img);
 
 /// <summary>
+/// Initialize an empty image with a linked empty texture of specified dimension.
+/// </summary>
+/// <param name="img"></param>
+/// <param name="width"></param>
+/// <param name="height"></param>
+void kr_image_init_empty(kr_image_t *img, int width, int height);
+
+/// <summary>
 /// Load an image.
 /// </summary>
 /// <param name="img"></param>
