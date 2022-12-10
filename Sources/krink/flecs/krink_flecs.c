@@ -28,7 +28,7 @@ static void evt_on_notify(kr_evt_event_t evt) {
 }
 
 static void InputSystem(ecs_iter_t *it) {
-	KrSingletonInput *inp = ecs_term(it, KrSingletonInput, 1);
+	KrSingletonInput *inp = ecs_field(it, KrSingletonInput, 1);
 
 	for (int i = 0; i < 256; ++i) inp[0].keys[i].triggered = false;
 	inp[0].mouse.primary.triggered = false;
@@ -295,7 +295,7 @@ ecs_entity_t kr_flecs_create_sdf_circle_wborder(ecs_world_t *world,
 
 void kr_flecs_set_depth(ecs_world_t *world, ecs_entity_t e, int32_t depth) {
 	bool is_added;
-	KrDrawable *d = ecs_get_mut(world, e, KrDrawable, &is_added);
+	KrDrawable *d = ecs_get_mut(world, e, KrDrawable);
 	assert(!is_added);
 	d->depth = depth;
 	ecs_modified(world, e, KrDrawable);

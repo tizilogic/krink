@@ -161,7 +161,6 @@ void kr_set_flecs_os_api(void) {
 	api.cond_wait_ = win_cond_wait;
 	api.sleep_ = kr_sleep;
 	api.now_ = kr_now;
-	api.enable_high_timer_resolution_ = kr_set_high_res_clock;
 	api.abort_ = kinc_stop;
 
 	ecs_os_set_api(&api);
@@ -241,7 +240,6 @@ void kr_set_flecs_os_api(void) {
 	api.cond_wait_ = posix_cond_wait;
 	api.sleep_ = kr_sleep;
 	api.now_ = kr_now;
-	api.enable_high_timer_resolution_ = kr_set_high_res_clock;
 	api.abort_ = kinc_stop;
 
 	ecs_os_set_api(&api);

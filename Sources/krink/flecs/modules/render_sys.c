@@ -12,7 +12,7 @@
 static bool scissor_active = false;
 
 static void FrameTime(ecs_iter_t *it) {
-	KrFrameTime *t = ecs_term(it, KrFrameTime, 1);
+	KrFrameTime *t = ecs_field(it, KrFrameTime, 1);
 	t[0].time = kinc_time();
 }
 
@@ -33,27 +33,27 @@ static void End(ecs_iter_t *it) {
 }
 
 static void Render(ecs_iter_t *it) {
-	KrDrawable *drawable = ecs_term(it, KrDrawable, 1);
-	KrPos2 *pos = ecs_term(it, KrPos2, 2);
-	KrColor *color = ecs_term(it, KrColor, 3);
-	KrImage *image = ecs_term(it, KrImage, 4);
-	KrText *text = ecs_term(it, KrText, 5);
-	KrStroke *stroke = ecs_term(it, KrStroke, 6);
-	KrSmooth *smooth = ecs_term(it, KrSmooth, 7);
-	KrTriangle *triangle = ecs_term(it, KrTriangle, 8);
-	KrRect *rect = ecs_term(it, KrRect, 9);
-	KrScissor *scissor = ecs_term(it, KrScissor, 10);
-	KrCorner *corner = ecs_term(it, KrCorner, 11);
-	KrCornerAsymm *corner_asymm = ecs_term(it, KrCornerAsymm, 12);
-	KrCircle *circle = ecs_term(it, KrCircle, 13);
-	KrBorder *border = ecs_term(it, KrBorder, 14);
-	KrLine *line = ecs_term(it, KrLine, 15);
-	KrAngle *angle = ecs_term(it, KrAngle, 16);
-	KrRotationCenter *rotation_center = ecs_term(it, KrRotationCenter, 17);
-	KrOpacity *opacity = ecs_term(it, KrOpacity, 18);
-	KrScaleX *scale_x = ecs_term(it, KrScaleX, 19);
-	KrScaleY *scale_y = ecs_term(it, KrScaleY, 20);
-	KrTranslation *translation = ecs_term(it, KrTranslation, 21);
+	KrDrawable *drawable = ecs_field(it, KrDrawable, 1);
+	KrPos2 *pos = ecs_field(it, KrPos2, 2);
+	KrColor *color = ecs_field(it, KrColor, 3);
+	KrImage *image = ecs_field(it, KrImage, 4);
+	KrText *text = ecs_field(it, KrText, 5);
+	KrStroke *stroke = ecs_field(it, KrStroke, 6);
+	KrSmooth *smooth = ecs_field(it, KrSmooth, 7);
+	KrTriangle *triangle = ecs_field(it, KrTriangle, 8);
+	KrRect *rect = ecs_field(it, KrRect, 9);
+	KrScissor *scissor = ecs_field(it, KrScissor, 10);
+	KrCorner *corner = ecs_field(it, KrCorner, 11);
+	KrCornerAsymm *corner_asymm = ecs_field(it, KrCornerAsymm, 12);
+	KrCircle *circle = ecs_field(it, KrCircle, 13);
+	KrBorder *border = ecs_field(it, KrBorder, 14);
+	KrLine *line = ecs_field(it, KrLine, 15);
+	KrAngle *angle = ecs_field(it, KrAngle, 16);
+	KrRotationCenter *rotation_center = ecs_field(it, KrRotationCenter, 17);
+	KrOpacity *opacity = ecs_field(it, KrOpacity, 18);
+	KrScaleX *scale_x = ecs_field(it, KrScaleX, 19);
+	KrScaleY *scale_y = ecs_field(it, KrScaleY, 20);
+	KrTranslation *translation = ecs_field(it, KrTranslation, 21);
 
 	for (int i = 0; i < it->count; ++i) {
 		float border_strength = 0.0f;
@@ -61,31 +61,31 @@ static void Render(ecs_iter_t *it) {
 		kr_matrix3x3_t transform = kr_matrix3x3_identity();
 
 		float sx = 1.0f, sy = 1.0f;
-		if (ecs_term_is_set(it, 21)) { // Translate
+		if (ecs_field_is_set(it, 21)) { // Translate
 			kr_matrix3x3_t tmat = kr_matrix3x3_translation(translation[i].x, translation[i].y);
 			transform = kr_matrix3x3_multmat(&transform, &tmat);
 		}
-		if (ecs_term_is_set(it, 19) && ecs_term_is_set(it, 20)) { // Scale asymmetric
+		if (ecs_field_is_set(it, 19) && ecs_field_is_set(it, 20)) { // Scale asymmetric
 			kr_matrix3x3_t smat = kr_matrix3x3_scale(scale_x[i].value, scale_y[i].value);
 			transform = kr_matrix3x3_multmat(&transform, &smat);
 			sx = scale_x[i].value;
 			sy = scale_y[i].value;
 		}
-		else if (ecs_term_is_set(it, 19)) { // ScaleX
+		else if (ecs_field_is_set(it, 19)) { // ScaleX
 			kr_matrix3x3_t smat = kr_matrix3x3_scale(scale_x[i].value, 1.0f);
 			transform = kr_matrix3x3_multmat(&transform, &smat);
 			sx = scale_x[i].value;
 			sy = 1.0f;
 		}
-		else if (ecs_term_is_set(it, 20)) { // ScaleY
+		else if (ecs_field_is_set(it, 20)) { // ScaleY
 			kr_matrix3x3_t smat = kr_matrix3x3_scale(1.0f, scale_y[i].value);
 			transform = kr_matrix3x3_multmat(&transform, &smat);
 			sx = 1.0f;
 			sy = scale_y[i].value;
 		}
-		if (ecs_term_is_set(it, 16)) { // Rotate
+		if (ecs_field_is_set(it, 16)) { // Rotate
 			float cx, cy;
-			if (ecs_term_is_set(it, 17)) {
+			if (ecs_field_is_set(it, 17)) {
 				cx = rotation_center[i].x;
 				cy = rotation_center[i].y;
 			}
@@ -146,7 +146,7 @@ static void Render(ecs_iter_t *it) {
 		}
 		kr_g2_set_transform(transform);
 
-		if (ecs_term_is_set(it, 18)) {
+		if (ecs_field_is_set(it, 18)) {
 			kr_g2_set_opacity(opacity[i].alpha);
 		}
 		else {
@@ -154,7 +154,7 @@ static void Render(ecs_iter_t *it) {
 		}
 
 		kr_g2_set_color(color[i].color);
-		if (ecs_term_is_set(it, 10)) {
+		if (ecs_field_is_set(it, 10)) {
 			kr_g2_scissor(scissor[i].x, scissor[i].y, scissor[i].w, scissor[i].h);
 		}
 		else if (scissor_active)
@@ -273,7 +273,7 @@ static inline void update_angle(float *offset, const float parent, const float c
 }
 
 static void OnAnchorSet(ecs_iter_t *it) {
-	KrAnchor *anchor = ecs_term(it, KrAnchor, 1);
+	KrAnchor *anchor = ecs_field(it, KrAnchor, 1);
 	for (int i = 0; i < it->count; ++i) {
 		if (!ecs_has(it->world, anchor[i].parent, KrTranslation)) {
 			ecs_set(it->world, anchor[i].parent, KrTranslation, {.x = 0.0f, .y = 0.0f});
@@ -299,8 +299,7 @@ static void OnAnchorSet(ecs_iter_t *it) {
 		if (cangle == NULL) cangle = &dummy;
 
 		bool unused;
-		KrInternalAnchor *ianchor =
-		    ecs_get_mut(it->world, it->entities[i], KrInternalAnchor, &unused);
+		KrInternalAnchor *ianchor = ecs_get_mut(it->world, it->entities[i], KrInternalAnchor);
 		update_offset(&ianchor->offset, ptrans, ctrans);
 		ianchor->parent_prev_trans.x = ptrans->x;
 		ianchor->parent_prev_trans.y = ptrans->y;
@@ -315,7 +314,7 @@ static void OnAnchorSet(ecs_iter_t *it) {
 }
 
 static void OnAnchorRemove(ecs_iter_t *it) {
-	KrAnchor *anchor = ecs_term(it, KrAnchor, 1);
+	KrAnchor *anchor = ecs_field(it, KrAnchor, 1);
 	for (int i = 0; i < it->count; ++i) {
 		ecs_remove(it->world, it->entities[i], KrInternalAnchor);
 	}
@@ -326,10 +325,10 @@ static inline bool comptrans(const KrTranslation *a, const KrTranslation *b) {
 }
 
 static void UpdateAnchored(ecs_iter_t *it) {
-	KrTranslation *ctrans = ecs_term(it, KrTranslation, 1);
-	KrAnchor *anchor = ecs_term(it, KrAnchor, 2);
-	KrInternalAnchor *ianchor = ecs_term(it, KrInternalAnchor, 3);
-	KrAngle *cangle = ecs_term(it, KrAngle, 4);
+	KrTranslation *ctrans = ecs_field(it, KrTranslation, 1);
+	KrAnchor *anchor = ecs_field(it, KrAnchor, 2);
+	KrInternalAnchor *ianchor = ecs_field(it, KrInternalAnchor, 3);
+	KrAngle *cangle = ecs_field(it, KrAngle, 4);
 
 	for (int i = 0; i < it->count; ++i) {
 		if (!ecs_is_valid(it->world, anchor[i].parent)) {
@@ -364,8 +363,8 @@ static void UpdateAnchored(ecs_iter_t *it) {
 }
 
 static void UpdateDepth(ecs_iter_t *it) {
-	KrDrawable *drawable = ecs_term(it, KrDrawable, 1);
-	KrSetDepth *set_depth = ecs_term(it, KrSetDepth, 2);
+	KrDrawable *drawable = ecs_field(it, KrDrawable, 1);
+	KrSetDepth *set_depth = ecs_field(it, KrSetDepth, 2);
 
 	for (int i = 0; i < it->count; ++i) {
 		drawable[i].depth = set_depth[i].depth;
@@ -382,8 +381,8 @@ void SystemsRenderImport(ecs_world_t *world) {
 
 	ECS_COMPONENT_DEFINE(world, KrInternalAnchor);
 
-	ECS_TRIGGER(world, OnAnchorSet, EcsOnSet, KrAnchor);
-	ECS_TRIGGER(world, OnAnchorRemove, EcsOnRemove, KrAnchor);
+	ECS_OBSERVER(world, OnAnchorSet, EcsOnSet, KrAnchor);
+	ECS_OBSERVER(world, OnAnchorRemove, EcsOnRemove, KrAnchor);
 	ECS_SYSTEM(
 	    world, UpdateAnchored,
 	    EcsPostUpdate, [inout] components.render.KrTranslation, [in] components.render.KrAnchor,
@@ -423,12 +422,13 @@ void SystemsRenderImport(ecs_world_t *world) {
 	    {KrVisible},
 	};
 
-	ecs_system_init(world, &(ecs_system_desc_t){.entity = {.name = "Render", .add = {EcsOnStore}},
-	                                            .query.filter.terms_buffer_count = 22,
-	                                            .query.filter.terms_buffer = termbuff,
-	                                            .query.order_by_component = ecs_id(KrDrawable),
-	                                            .query.order_by = compare_render_order,
-	                                            .callback = Render});
+	ecs_system(world,
+	           {.entity = ecs_entity(world, {.name = "Render", .add = {ecs_dependson(EcsOnStore)}}),
+	            .query.filter.terms_buffer_count = 22,
+	            .query.filter.terms_buffer = termbuff,
+	            .query.order_by_component = ecs_id(KrDrawable),
+	            .query.order_by = compare_render_order,
+	            .callback = Render});
 
 	ECS_SYSTEM(world, End, EcsOnStore);
 }
