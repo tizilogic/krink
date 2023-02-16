@@ -4,6 +4,7 @@
 #include <kinc/system.h>
 #include <stddef.h>
 #include <stdint.h>
+#include <stdlib.h>
 #include <string.h>
 #if defined(KORE_IOS) || defined(KORE_ANDROID)
 #include <kinc/input/surface.h>
@@ -166,26 +167,33 @@ static void shutdown(void) {
 	notify(KR_EVT_SHUTDOWN, unused);
 }
 
+static void drop_files(wchar_t* file,void* udata){
+	kr_evt_data_t data;
+	memset(&data, 0, sizeof(kr_evt_data_t));
+	size_t len = wcstombs(data.drop.filename,file,sizeof(data.drop.filename));
+	notify(KR_EVT_DROP_FILE, data);
+}
 void kr_evt_init(void) {
-	kinc_keyboard_set_key_up_callback(key_up);
-	kinc_keyboard_set_key_down_callback(key_down);
-	kinc_keyboard_set_key_press_callback(key_press);
+	kinc_keyboard_set_key_up_callback(key_up,NULL);
+	kinc_keyboard_set_key_down_callback(key_down,NULL);
+	kinc_keyboard_set_key_press_callback(key_press,NULL);
 
 #if defined(KORE_IOS) || defined(KORE_ANDROID)
 	kinc_surface_set_touch_start_callback(touch_start);
 	kinc_surface_set_touch_end_callback(touch_end);
 	kinc_surface_set_move_callback(finger_move);
 #else
-	kinc_mouse_set_press_callback(mouse_press);
-	kinc_mouse_set_release_callback(mouse_release);
-	kinc_mouse_set_scroll_callback(mouse_scroll);
-	kinc_mouse_set_move_callback(mouse_move);
+	kinc_mouse_set_press_callback(mouse_press,NULL);
+	kinc_mouse_set_release_callback(mouse_release,NULL);
+	kinc_mouse_set_scroll_callback(mouse_scroll,NULL);
+	kinc_mouse_set_move_callback(mouse_move,NULL);
+	kinc_set_drop_files_callback(drop_files,NULL);
 #endif
-	kinc_set_foreground_callback(foreground);
-	kinc_set_background_callback(background);
-	kinc_set_pause_callback(pause);
-	kinc_set_resume_callback(resume);
-	kinc_set_shutdown_callback(shutdown);
+	kinc_set_foreground_callback(foreground,NULL);
+	kinc_set_background_callback(background,NULL);
+	kinc_set_pause_callback(pause,NULL);
+	kinc_set_resume_callback(resume,NULL);
+	kinc_set_shutdown_callback(shutdown,NULL);
 
 	for (int i = 0; i < KR_EVT_MAX_OBSERVER; ++i) {
 		observers[i] = NULL;
