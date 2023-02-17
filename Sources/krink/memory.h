@@ -70,6 +70,13 @@ int kr_allocation_available(void);
 /// <returns>The size the pool was initially allocated</returns>
 int kr_allocation_total(void);
 
+/// <summary>
+/// When compiled in debug mode, tracks the maximum total allocated memory from the pool.
+/// Note: Only sums up requested size!
+/// </summary>
+/// <returns>The maximum used memory at runtime</returns>
+int kr_allocation_max(void);
+
 #else
 #include <stdlib.h>
 
@@ -83,6 +90,7 @@ int kr_allocation_total(void);
 #define kr_allocation_size() -1
 #define kr_allocation_available() -1
 #define kr_allocation_total() -1
+#define kr_allocation_max() -1;
 
 #endif
 

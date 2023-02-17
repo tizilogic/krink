@@ -23,6 +23,7 @@ typedef struct kr_alloc {
 static int kr_pool_total = 0;
 static int kr_pool_num_allocs = 0;
 static int kr_pool_allocated = 0;
+static int kr_pool_allocated_max = 0;
 static kr_alloc_t *kr_allocs = NULL;
 static int kr_allocs_count = 0;
 
@@ -51,6 +52,7 @@ static void kr_alloctrack_malloc(void *ptr, size_t size) {
 			kr_allocs[i].size = size;
 			++kr_pool_num_allocs;
 			kr_pool_allocated += size;
+			kr_pool_allocated_max = (kr_pool_allocated > kr_pool_allocated_max) ? kr_pool_allocated : kr_pool_allocated_max;
 			return;
 		}
 	}
@@ -79,6 +81,7 @@ static void kr_alloctrack_realloc(void *old, void *ptr, size_t size) {
 		if (kr_allocs[i].ptr == old) {
 			kr_allocs[i].ptr = ptr;
 			kr_pool_allocated += size - kr_allocs[i].size;
+			kr_pool_allocated_max = (kr_pool_allocated > kr_pool_allocated_max) ? kr_pool_allocated : kr_pool_allocated_max;
 			kr_allocs[i].size = size;
 			return;
 		}
@@ -161,6 +164,10 @@ int kr_allocation_total(void) {
 	return kr_pool_total;
 }
 
+int kr_allocation_max(void) {
+	return kr_pool_allocated_max;
+}
+
 #else
 
 int kr_allocation_count(void) {
@@ -173,6 +180,10 @@ int kr_allocation_available(void) {
 	return -1;
 }
 int kr_allocation_total(void) {
+	return -1;
+}
+
+int kr_allocation_max(void) {
 	return -1;
 }
 
