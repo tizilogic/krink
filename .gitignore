@@ -3,3 +3,6 @@
 build
 Docs/html
 Docs/latex
+.cache/
+Tests/*/Deployment
+!Tests/*/Deployment/keepme.txt
