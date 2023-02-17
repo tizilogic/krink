@@ -64,6 +64,8 @@ static void kr_alloctrack_malloc(void *ptr, size_t size) {
 }
 
 static void kr_alloctrack_free(void *ptr) {
+	if (ptr == NULL) return;
+	
 	for (int i = 0; i < kr_allocs_count; ++i) {
 		if (kr_allocs[i].ptr == ptr) {
 			kr_allocs[i].ptr = NULL;
