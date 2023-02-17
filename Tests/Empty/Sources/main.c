@@ -14,7 +14,7 @@
 
 static void *heap;
 
-static void update(void) {
+static void update(void *unused) {
 	kinc_g4_begin(0);
 	kr_flecs_tick();
 	kinc_g4_end(0);
@@ -35,7 +35,7 @@ int kickstart(int argc, char **argv) {
 #endif
 	}
 	kinc_init("Empty", w, h, NULL, NULL);
-	kinc_set_update_callback(update);
+	kinc_set_update_callback(update, NULL);
 	heap = malloc(20 * 1024 * 1024);
 	assert(heap != NULL);
 	kr_init(heap, 20 * 1024 * 1024, NULL, 0);

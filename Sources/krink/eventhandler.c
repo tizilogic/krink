@@ -24,25 +24,25 @@ void kr_evt_internal_trigger_ext_evt(kr_evt_event_type_t event, kr_evt_data_t da
 	notify(event, data);
 }
 
-static void key_up(int keycode) {
+static void key_up(int keycode, void *unused_data) {
 	kr_evt_data_t data;
 	data.key.keycode = keycode;
 	notify(KR_EVT_KEY_UP, data);
 }
 
-static void key_down(int keycode) {
+static void key_down(int keycode, void *unused_data) {
 	kr_evt_data_t data;
 	data.key.keycode = keycode;
 	notify(KR_EVT_KEY_DOWN, data);
 }
 
-static void key_press(unsigned character) {
+static void key_press(unsigned character, void *unused_data) {
 	kr_evt_data_t data;
 	data.key_press.character = character;
 	notify(KR_EVT_KEY_PRESS, data);
 }
 
-static void mouse_press(int window, int button, int x, int y) {
+static void mouse_press(int window, int button, int x, int y, void *unused_data) {
 	kr_evt_data_t data;
 	data.mouse_button.window = window;
 	data.mouse_button.button = button;
@@ -57,7 +57,7 @@ static void mouse_press(int window, int button, int x, int y) {
 	notify(KR_EVT_PRIMARY_START, pdata);
 }
 
-static void mouse_release(int window, int button, int x, int y) {
+static void mouse_release(int window, int button, int x, int y, void *unused_data) {
 	kr_evt_data_t data;
 	data.mouse_button.window = window;
 	data.mouse_button.button = button;
@@ -72,14 +72,14 @@ static void mouse_release(int window, int button, int x, int y) {
 	notify(KR_EVT_PRIMARY_END, pdata);
 }
 
-static void mouse_scroll(int window, int delta) {
+static void mouse_scroll(int window, int delta, void *unused_data) {
 	kr_evt_data_t data;
 	data.mouse_scroll.window = window;
 	data.mouse_scroll.delta = delta;
 	notify(KR_EVT_MOUSE_SCROLL, data);
 }
 
-static void mouse_move(int window, int x, int y, int dx, int dy) {
+static void mouse_move(int window, int x, int y, int dx, int dy, void *unused_data) {
 	kr_evt_data_t data;
 	data.mouse_move.window = window;
 	data.mouse_move.x = x;
@@ -136,56 +136,56 @@ static void finger_move(int finger, int x, int y) {
 	notify(KR_EVT_PRIMARY_MOVE, pdata);
 }
 
-static void foreground(void) {
+static void foreground(void *unused_data) {
 	kr_evt_data_t unused;
 	memset(&unused, 0, sizeof(kr_evt_data_t));
 	notify(KR_EVT_FOREGROUND, unused);
 }
 
-static void background(void) {
+static void background(void *unused_data) {
 	kr_evt_data_t unused;
 	memset(&unused, 0, sizeof(kr_evt_data_t));
 	notify(KR_EVT_BACKGROUND, unused);
 }
 
-static void pause(void) {
+static void pause(void *unused_data) {
 	kr_evt_data_t unused;
 	memset(&unused, 0, sizeof(kr_evt_data_t));
 	notify(KR_EVT_PAUSE, unused);
 }
 
-static void resume(void) {
+static void resume(void *unused_data) {
 	kr_evt_data_t unused;
 	memset(&unused, 0, sizeof(kr_evt_data_t));
 	notify(KR_EVT_RESUME, unused);
 }
 
-static void shutdown(void) {
+static void shutdown(void *unused_data) {
 	kr_evt_data_t unused;
 	memset(&unused, 0, sizeof(kr_evt_data_t));
 	notify(KR_EVT_SHUTDOWN, unused);
 }
 
 void kr_evt_init(void) {
-	kinc_keyboard_set_key_up_callback(key_up);
-	kinc_keyboard_set_key_down_callback(key_down);
-	kinc_keyboard_set_key_press_callback(key_press);
+	kinc_keyboard_set_key_up_callback(key_up, NULL);
+	kinc_keyboard_set_key_down_callback(key_down, NULL);
+	kinc_keyboard_set_key_press_callback(key_press, NULL);
 
 #if defined(KORE_IOS) || defined(KORE_ANDROID)
 	kinc_surface_set_touch_start_callback(touch_start);
 	kinc_surface_set_touch_end_callback(touch_end);
 	kinc_surface_set_move_callback(finger_move);
 #else
-	kinc_mouse_set_press_callback(mouse_press);
-	kinc_mouse_set_release_callback(mouse_release);
-	kinc_mouse_set_scroll_callback(mouse_scroll);
-	kinc_mouse_set_move_callback(mouse_move);
+	kinc_mouse_set_press_callback(mouse_press, NULL);
+	kinc_mouse_set_release_callback(mouse_release, NULL);
+	kinc_mouse_set_scroll_callback(mouse_scroll, NULL);
+	kinc_mouse_set_move_callback(mouse_move, NULL);
 #endif
-	kinc_set_foreground_callback(foreground);
-	kinc_set_background_callback(background);
-	kinc_set_pause_callback(pause);
-	kinc_set_resume_callback(resume);
-	kinc_set_shutdown_callback(shutdown);
+	kinc_set_foreground_callback(foreground, NULL);
+	kinc_set_background_callback(background, NULL);
+	kinc_set_pause_callback(pause, NULL);
+	kinc_set_resume_callback(resume, NULL);
+	kinc_set_shutdown_callback(shutdown, NULL);
 
 	for (int i = 0; i < KR_EVT_MAX_OBSERVER; ++i) {
 		observers[i] = NULL;
