@@ -4,6 +4,7 @@
 #include <kinc/system.h>
 #include <stddef.h>
 #include <stdint.h>
+#include <stdlib.h>
 #include <string.h>
 #if defined(KORE_IOS) || defined(KORE_ANDROID)
 #include <kinc/input/surface.h>
@@ -166,6 +167,13 @@ static void shutdown(void *unused_data) {
 	notify(KR_EVT_SHUTDOWN, unused);
 }
 
+static void drop_files(wchar_t *file, void *udata) {
+	kr_evt_data_t data;
+	memset(&data, 0, sizeof(kr_evt_data_t));
+	size_t len = wcstombs(data.drop.filename, file, sizeof(data.drop.filename));
+	notify(KR_EVT_DROP_FILE, data);
+}
+
 void kr_evt_init(void) {
 	kinc_keyboard_set_key_up_callback(key_up, NULL);
 	kinc_keyboard_set_key_down_callback(key_down, NULL);
@@ -180,6 +188,7 @@ void kr_evt_init(void) {
 	kinc_mouse_set_release_callback(mouse_release, NULL);
 	kinc_mouse_set_scroll_callback(mouse_scroll, NULL);
 	kinc_mouse_set_move_callback(mouse_move, NULL);
+	kinc_set_drop_files_callback(drop_files, NULL);
 #endif
 	kinc_set_foreground_callback(foreground, NULL);
 	kinc_set_background_callback(background, NULL);
