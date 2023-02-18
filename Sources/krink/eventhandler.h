@@ -31,7 +31,8 @@ typedef enum kr_evt_event_type {
 	KR_EVT_PAUSE,
 	KR_EVT_RESUME,
 	KR_EVT_SHUTDOWN,
-	KR_EVT_WINDOW_SIZE_CHANGE
+	KR_EVT_WINDOW_SIZE_CHANGE,
+	KR_EVT_DROP_FILE
 } kr_evt_event_type_t;
 
 typedef struct kr_evt_key_event {
@@ -66,6 +67,10 @@ typedef struct kr_evt_window_size_change_event {
 	int window, width, height;
 } kr_evt_window_size_change_event_t;
 
+typedef struct kr_evt_dropfiles_event_t {
+	char filename[260];
+} kr_evt_dropfiles_event_t;
+
 typedef union kr_evt_data {
 	kr_evt_key_event_t key;
 	kr_evt_key_event_press_t key_press;
@@ -75,6 +80,7 @@ typedef union kr_evt_data {
 	kr_evt_finger_touch_event_t touch;
 	kr_evt_primary_event_t primary;
 	kr_evt_window_size_change_event_t window;
+	kr_evt_dropfiles_event_t drop;
 } kr_evt_data_t;
 
 typedef struct kr_evt_event {
