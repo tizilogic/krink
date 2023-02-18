@@ -4,6 +4,7 @@
 #include <kinc/system.h>
 #include <stddef.h>
 #include <stdint.h>
+#include <stdlib.h>
 #include <string.h>
 #if defined(KORE_IOS) || defined(KORE_ANDROID)
 #include <kinc/input/surface.h>
