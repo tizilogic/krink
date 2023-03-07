@@ -343,7 +343,16 @@ void kr_g2_scissor(float x, float y, float w, float h) {
 	kr_tsp_end();
 	kr_csp_end();
 	kr_sdf_end();
-	kinc_g4_scissor((int)(x + 0.5f), (int)(y + 0.5f), (int)(w + 0.5f), (int)(h + 0.5f));
+    int xi = (int)(x + 0.5f);
+    int yi = (int)(y + 0.5f);
+    int wi = (int)(w + 0.5f);
+    int hi = (int)(h + 0.5f);
+#ifdef KINC_METAL
+	// Crude metal fix! TODO: Improve bound check
+    if (xi + wi > g2_last_width) wi = g2_last_width - xi;
+    if (yi + hi > g2_last_height) hi = g2_last_height - yi;
+#endif
+	kinc_g4_scissor(xi, yi, wi, hi);
 }
 
 void kr_g2_disable_scissor(void) {
