@@ -78,8 +78,8 @@ void kr_csp_init(void) {
 
 	kinc_g4_index_buffer_init(&rect_index_buffer, KR_G2_CSP_BUFFER_SIZE * 3 * 2,
 	                          KINC_G4_INDEX_BUFFER_FORMAT_32BIT, KINC_G4_USAGE_STATIC);
-	int *indices = kinc_g4_index_buffer_lock(&rect_index_buffer);
-	for (int i = 0; i < KR_G2_CSP_BUFFER_SIZE; ++i) {
+	uint32_t *indices = (uint32_t *)kinc_g4_index_buffer_lock_all(&rect_index_buffer);
+	for (uint32_t i = 0; i < KR_G2_CSP_BUFFER_SIZE; ++i) {
 		indices[i * 3 * 2 + 0] = i * 4 + 0;
 		indices[i * 3 * 2 + 1] = i * 4 + 1;
 		indices[i * 3 * 2 + 2] = i * 4 + 2;
@@ -87,7 +87,7 @@ void kr_csp_init(void) {
 		indices[i * 3 * 2 + 4] = i * 4 + 2;
 		indices[i * 3 * 2 + 5] = i * 4 + 3;
 	}
-	kinc_g4_index_buffer_unlock(&rect_index_buffer);
+	kinc_g4_index_buffer_unlock_all(&rect_index_buffer);
 
 	kinc_g4_vertex_buffer_init(&tris_vertex_buffer, KR_G2_CSP_BUFFER_SIZE * 3, &structure,
 	                           KINC_G4_USAGE_DYNAMIC, 0);
@@ -95,13 +95,13 @@ void kr_csp_init(void) {
 
 	kinc_g4_index_buffer_init(&tris_index_buffer, KR_G2_CSP_BUFFER_SIZE * 3,
 	                          KINC_G4_INDEX_BUFFER_FORMAT_32BIT, KINC_G4_USAGE_STATIC);
-	indices = kinc_g4_index_buffer_lock(&tris_index_buffer);
-	for (int i = 0; i < KR_G2_CSP_BUFFER_SIZE; ++i) {
+	indices = (uint32_t *)kinc_g4_index_buffer_lock_all(&tris_index_buffer);
+	for (uint32_t i = 0; i < KR_G2_CSP_BUFFER_SIZE; ++i) {
 		indices[i * 3 + 0] = i * 3 + 0;
 		indices[i * 3 + 1] = i * 3 + 1;
 		indices[i * 3 + 2] = i * 3 + 2;
 	}
-	kinc_g4_index_buffer_unlock(&tris_index_buffer);
+	kinc_g4_index_buffer_unlock_all(&tris_index_buffer);
 }
 
 // Rect Impl

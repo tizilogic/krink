@@ -6,8 +6,8 @@
 #include <kinc/graphics4/shader.h>
 #include <kinc/graphics4/vertexbuffer.h>
 #include <kinc/graphics4/vertexstructure.h>
-#include <kinc/math/core.h>
 #include <kinc/io/filereader.h>
+#include <kinc/math/core.h>
 #include <krink/color.h>
 #include <krink/math/matrix.h>
 #include <krink/math/vector.h>
@@ -48,7 +48,6 @@ static void sdf_line_end(void);
 static void sdf_rect_draw_buffer(bool end);
 static void sdf_circle_draw_buffer(bool end);
 static void sdf_line_draw_buffer(bool end);
-
 
 static void build_rect_pipeline(void) {
 	{
@@ -103,8 +102,8 @@ static void build_rect_pipeline(void) {
 
 	kinc_g4_index_buffer_init(&rect_index_buffer, KR_G2_SDF_BUFFER_SIZE * 3 * 2,
 	                          KINC_G4_INDEX_BUFFER_FORMAT_32BIT, KINC_G4_USAGE_STATIC);
-	int *indices = kinc_g4_index_buffer_lock(&rect_index_buffer);
-	for (int i = 0; i < KR_G2_SDF_BUFFER_SIZE; ++i) {
+	uint32_t *indices = (uint32_t *)kinc_g4_index_buffer_lock_all(&rect_index_buffer);
+	for (uint32_t i = 0; i < KR_G2_SDF_BUFFER_SIZE; ++i) {
 		indices[i * 3 * 2 + 0] = i * 4 + 0;
 		indices[i * 3 * 2 + 1] = i * 4 + 1;
 		indices[i * 3 * 2 + 2] = i * 4 + 2;
@@ -112,7 +111,7 @@ static void build_rect_pipeline(void) {
 		indices[i * 3 * 2 + 4] = i * 4 + 2;
 		indices[i * 3 * 2 + 5] = i * 4 + 3;
 	}
-	kinc_g4_index_buffer_unlock(&rect_index_buffer);
+	kinc_g4_index_buffer_unlock_all(&rect_index_buffer);
 }
 
 static void build_circle_pipeline(void) {
@@ -167,8 +166,8 @@ static void build_circle_pipeline(void) {
 
 	kinc_g4_index_buffer_init(&circle_index_buffer, KR_G2_SDF_BUFFER_SIZE * 3 * 2,
 	                          KINC_G4_INDEX_BUFFER_FORMAT_32BIT, KINC_G4_USAGE_STATIC);
-	int *indices = kinc_g4_index_buffer_lock(&circle_index_buffer);
-	for (int i = 0; i < KR_G2_SDF_BUFFER_SIZE; ++i) {
+	uint32_t *indices = (uint32_t *)kinc_g4_index_buffer_lock_all(&circle_index_buffer);
+	for (uint32_t i = 0; i < KR_G2_SDF_BUFFER_SIZE; ++i) {
 		indices[i * 3 * 2 + 0] = i * 4 + 0;
 		indices[i * 3 * 2 + 1] = i * 4 + 1;
 		indices[i * 3 * 2 + 2] = i * 4 + 2;
@@ -176,7 +175,7 @@ static void build_circle_pipeline(void) {
 		indices[i * 3 * 2 + 4] = i * 4 + 2;
 		indices[i * 3 * 2 + 5] = i * 4 + 3;
 	}
-	kinc_g4_index_buffer_unlock(&circle_index_buffer);
+	kinc_g4_index_buffer_unlock_all(&circle_index_buffer);
 }
 
 static void build_line_pipeline(void) {
@@ -229,8 +228,8 @@ static void build_line_pipeline(void) {
 
 	kinc_g4_index_buffer_init(&line_index_buffer, KR_G2_SDF_BUFFER_SIZE * 3 * 2,
 	                          KINC_G4_INDEX_BUFFER_FORMAT_32BIT, KINC_G4_USAGE_STATIC);
-	int *indices = kinc_g4_index_buffer_lock(&line_index_buffer);
-	for (int i = 0; i < KR_G2_SDF_BUFFER_SIZE; ++i) {
+	uint32_t *indices = (uint32_t *)kinc_g4_index_buffer_lock_all(&line_index_buffer);
+	for (uint32_t i = 0; i < KR_G2_SDF_BUFFER_SIZE; ++i) {
 		indices[i * 3 * 2 + 0] = i * 4 + 0;
 		indices[i * 3 * 2 + 1] = i * 4 + 1;
 		indices[i * 3 * 2 + 2] = i * 4 + 2;
@@ -238,7 +237,7 @@ static void build_line_pipeline(void) {
 		indices[i * 3 * 2 + 4] = i * 4 + 2;
 		indices[i * 3 * 2 + 5] = i * 4 + 3;
 	}
-	kinc_g4_index_buffer_unlock(&line_index_buffer);
+	kinc_g4_index_buffer_unlock_all(&line_index_buffer);
 }
 
 void kr_sdf_init(void) {

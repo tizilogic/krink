@@ -83,8 +83,8 @@ void kr_isp_init(void) {
 
 	kinc_g4_index_buffer_init(&index_buffer, KR_G2_ISP_BUFFER_SIZE * 3 * 2,
 	                          KINC_G4_INDEX_BUFFER_FORMAT_32BIT, KINC_G4_USAGE_STATIC);
-	int *indices = kinc_g4_index_buffer_lock(&index_buffer);
-	for (int i = 0; i < KR_G2_ISP_BUFFER_SIZE; ++i) {
+	uint32_t *indices = (uint32_t *)kinc_g4_index_buffer_lock_all(&index_buffer);
+	for (uint32_t i = 0; i < KR_G2_ISP_BUFFER_SIZE; ++i) {
 		indices[i * 3 * 2 + 0] = i * 4 + 0;
 		indices[i * 3 * 2 + 1] = i * 4 + 1;
 		indices[i * 3 * 2 + 2] = i * 4 + 2;
@@ -92,7 +92,7 @@ void kr_isp_init(void) {
 		indices[i * 3 * 2 + 4] = i * 4 + 2;
 		indices[i * 3 * 2 + 5] = i * 4 + 3;
 	}
-	kinc_g4_index_buffer_unlock(&index_buffer);
+	kinc_g4_index_buffer_unlock_all(&index_buffer);
 }
 
 void kr_isp_set_rect_verts(float btlx, float btly, float tplx, float tply, float tprx, float tpry,
