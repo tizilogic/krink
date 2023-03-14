@@ -11,6 +11,10 @@
 #define KR_EVT_MAX_OBSERVER 32
 #endif
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /// Event type passed to observers
 typedef enum kr_evt_event_type {
 	KR_EVT_KEY_DOWN,
@@ -116,3 +120,7 @@ void kr_evt_add_observer(void (*value)(kr_evt_event_t));
 void kr_evt_remove_observer(void (*value)(kr_evt_event_t));
 
 void kr_evt_internal_trigger_ext_evt(kr_evt_event_type_t event, kr_evt_data_t data);
+
+#ifdef __cplusplus
+}
+#endif

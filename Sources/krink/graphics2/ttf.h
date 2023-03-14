@@ -6,6 +6,10 @@
     \brief Provides a basic TrueType Font handling.
 */
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef struct kr_ttf_image kr_ttf_image_t;
 
 typedef struct kr_ttf_aligned_quad {
@@ -142,3 +146,7 @@ int kr_ttf_get_first_unused_y(kr_ttf_font_t *font, int size);
 /// </summary>
 /// <param name="font">Pointer to your font object</param>
 void kr_ttf_font_destroy(kr_ttf_font_t *font);
+
+#ifdef __cplusplus
+}
+#endif

@@ -10,6 +10,10 @@
 
 #define KR_TWEEN_DEFAULT_OVERSHOOT 1.70158f
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /// Available ease functions.
 typedef enum kr_tween_ease {
 	KR_EASE_LINEAR = 0,
@@ -53,3 +57,7 @@ typedef enum kr_tween_ease {
 /// <param name="k">Linear input in range 0..1</param>
 /// <returns>The evaluated function value</returns>
 float kr_tween(kr_tween_ease_t ease, float k);
+
+#ifdef __cplusplus
+}
+#endif

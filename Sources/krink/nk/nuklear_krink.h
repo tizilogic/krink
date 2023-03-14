@@ -21,6 +21,10 @@
 #define KR_NK_MAX_CHARACTERS 512
 #endif
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /// <summary>
 /// Call before using Nuklear.
 /// </summary>
@@ -41,3 +45,7 @@ struct nk_context *kr_nk_get_ctx(void);
 /// <param name="window">The framebuffer to render to</param>
 /// <param name="clear">Color to clear</param>
 NK_API void kr_nk_render(int window, struct nk_color clear);
+
+#ifdef __cplusplus
+}
+#endif

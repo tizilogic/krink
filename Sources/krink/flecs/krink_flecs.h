@@ -20,6 +20,10 @@
 #define KR_FLECS_EVT_BUFFER_SIZE 1024
 #endif
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef struct kr_rect {
 	float x, y, w, h;
 } kr_rect_t;
@@ -311,3 +315,7 @@ void kr_flecs_create_animation(ecs_world_t *world, ecs_entity_t e, const kr_init
 /// <param name="sequence">Initializer</param>
 void kr_flecs_create_sequence(ecs_world_t *world, ecs_entity_t e,
                               const kr_init_sequence_t *sequence, const KrCallback *callback);
+
+#ifdef __cplusplus
+}
+#endif

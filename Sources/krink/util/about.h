@@ -6,6 +6,10 @@
     \brief Provides license text from 3rd party code used in krink.
 */
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef enum kr_3rd_party_license {
     KR_3RD_PARTY_KINC = 0,
     KR_3RD_PARTY_FLECS,
@@ -183,3 +187,7 @@ static inline char *kr_get_all_licenses(const char *sep) {
     }
     return all_licenses;
 }
+
+#ifdef __cplusplus
+}
+#endif

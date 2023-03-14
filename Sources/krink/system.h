@@ -7,6 +7,10 @@
    else.
 */
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /// <summary>
 /// Needs to be called before using krink. Sets up memory management and font rendering. If `glyphs`
 /// is not `NULL` the content of it will be copied to an internal buffer.
@@ -23,3 +27,7 @@ void kr_init(void *memblk, size_t size, int *glyphs, int num_glyphs);
 /// Needs to be called after using krink.
 /// </summary>
 void kr_destroy(void);
+
+#ifdef __cplusplus
+}
+#endif

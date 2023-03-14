@@ -9,6 +9,10 @@
     \brief Functionality for creating and loading images. See Kinc docs for underlying capabilities.
 */
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef struct kr_image {
 	kinc_g4_texture_t *tex;
 	kinc_image_t *image;
@@ -63,3 +67,7 @@ void kr_image_generate_mipmaps(kr_image_t *img, int levels);
 /// </summary>
 /// <param name="img"></param>
 void kr_image_destroy(kr_image_t *img);
+
+#ifdef __cplusplus
+}
+#endif

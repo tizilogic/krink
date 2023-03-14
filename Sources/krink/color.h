@@ -5,6 +5,10 @@
     \brief Provides color operations.
 */
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /// <summary>
 /// Extract the value of a channel from a given color.
 /// </summary>
@@ -41,3 +45,7 @@ uint32_t kr_color_from_rgbai(uint8_t r, uint8_t g, uint8_t b, uint8_t a);
 /// <param name="a"></param>
 /// <returns>The color in `uint32_t` format</returns>
 uint32_t kr_color_from_rgbaf_normalized(float r, float g, float b, float a);
+
+#ifdef __cplusplus
+}
+#endif

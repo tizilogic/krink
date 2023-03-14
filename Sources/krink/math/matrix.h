@@ -7,6 +7,10 @@
     \brief Provides basic matrix operations.
 */
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef struct kr_matrix3x3 {
 	float m00, m10, m20, m01, m11, m21, m02, m12, m22;
 } kr_matrix3x3_t;
@@ -62,3 +66,7 @@ float kr_matrix4x4_cofactor(float m0, float m1, float m2, float m3, float m4, fl
 float kr_matrix4x4_determinant(kr_matrix4x4_t *m);
 kr_matrix4x4_t kr_matrix4x4_inverse(kr_matrix4x4_t *m);
 kinc_matrix4x4_t kr_matrix4x4_to_kinc(kr_matrix4x4_t *m);
+
+#ifdef __cplusplus
+}
+#endif

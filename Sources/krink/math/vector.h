@@ -4,6 +4,10 @@
     \brief Provides basic vector operations.
 */
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef struct kr_vec2 {
 	float x;
 	float y;
@@ -58,3 +62,7 @@ kr_vec4_t kr_vec4_normalized(kr_vec4_t v);
 // TODO: implement if needed
 // float kr_vec4_dot(kr_vec4_t vlh, kr_vec4_t vrh);
 // kr_vec4_t kr_vec4_cross(kr_vec4_t vlh, kr_vec4_t vrh);
+
+#ifdef __cplusplus
+}
+#endif
