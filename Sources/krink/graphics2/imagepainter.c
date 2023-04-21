@@ -14,6 +14,9 @@
 #include <krink/math/vector.h>
 #include <krink/memory.h>
 
+#include <assert.h>
+#include <stdbool.h>
+
 static kinc_g4_vertex_buffer_t vertex_buffer;
 static kinc_g4_index_buffer_t index_buffer;
 static kinc_g4_shader_t vert_shader;
@@ -26,6 +29,7 @@ static kinc_matrix4x4_t projection_matrix;
 static float *rect_verts = NULL;
 static int buffer_index = 0;
 static int buffer_start = 0;
+static bool isp_initialized = false;
 
 static bool bilinear_filter = false;
 
@@ -36,6 +40,7 @@ static int font_size = 0;
 #endif
 
 void kr_isp_init(void) {
+	assert(!isp_initialized);
 	{
 		kinc_file_reader_t reader;
 		kinc_file_reader_open(&reader, "kr-painter-image.vert", KINC_FILE_TYPE_ASSET);
@@ -93,6 +98,17 @@ void kr_isp_init(void) {
 		indices[i * 3 * 2 + 5] = i * 4 + 3;
 	}
 	kinc_g4_index_buffer_unlock_all(&index_buffer);
+	isp_initialized = true;
+}
+
+void kr_isp_destroy(void) {
+	assert(isp_initialized);
+	kinc_g4_index_buffer_destroy(&index_buffer);
+	kinc_g4_vertex_buffer_destroy(&vertex_buffer);
+	kinc_g4_pipeline_destroy(&pipeline);
+	kinc_g4_shader_destroy(&vert_shader);
+	kinc_g4_shader_destroy(&frag_shader);
+	isp_initialized = false;
 }
 
 void kr_isp_set_rect_verts(float btlx, float btly, float tplx, float tply, float tprx, float tpry,

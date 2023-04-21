@@ -13,6 +13,9 @@
 #include <krink/math/vector.h>
 #include <krink/memory.h>
 
+#include <assert.h>
+#include <stdbool.h>
+
 static kinc_g4_vertex_buffer_t rect_vertex_buffer;
 static kinc_g4_index_buffer_t rect_index_buffer;
 static kinc_g4_vertex_buffer_t circle_vertex_buffer;
@@ -41,6 +44,7 @@ static int circle_buffer_index = 0;
 static int circle_buffer_start = 0;
 static int line_buffer_index = 0;
 static int line_buffer_start = 0;
+static bool sdf_initialized = false;
 
 static void sdf_rect_end(void);
 static void sdf_circle_end(void);
@@ -241,9 +245,33 @@ static void build_line_pipeline(void) {
 }
 
 void kr_sdf_init(void) {
+	assert(!sdf_initialized);
 	build_rect_pipeline();
 	build_circle_pipeline();
 	build_line_pipeline();
+	sdf_initialized = true;
+}
+
+void kr_sdf_destroy(void) {
+	assert(sdf_initialized);
+	kinc_g4_index_buffer_destroy(&rect_index_buffer);
+	kinc_g4_vertex_buffer_destroy(&rect_vertex_buffer);
+	kinc_g4_pipeline_destroy(&rect_pipeline);
+	kinc_g4_shader_destroy(&rect_vert_shader);
+	kinc_g4_shader_destroy(&rect_frag_shader);
+
+	kinc_g4_index_buffer_destroy(&circle_index_buffer);
+	kinc_g4_vertex_buffer_destroy(&circle_vertex_buffer);
+	kinc_g4_pipeline_destroy(&circle_pipeline);
+	kinc_g4_shader_destroy(&circle_vert_shader);
+	kinc_g4_shader_destroy(&circle_frag_shader);
+
+	kinc_g4_index_buffer_destroy(&line_index_buffer);
+	kinc_g4_vertex_buffer_destroy(&line_vertex_buffer);
+	kinc_g4_pipeline_destroy(&line_pipeline);
+	kinc_g4_shader_destroy(&line_vert_shader);
+	kinc_g4_shader_destroy(&line_frag_shader);
+	sdf_initialized = false;
 }
 
 // SDF Rect Impl

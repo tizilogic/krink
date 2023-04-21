@@ -35,13 +35,13 @@ static int g2_last_width = -1;
 static int g2_last_height = -1;
 
 void kr_g2_init(void) {
-	if (!g2_painters_initialized) {
-		kr_isp_init();
-		kr_csp_init();
-		kr_tsp_init();
-		kr_sdf_init();
-		g2_transformation = kr_matrix3x3_identity();
-	}
+	assert(!g2_painters_initialized);
+	kr_isp_init();
+	kr_csp_init();
+	kr_tsp_init();
+	kr_sdf_init();
+	g2_transformation = kr_matrix3x3_identity();
+	g2_painters_initialized = true;
 }
 
 static inline void internal_set_projection_matrix(int iwidth, int iheight) {
@@ -83,11 +83,16 @@ static void internal_update_projection_matrix(int window) {
 }
 
 void kr_g2_destroy(void) {
-	// Maybe not needed?
+	assert(g2_painters_initialized);
+	kr_isp_destroy();
+	kr_csp_destroy();
+	kr_tsp_destroy();
+	kr_sdf_destroy();
+	g2_painters_initialized = false;
 }
 
 void kr_g2_begin(int window) {
-	assert(!begin && g2_active_window == -1);
+	assert(!begin && g2_active_window == -1 && g2_painters_initialized);
 	g2_active_window = window;
 	internal_update_projection_matrix(window);
 	begin = true;
@@ -343,14 +348,14 @@ void kr_g2_scissor(float x, float y, float w, float h) {
 	kr_tsp_end();
 	kr_csp_end();
 	kr_sdf_end();
-    int xi = (int)(x + 0.5f);
-    int yi = (int)(y + 0.5f);
-    int wi = (int)(w + 0.5f);
-    int hi = (int)(h + 0.5f);
+	int xi = (int)(x + 0.5f);
+	int yi = (int)(y + 0.5f);
+	int wi = (int)(w + 0.5f);
+	int hi = (int)(h + 0.5f);
 #ifdef KINC_METAL
 	// Crude metal fix! TODO: Improve bound check
-    if (xi + wi > g2_last_width) wi = g2_last_width - xi;
-    if (yi + hi > g2_last_height) hi = g2_last_height - yi;
+	if (xi + wi > g2_last_width) wi = g2_last_width - xi;
+	if (yi + hi > g2_last_height) hi = g2_last_height - yi;
 #endif
 	kinc_g4_scissor(xi, yi, wi, hi);
 }

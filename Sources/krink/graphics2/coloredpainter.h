@@ -12,6 +12,7 @@ extern "C" {
 #endif
 
 void kr_csp_init(void);
+void kr_csp_destroy(void);
 void kr_csp_set_projection_matrix(kinc_matrix4x4_t mat);
 void kr_csp_fill_rect(float x, float y, float width, float height, uint32_t color, float opacity,
                       kr_matrix3x3_t transformation);

@@ -14,6 +14,7 @@ extern "C" {
 #endif
 
 void kr_isp_init(void);
+void kr_isp_destroy(void);
 void kr_isp_set_bilinear_filter(bool bilinear);
 void kr_isp_set_projection_matrix(kinc_matrix4x4_t mat);
 void kr_isp_draw_scaled_sub_image(kr_image_t *img, float sx, float sy, float sw, float sh, float dx,

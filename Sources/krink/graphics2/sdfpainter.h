@@ -18,6 +18,7 @@ typedef struct kr_sdf_corner_radius {
 } kr_sdf_corner_radius_t;
 
 void kr_sdf_init(void);
+void kr_sdf_destroy(void);
 void kr_sdf_set_projection_matrix(kinc_matrix4x4_t mat);
 void kr_sdf_draw_rect(float x, float y, float width, float height, kr_sdf_corner_radius_t corner,
                       float border, float smooth, uint32_t color, uint32_t border_color,

@@ -15,6 +15,7 @@ extern "C" {
 #endif
 
 void kr_tsp_init(void);
+void kr_tsp_destroy(void);
 void kr_tsp_draw_buffer(bool end);
 void kr_tsp_set_bilinear_filter(bool bilinear);
 void kr_tsp_set_projection_matrix(kinc_matrix4x4_t mat);

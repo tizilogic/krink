@@ -1,4 +1,5 @@
 #include "coloredpainter.h"
+#include <assert.h>
 #include <kinc/graphics4/graphics.h>
 #include <kinc/graphics4/indexbuffer.h>
 #include <kinc/graphics4/pipeline.h>
@@ -28,11 +29,13 @@ static int rect_buffer_index = 0;
 static int rect_buffer_start = 0;
 static int tris_buffer_index = 0;
 static int tris_buffer_start = 0;
+static bool csp_initialized = false;
 
 static void csp_rect_end(bool tris_done);
 static void csp_tris_end(bool rects_done);
 
 void kr_csp_init(void) {
+	assert(!csp_initialized);
 	{
 		kinc_file_reader_t reader;
 		kinc_file_reader_open(&reader, "kr-painter-colored.vert", KINC_FILE_TYPE_ASSET);
@@ -102,6 +105,19 @@ void kr_csp_init(void) {
 		indices[i * 3 + 2] = i * 3 + 2;
 	}
 	kinc_g4_index_buffer_unlock_all(&tris_index_buffer);
+	csp_initialized = true;
+}
+
+void kr_csp_destroy(void) {
+	assert(csp_initialized);
+	kinc_g4_index_buffer_destroy(&tris_index_buffer);
+	kinc_g4_index_buffer_destroy(&rect_index_buffer);
+	kinc_g4_vertex_buffer_destroy(&tris_vertex_buffer);
+	kinc_g4_vertex_buffer_destroy(&rect_vertex_buffer);
+	kinc_g4_pipeline_destroy(&pipeline);
+	kinc_g4_shader_destroy(&vert_shader);
+	kinc_g4_shader_destroy(&frag_shader);
+	csp_initialized = false;
 }
 
 // Rect Impl

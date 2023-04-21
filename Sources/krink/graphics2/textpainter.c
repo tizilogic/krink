@@ -1,7 +1,6 @@
 #ifndef KR_FULL_RGBA_FONTS
 #include "textpainter.h"
 
-#include <assert.h>
 #include <kinc/graphics4/graphics.h>
 #include <kinc/graphics4/indexbuffer.h>
 #include <kinc/graphics4/pipeline.h>
@@ -16,6 +15,9 @@
 #include <krink/math/vector.h>
 #include <krink/memory.h>
 
+#include <assert.h>
+#include <stdbool.h>
+
 static kinc_g4_vertex_buffer_t vertex_buffer;
 static kinc_g4_index_buffer_t index_buffer;
 static kinc_g4_shader_t vert_shader;
@@ -28,12 +30,14 @@ static kinc_matrix4x4_t projection_matrix;
 static float *rect_verts = NULL;
 static int buffer_index = 0;
 static int buffer_start = 0;
+static bool tsp_initialized = false;
 
 static kr_ttf_font_t *active_font = NULL;
 static bool bilinear_filter = false;
 static int font_size = 0;
 
 void kr_tsp_init(void) {
+	assert(!tsp_initialized);
 	{
 		kinc_file_reader_t reader;
 		kinc_file_reader_open(&reader, "kr-painter-text.vert", KINC_FILE_TYPE_ASSET);
@@ -91,6 +95,17 @@ void kr_tsp_init(void) {
 		indices[i * 3 * 2 + 5] = i * 4 + 3;
 	}
 	kinc_g4_index_buffer_unlock_all(&index_buffer);
+	tsp_initialized = true;
+}
+
+void kr_tsp_destroy(void) {
+	assert(tsp_initialized);
+	kinc_g4_index_buffer_destroy(&index_buffer);
+	kinc_g4_vertex_buffer_destroy(&vertex_buffer);
+	kinc_g4_pipeline_destroy(&pipeline);
+	kinc_g4_shader_destroy(&vert_shader);
+	kinc_g4_shader_destroy(&frag_shader);
+	tsp_initialized = false;
 }
 
 void kr_tsp_set_rect_verts(float btlx, float btly, float tplx, float tply, float tprx, float tpry,
