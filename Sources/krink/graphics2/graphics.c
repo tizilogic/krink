@@ -84,6 +84,7 @@ static void internal_update_projection_matrix(int window) {
 
 void kr_g2_destroy(void) {
 	assert(g2_painters_initialized);
+	kinc_g4_flush();
 	kr_isp_destroy();
 	kr_csp_destroy();
 	kr_tsp_destroy();
