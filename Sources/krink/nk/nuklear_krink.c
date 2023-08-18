@@ -1,5 +1,6 @@
 #include "nuklear_krink.h"
 #include <assert.h>
+#include <math.h>
 #include <kinc/input/keyboard.h>
 #include <krink/eventhandler.h>
 #include <krink/memory.h>
