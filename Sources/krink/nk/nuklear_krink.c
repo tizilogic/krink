@@ -218,7 +218,16 @@ NK_API void kr_nk_render(int window, struct nk_color clear) {
 			                            (float)(i->img.region[2]), (float)(i->img.region[3]),
 			                            (float)i->x, (float)i->y, (float)i->w, (float)i->h);
 		} break;
-		case NK_COMMAND_CURVE:
+		case NK_COMMAND_CURVE:{
+			const struct nk_command_curve *c = (const struct nk_command_curve *)cmd;
+			kr_g2_set_color(nk_color_to_uint(c->color));
+			double px = 0.0;double py = 0.0;double u = 0.0;
+			for(u = 0.0 ; u <= 1.0 ; u += 0.0001){
+				px = pow(1-u,3)*c->begin.x+3*u*pow(1-u,2)*c->ctrl[0].x+3*pow(u,2)*(1-u)*c->ctrl[1].x+pow(u,3)*c->end.x;
+				py = pow(1-u,3)*c->begin.y+3*u*pow(1-u,2)*c->ctrl[0].y+3*pow(u,2)*(1-u)*c->ctrl[1].y+pow(u,3)*c->end.y;
+				kr_g2_fill_rect(px,py,c->line_thickness,c->line_thickness);
+			}
+		}break;
 		case NK_COMMAND_POLYGON:
 		case NK_COMMAND_POLYGON_FILLED:
 		case NK_COMMAND_POLYLINE:
