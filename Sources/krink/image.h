@@ -1,5 +1,6 @@
 #pragma once
 
+#include <kinc/graphics4/rendertarget.h>
 #include <kinc/graphics4/texture.h>
 #include <kinc/image.h>
 #include <stdbool.h>
@@ -13,11 +14,17 @@
 extern "C" {
 #endif
 
+typedef enum kr_image_tex_type {
+	KR_IMAGE_TEX_TYPE_TEXTURE,
+	KR_IMAGE_TEX_TYPE_RENDERTARGET,
+} kr_image_tex_type_t;
+
 typedef struct kr_image {
-	kinc_g4_texture_t *tex;
+	void *tex;
 	kinc_image_t *image;
 	float real_width, real_height;
 	const char *path;
+	kr_image_tex_type_t type;
 	bool in_memory, loaded, owns_tex;
 } kr_image_t;
 
@@ -54,6 +61,18 @@ void kr_image_load(kr_image_t *img, const char *path, bool keep_in_memory);
 /// tex</param>
 void kr_image_from_texture(kr_image_t *img, kinc_g4_texture_t *tex, float real_width,
                            float real_height);
+
+/// <summary>
+/// Initialize an image from a render target.
+/// </summary>
+/// <param name="img"></param>
+/// <param name="rendertarget"></param>
+/// <param name="real_width">Either provide real width or set to 0 to use the information stored in
+/// rendertarget</param>
+/// <param name="real_height">Either provide real width or set to 0 to use the information stored in
+/// rendertarget</param>
+void kr_image_from_rendertarget(kr_image_t *img, kinc_g4_render_target_t *rendertarget,
+                                float real_width, float real_height);
 
 /// <summary>
 /// Generate mipmaps for a loaded image.

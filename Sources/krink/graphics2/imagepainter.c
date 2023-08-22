@@ -1,4 +1,6 @@
 #include "imagepainter.h"
+#include "kinc/graphics4/rendertarget.h"
+#include "krink/image.h"
 
 #include <kinc/graphics4/graphics.h>
 #include <kinc/graphics4/indexbuffer.h>
@@ -23,7 +25,8 @@ static kinc_g4_shader_t vert_shader;
 static kinc_g4_shader_t frag_shader;
 static kinc_g4_pipeline_t pipeline;
 static kinc_g4_texture_unit_t texunit;
-static kinc_g4_texture_t *last_texture = NULL;
+static void *last_texture = NULL;
+static kr_image_tex_type_t last_type = KR_IMAGE_TEX_TYPE_TEXTURE;
 static kinc_g4_constant_location_t proj_mat_loc;
 static kinc_matrix4x4_t projection_matrix;
 static float *rect_verts = NULL;
@@ -166,7 +169,10 @@ void kr_isp_draw_buffer(bool end) {
 	kinc_g4_set_matrix4(proj_mat_loc, &projection_matrix);
 	kinc_g4_set_vertex_buffer(&vertex_buffer);
 	kinc_g4_set_index_buffer(&index_buffer);
-	kinc_g4_set_texture(texunit, last_texture);
+	if (last_type == KR_IMAGE_TEX_TYPE_TEXTURE)
+		kinc_g4_set_texture(texunit, last_texture);
+	else if (last_type == KR_IMAGE_TEX_TYPE_RENDERTARGET)
+		kinc_g4_render_target_use_color_as_texture(last_texture, texunit);
 	kinc_g4_set_texture_addressing(texunit, KINC_G4_TEXTURE_ADDRESSING_CLAMP,
 	                               KINC_G4_TEXTURE_ADDRESSING_CLAMP);
 	kinc_g4_set_texture_mipmap_filter(texunit, bilinear_filter ? KINC_G4_MIPMAP_FILTER_LINEAR
@@ -203,7 +209,7 @@ void kr_isp_set_projection_matrix(kinc_matrix4x4_t mat) {
 void kr_isp_draw_scaled_sub_image(kr_image_t *img, float sx, float sy, float sw, float sh, float dx,
                                   float dy, float dw, float dh, float opacity, uint32_t color,
                                   kr_matrix3x3_t transformation) {
-	kinc_g4_texture_t *tex = img->tex;
+	void *tex = img->tex;
 	if (buffer_start + buffer_index + 1 >= KR_G2_ISP_BUFFER_SIZE ||
 	    (last_texture != NULL && tex != last_texture))
 		kr_isp_draw_buffer(false);
@@ -217,6 +223,7 @@ void kr_isp_draw_scaled_sub_image(kr_image_t *img, float sx, float sy, float sw,
 
 	++buffer_index;
 	last_texture = tex;
+	last_type = img->type;
 }
 
 #ifdef KR_FULL_RGBA_FONTS
