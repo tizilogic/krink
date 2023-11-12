@@ -15,9 +15,11 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    - name: Get krink Submodules
-      run: git submodule update --init
-    - name: Get Kinc DLC
-      run: ./Kinc/get_dlc
+    - uses: actions/setup-java@v3
+      with:
+        distribution: 'oracle'
+        java-version: '17'
+    - name: Get krink DLC
+      run: ./get_dlc
     - name: Compile
-      run: Kinc/make android -g vulkan --kinc Kinc --from Tests/Empty --noshaders --compile
+      run: Kinc/make android -g vulkan --kinc Kinc --from Tests/Empty --compile
