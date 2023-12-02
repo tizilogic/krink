@@ -173,7 +173,7 @@ void kr_isp_draw_buffer(bool end) {
 		kinc_g4_set_texture(texunit, last_texture);
 	else if (last_type == KR_IMAGE_TEX_TYPE_RENDERTARGET)
 		kinc_g4_render_target_use_color_as_texture(last_texture, texunit);
-	kinc_g4_set_texture_addressing(texunit, KINC_G4_TEXTURE_ADDRESSING_CLAMP,
+	kinc_g4_set_texture_addressing(texunit, KINC_G4_TEXTURE_DIRECTION_U,
 	                               KINC_G4_TEXTURE_ADDRESSING_CLAMP);
 	kinc_g4_set_texture_mipmap_filter(texunit, bilinear_filter ? KINC_G4_MIPMAP_FILTER_LINEAR
 	                                                           : KINC_G4_MIPMAP_FILTER_NONE);

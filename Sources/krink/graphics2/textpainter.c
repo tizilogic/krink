@@ -168,7 +168,7 @@ void kr_tsp_draw_buffer(bool end) {
 	kinc_g4_set_vertex_buffer(&vertex_buffer);
 	kinc_g4_set_index_buffer(&index_buffer);
 	kinc_g4_set_texture(texunit, last_texture);
-	kinc_g4_set_texture_addressing(texunit, KINC_G4_TEXTURE_ADDRESSING_CLAMP,
+	kinc_g4_set_texture_addressing(texunit, KINC_G4_TEXTURE_DIRECTION_U,
 	                               KINC_G4_TEXTURE_ADDRESSING_CLAMP);
 	kinc_g4_set_texture_mipmap_filter(texunit, KINC_G4_MIPMAP_FILTER_NONE);
 	kinc_g4_set_texture_minification_filter(
