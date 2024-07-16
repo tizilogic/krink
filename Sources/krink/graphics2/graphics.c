@@ -5,6 +5,7 @@
 
 #ifdef KR_FULL_RGBA_FONTS
 #define kr_tsp_init()
+#define kr_tsp_destroy()
 #define kr_tsp_set_projection_matrix(m)
 #define kr_tsp_end()
 #else
