@@ -23,14 +23,14 @@ static inline float myround(float v) {
 	return (float)((int)(v + 0.5f));
 }
 
-typedef struct kr_ttf_image {
+struct kr_ttf_image {
 	float m_size;
 	stbtt_bakedchar *chars;
 	kinc_g4_texture_t *tex;
 	int width, height, first_unused_y;
 	float baseline, descent, line_gap;
 	bool owns_tex;
-} kr_ttf_image_t;
+};
 
 void kr_ttf_load_font_blob_internal(kr_ttf_font_t *font, const char *fontpath) {
 	kinc_file_reader_t fh;
@@ -238,6 +238,7 @@ void kr_ttf_load(kr_ttf_font_t *font, int size) {
 	kinc_image_init_from_bytes(&fontimg, pixels, width, height, KR_FONT_IMAGE_FORMAT);
 	img->tex = (kinc_g4_texture_t *)kr_malloc(sizeof(kinc_g4_texture_t));
 	kinc_g4_texture_init_from_image(img->tex, &fontimg);
+	kinc_g4_texture_generate_mipmaps(img->tex, 1);
 	kinc_image_destroy(&fontimg);
 	kr_free(pixels);
 }
