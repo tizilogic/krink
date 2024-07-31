@@ -65,8 +65,9 @@ void kr_ttf_load(kr_ttf_font_t *font, int size);
 /// <param name="tex">The texture that contains the font</param>
 /// <param name="xoff">Offset of the baked font in the texture</param>
 /// <param name="yoff">Offset of the baked font in the texture</param>
+/// <param name="owns_texture">Whether the font owns the texture</param>
 void kr_ttf_load_baked_font(kr_ttf_font_t *font, kr_ttf_font_t *origin, int size,
-                            kinc_g4_texture_t *tex, float xoff, float yoff);
+                            kinc_g4_texture_t *tex, float xoff, float yoff, bool owns_texture);
 
 /// <summary>
 /// Returns the normalized font height in pixel.

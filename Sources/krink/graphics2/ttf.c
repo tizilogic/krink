@@ -244,7 +244,7 @@ void kr_ttf_load(kr_ttf_font_t *font, int size) {
 }
 
 void kr_ttf_load_baked_font(kr_ttf_font_t *font, kr_ttf_font_t *origin, int size,
-                            kinc_g4_texture_t *tex, float xoff, float yoff) {
+                            kinc_g4_texture_t *tex, float xoff, float yoff, bool owns_texture) {
 
 	if (!prepare_font_load(font, size)) return;
 
@@ -269,7 +269,7 @@ void kr_ttf_load_baked_font(kr_ttf_font_t *font, kr_ttf_font_t *origin, int size
 		}
 		img->first_unused_y = origin_img->first_unused_y + (int)(yoff + 0.5f);
 	}
-	img->owns_tex = true;
+	img->owns_tex = owns_texture;
 	img->tex = tex;
 }
 
